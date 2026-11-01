@@ -1,0 +1,204 @@
+{
+  "schema": "cuo.release-readiness.v1",
+  "assessedAt": "2026-11-01T20:44:33.102015+00:00",
+  "status": "development-preview",
+  "stableReleaseReady": false,
+  "scope": "one Linux Docker host; single Core, Agent and Identity writer; local source builds",
+  "git": {
+    "baseRevision": "28618e8d31670e9aaffdd33e9bb41c6a9aea5670",
+    "worktreeDirty": true,
+    "note": "Images built and tests performed from the recorded working tree. This is not signed build provenance or evidence for a clean release tag."
+  },
+  "sourceSha256": {
+    "Dockerfile": "5f3a86c2ced5eff6fa1c446adec8f872816daa7804fd4e730a6e2f12b54b3481",
+    "console/Dockerfile": "f268a1b78014cb674f1fbf8ceb080eb5447d1dbc54420f4bd21ecfce93e600f0",
+    "cmd/cuo/main.go": "a025669542b88b0f1fb56b6fd8aecca41828002705d6ffa5eee48c5ccd285d62",
+    "internal/backup/archive.go": "f9927405d14ca787da86106894fe64e38b6e589755b731bfdc0345a5d40afb3f",
+    "tools/backup.sh": "778695c571833c7838991b6553e8d930110bd63dd151121f1ea3fd924f94ed36",
+    "tools/restore.sh": "3d7867d00e348dd8ea8e45f0adeb4326b771dbf7b131eb815026b20edd16e615",
+    "tools/data-common.sh": "90ac8656e6841d5aceb4fea7ee664b6652deccc914547e0cd04f63470d05c37c",
+    "tools/check-images.mjs": "0b4ea887c9bb30dd16753b4072867ae4c5f3a7f5dff814c5d1b94e1354bbad0b",
+    "tools/test-restore.mjs": "187a2a5b9572e9c7530d3da074951b05eb1fa5dd356f837c446847ea1d9539bb"
+  },
+  "checks": {
+    "goRace": {
+      "result": "passed",
+      "commandOrScope": "go test -race ./..."
+    },
+    "goVet": {
+      "result": "passed",
+      "commandOrScope": "go vet ./..."
+    },
+    "goVulncheck": {
+      "result": "passed",
+      "commandOrScope": "go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./..."
+    },
+    "releaseToolTests": {
+      "result": "passed",
+      "commandOrScope": "node --test tools/test/*.test.mjs"
+    },
+    "imageRuntimeAuthTests": {
+      "result": "passed",
+      "commandOrScope": "Node --test auth, OIDC and login-mode tests inside final Alpine Console image (7 passed)"
+    },
+    "realDockerAgent": {
+      "result": "passed",
+      "commandOrScope": "CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile|TestDisposableDockerUpdate -count=1"
+    },
+    "restore": {
+      "result": "passed",
+      "commandOrScope": "node tools/test-restore.mjs"
+    },
+    "notices": {
+      "result": "passed",
+      "commandOrScope": "node tools/generate-notices.mjs --check"
+    },
+    "localBrowser": {
+      "result": "passed",
+      "commandOrScope": "Reloaded installed local demo with CUA, dashboard and help rendered; no browser errors"
+    }
+  },
+  "sourceSCA": {
+    "govulncheck": "No vulnerabilities found.",
+    "npmRuntime": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "npmSelectedBuildWorkspaces": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "images": {
+    "schema": "cuo.image-checks.v1",
+    "createdAt": "2026-11-01T20:39:02.237Z",
+    "revision": "28618e8d31670e9aaffdd33e9bb41c6a9aea5670",
+    "dirty": true,
+    "platform": "linux/x86_64",
+    "tools": {
+      "trivy": "Version: 0.76.1\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-11-01 19:08:08.720434681 +0000 UTC\n  NextUpdate: 2026-11-02 19:08:08.720434111 +0000 UTC\n  DownloadedAt: 2026-11-01 20:34:21.380638189 +0000 UTC",
+      "syft": "Application:   syft\nVersion:       1.55.0\nBuildDate:     2026-10-19T18:54:46Z\nGitCommit:     f15c3343e29dfb20cf6d82c820e7090b49808c96\nGitDescription: v1.55.0\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11"
+    },
+    "services": [
+      {
+        "service": "core",
+        "imageId": "sha256:84ace8e272450dbab087f8f616bf329ac6a27f299463d2d2d42d4160e8bec153",
+        "archiveSha256": "sha256:17566248ecef25a9680c01138fea7270d1c7828198a51eae7fb88eed56c860f3",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 838,
+        "scanSha256": "sha256:d818b1706a85b906eae026f5c35271befa671d91470c95a78921b064ab48b2dd",
+        "sbomSha256": "sha256:db82837ee4ef34e6f0cc716e7878187ec63887b477c9e2ca8dcdb9c710cc1205",
+        "archiveRetained": false
+      },
+      {
+        "service": "agent",
+        "imageId": "sha256:bb83c33766b01f189fd9034fccf4cf4d392de694979b788dca9130ea15135589",
+        "archiveSha256": "sha256:a00f5db3f3bdddfde008ae68dda4612482b253981553f1ce4727f0ffad0d0eec",
+        "passed": false,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 1,
+          "MEDIUM": 4,
+          "LOW": 0,
+          "UNKNOWN": 3
+        },
+        "sbomComponents": 1092,
+        "scanSha256": "sha256:a7c68f43d0a7de557c5fcb5ba335598cdd25c90ad98d39fe76969f685fe57ad7",
+        "sbomSha256": "sha256:3ecf4a13e8cd641b3fe94604f944e9da140b7bd5d41c7304f133b7e27a649b5a",
+        "archiveRetained": false
+      },
+      {
+        "service": "console",
+        "imageId": "sha256:c699d8fb3bc20646459f7062d3eb0dade60eb8138a30c8e221803eaf033a5452",
+        "archiveSha256": "sha256:ef152d3da31c3c8b3f486fbea6b784b7976d74ce25ef916c4d2ae0a13d66c2f7",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 114,
+        "scanSha256": "sha256:b1e8f8a4721b656d16392ea61f159470e2cb8158d9e25f62a58a6c6b18258727",
+        "sbomSha256": "sha256:2a29977aa52869973922755879cfc06f7ffb455bc339de373911c3328b60f81e",
+        "archiveRetained": false
+      }
+    ],
+    "passed": false
+  },
+  "unresolvedHighOrCritical": [
+    {
+      "service": "agent",
+      "binary": "usr/local/libexec/docker/cli-plugins/docker-compose",
+      "id": "CVE-2026-78669",
+      "package": "golang.org/x/net",
+      "installed": "v0.58.0",
+      "fixed": "0.60.0",
+      "severity": "HIGH",
+      "status": "open; no suppression",
+      "advisory": "https://pkg.go.dev/vuln/GO-2026-6611"
+    }
+  ],
+  "fullLocalImageEvidence": "reports/image-checks/ (ignored; equivalent uploaded by manual release-preflight workflow)",
+  "restoreEvidence": "reports/restore-test.json",
+  "localDeployment": {
+    "healthyServices": [
+      "agent",
+      "core",
+      "console"
+    ],
+    "healthHTTP": 200,
+    "url": "http://127.0.0.1:8095",
+    "productionSSHDeploymentPerformed": false
+  },
+  "github": {
+    "repository": "https://github.com/konnilabs/cuo",
+    "visibility": "public",
+    "releases": [],
+    "verifiedMainCI": {
+      "revision": "d0398767fdeff381d2fa4495ea0807cc29b628b9",
+      "status": "success",
+      "url": "https://github.com/konnilabs/cuo/actions/runs/41321773403"
+    },
+    "localChangesPushed": false,
+    "newPreflightExecutedOnGitHub": false,
+    "privateVulnerabilityReportingEnabled": false,
+    "secretScanningEnabled": true,
+    "pushProtectionEnabled": true
+  },
+  "openStableArtifactGates": [
+    "Remaining HIGH in bundled Compose plugin",
+    "Digest-preserving build-once OCI publication with agreed names/version/platform/signing identity",
+    "Signed, reviewed image SBOM coverage and build provenance; verification from destination registry",
+    "Complete scoped WCAG 2.2 AA audit including assistive technology",
+    "Confidential vulnerability reporting channel",
+    "Final-commit CI and final-artifact fresh scans"
+  ],
+  "explicitlyOutsideMVP": [
+    "Private registry credentials (public/anonymous registry images only)",
+    "Multi-host transport",
+    "Automatic application database/volume rollback",
+    "Highly available multi-writer storage and failover"
+  ],
+  "restoreLimits": [
+    "CUO volumes only; not managed application data",
+    "Not atomic across three volume replacements; failed copies leave CUO stopped",
+    "Host-loss restore with separately protected .env, project sources and proxy configuration not yet certified"
+  ]
+}

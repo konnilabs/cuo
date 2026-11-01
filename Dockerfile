@@ -13,7 +13,8 @@ USER 10001:10001
 ENV CUO_DATA=/data
 ENTRYPOINT ["cuo"]
 FROM docker:29-cli@sha256:5e6baf67325a79f64ed3bed6863954d5e05d0f3d4e57cbdb14809346814bbfdb AS agent
-RUN apk add --no-cache ca-certificates tzdata
+# Updates never build images; omit the unused Buildx plugin and patch OS packages.
+RUN apk upgrade --no-cache && apk add --no-cache ca-certificates tzdata && rm -f /usr/local/libexec/docker/cli-plugins/docker-buildx
 COPY --from=go-build /cuo /usr/local/bin/cuo
 COPY LICENSE NOTICE third_party/XTend-LICENSE third_party/Watchtower-LICENSE /usr/share/licenses/cuo/
 ENV CUO_DATA=/data

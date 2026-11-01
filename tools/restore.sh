@@ -1,16 +1,26 @@
 #!/bin/sh
 set -eu
-cd "$(dirname "$0")/.."
+. "$(dirname "$0")/data-common.sh"
 backup_file=${1:?Usage: ./tools/restore.sh /absolute/backup.tar.gz}
+case "$backup_file" in /*) ;; *) echo 'Absolute backup path required' >&2; exit 1;; esac
 [ -f "$backup_file" ] || exit 1
-# Concrete terminal confirmation for replacement of existing application data.
-printf 'Replace CUO identity, policies, jobs and agent journals with this backup? Type RESTORE: '
+# Check the full archive and database schemas before stopping any service.
+data_verify < "$backup_file"
+printf 'Replace CUO identity, policies, jobs and agent journals? Type RESTORE: '
 read -r answer
 [ "$answer" = RESTORE ] || exit 1
-# Validate archive member paths before stopping any service.
-if tar -tzf "$backup_file" | awk '(/^\// || /(^|\/)\.\.($|\/)/ || $0 !~ /^(identity|core|agent)(\/|$)/) {bad=1} END {exit bad?0:1}'; then
- echo 'Unsafe or unexpected archive member' >&2;exit 1
-fi
+umask 077
+# Keep a recovery point if replacing one of the three volumes fails.
+safety=$(mktemp "${backup_file}.before-restore.XXXXXX")
 docker compose stop
-docker run --rm --network none -i -v cuo_identity:/identity -v cuo_core:/core -v cuo_agent:/agent alpine:3.22 sh -c 'find /identity /core /agent -mindepth 1 -delete && tar -xzf - -C /' < "$backup_file"
-docker compose up -d
+data_archive > "$safety"
+printf 'Protected pre-restore snapshot: %s\n' "$safety"
+if ! docker run --rm --pull never --network none -i --user 0 --entrypoint cuo \
+  --mount "type=volume,source=$identity_volume,target=/identity" \
+  --mount "type=volume,source=$core_volume,target=/core" \
+  --mount "type=volume,source=$agent_volume,target=/agent" \
+  "$data_image" backup restore < "$backup_file"; then
+  echo 'Restore failed. CUO remains stopped. Retain the pre-restore snapshot for manual recovery.' >&2
+  exit 1
+fi
+docker compose start --wait
