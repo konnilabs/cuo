@@ -272,11 +272,33 @@ td:last-child {
   text-align: right;
 }
 .sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
   border: 0;
   background: transparent;
   color: inherit;
   font: inherit;
-  padding: 0;
+  padding: 0 2px;
+  min-height: 28px;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+.sort:hover,
+.sort:focus-visible {
+  background: var(--cuo-canvas, #f4f7fb);
+  color: var(--cuo-text, #0b1231);
+}
+.sort x-icon {
+  flex: 0 0 12px;
+  opacity: 0.7;
+}
+th[aria-sort] .sort {
+  color: var(--cuo-text, #0b1231);
+  font-weight: 500;
+}
+th[aria-sort] .sort x-icon {
+  opacity: 1;
 }
 .container-name {
   display: flex;
@@ -689,6 +711,7 @@ td:last-child {
 .host-card,
 .settings-list article,
 .job-card {
+  min-width: 0;
   border: 1px solid var(--cuo-border, #e3e9f3);
   border-radius: 12px;
   padding: 20px;
@@ -699,6 +722,28 @@ td:last-child {
 .job-card p {
   margin: 12px 0;
   line-height: 1.6;
+}
+.policy-list {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+}
+.policy-heading {
+  display: flex;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.policy-title {
+  flex: 1 1 120px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.policy-heading > .badge {
+  flex: 0 0 auto;
+  max-width: 100%;
+  white-space: normal;
+}
+.policy-card p {
+  overflow-wrap: anywhere;
 }
 .callout {
   padding: 13px 15px;

@@ -3,6 +3,7 @@ import type { MaracaBrowserFacade } from "@ccslabs/xtend/maraca/browser-composit
 import type { Intent, Request, VM } from "./contracts.ts";
 import { createCUOClient } from "./generated-api.ts";
 import { initial, present, demoVM, pageNames } from "./view.ts";
+import { applyTableSort } from "../components/table-sorting.mjs";
 declare global {
   interface Window {
     XTendMaraca: MaracaBrowserFacade;
@@ -251,7 +252,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     } else if (kind === "query") {
       vm.query = value.slice(0, 160);
       vm.offset = 0;
-    } else if (kind === "sort") vm.sort = value;
+    } else if (kind === "sort") vm = applyTableSort(vm, id, value);
     else if (kind === "page") vm.offset = Math.max(0, Number(value) || 0);
     else if (kind === "calendar") {
       vm.calendar = value;
