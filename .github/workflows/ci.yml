@@ -21,6 +21,7 @@ jobs:
       - working-directory: console
         run: |
           npm run setup
+          node ../tools/generate-notices.mjs --check
           npm run build
           npm test
           npm audit --prefix runtime --audit-level=high
@@ -29,7 +30,7 @@ jobs:
       - name: Disposable Docker update
         run: |
           CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableDockerUpdate -count=1
-          CUO_DOCKER_E2E=1 go test -v ./internal/core -run TestDurableCoreDockerUpdate -count=1
+          CUO_DOCKER_E2E=1 go test -v ./internal/core -run 'TestDurableCoreDockerUpdate|TestDisposableBulkRun' -count=1
       - name: Install fresh test stack
         run: |
           mkdir -p work

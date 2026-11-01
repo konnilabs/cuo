@@ -511,7 +511,7 @@ export class XMaintenancePlanner extends Widget {
           "small",
           { class: "muted indent" },
           chosen
-            ? "Max. 1 paralleles Update · Healthcheck erforderlich"
+            ? `Max. ${(vm.policies || []).find((p) => p.scope === "global")?.concurrency || 1} parallele Updates · Healthcheck erforderlich`
             : "IANA-Zeitzonen · Sommerzeit berücksichtigt",
         ),
         h(
@@ -828,6 +828,11 @@ export class XPolicyEditor extends Widget {
                   "Keines"),
             ),
             button("Bearbeiten", "policy", "", p.id, "btn"),
+            h(
+              "p",
+              { class: "muted small" },
+              `Parallelität: max. ${p.concurrency || 1}`,
+            ),
           ),
         ),
       ),
@@ -871,7 +876,15 @@ export class XHostHealth extends Widget {
           { class: "core-line" },
           icon("shield"),
           h("span", {}, "Anmeldung"),
-          h("b", {}, vm.oidc?.enabled ? "SSO + lokal" : "Lokal"),
+          h(
+            "b",
+            {},
+            vm.oidc?.enabled
+              ? vm.oidc.localLoginEnabled === false
+                ? "Nur SSO"
+                : "SSO + lokal"
+              : "Lokal",
+          ),
         ),
         h(
           "div",

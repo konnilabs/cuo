@@ -128,6 +128,7 @@ const topbar = el("header", { class: "topbar" }, [
     text("kbd", "Alt K"),
   ]),
   el("div", { class: "topbar-tools" }, [
+    cmd("Hilfe und Lizenzen öffnen", "help", "", "question", "icon-btn", "cuo"),
     cmd(
       "$model.cuo.vm.themeToggleLabel",
       "theme",

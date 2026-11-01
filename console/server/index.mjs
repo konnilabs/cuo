@@ -194,6 +194,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (url.pathname === "/auth/login" && req.method === "POST") {
+      if (!oidc.config().localLoginEnabled) {
+        audit(null, "login.disabled");
+        json(res, 403, {
+          code: "LOCAL_LOGIN_DISABLED",
+          message: "Die lokale Anmeldung ist deaktiviert. Bitte SSO verwenden.",
+        });
+        return;
+      }
       if (limited(req.socket.remoteAddress + ":login", 6)) {
         json(res, 429, {
           message: "Zu viele Anmeldeversuche. Bitte eine Minute warten.",
@@ -211,6 +219,15 @@ const server = http.createServer(async (req, res) => {
       if (!user || !valid) {
         audit(null, "login.failed");
         json(res, 401, { message: "Benutzername oder Passwort ungültig" });
+        return;
+      }
+      // Password verification is asynchronous; respect a mode change made by
+      // an Owner while this login request was in flight.
+      if (!oidc.config().localLoginEnabled) {
+        json(res, 403, {
+          code: "LOCAL_LOGIN_DISABLED",
+          message: "Die lokale Anmeldung ist deaktiviert. Bitte SSO verwenden.",
+        });
         return;
       }
       auth.issue(res, user, secure);

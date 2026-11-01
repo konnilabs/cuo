@@ -9,6 +9,9 @@ registerIconPack({
   id: "cuo",
   label: "CUO local interface icons",
   icons: {
+    question: {
+      nodes: [c(12, 12, 9), p("M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4M12 17h.01")],
+    },
     sort: { nodes: [p("m8 9 4-4 4 4M8 15l4 4 4-4")] },
     user: { nodes: [c(12, 8, 4), p("M4 22v-2a8 8 0 0 1 16 0v2")] },
     shield: {

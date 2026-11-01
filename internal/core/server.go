@@ -116,7 +116,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	minimum := "Operator"
-	if strings.Contains(r.URL.Path, "/policies/") || strings.Contains(r.URL.Path, "/maintenance-windows") {
+	if strings.Contains(r.URL.Path, "/policies/") || strings.Contains(r.URL.Path, "/maintenance-windows") || r.URL.Path == "/api/v1/update-runs" {
 		minimum = "Administrator"
 	}
 	if !p.Can(minimum) {
@@ -294,6 +294,23 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 	store := s.Engine.Store
 	bad := func(code, msg string) (int, any) { return 422, map[string]any{"code": code, "message": msg} }
 	switch {
+	case path == "/api/v1/update-runs" && method == "POST":
+		var input struct {
+			All       bool   `json:"all"`
+			Reason    string `json:"reason"`
+			Confirmed bool   `json:"confirmed"`
+		}
+		if decode(body, &input) != nil || !input.All || !input.Confirmed || len(strings.TrimSpace(input.Reason)) < 3 || len(input.Reason) > 500 {
+			return bad("CONFIRMATION_REQUIRED", "Bestätige alle Neustarts und gib einen Grund an")
+		}
+		run, err := s.Engine.CreateRun(p, strings.TrimSpace(input.Reason))
+		if err != nil {
+			return bad("RUN_FAILED", err.Error())
+		}
+		if len(run.Jobs) == 0 {
+			return 409, map[string]any{"code": "NO_ELIGIBLE_UPDATES", "message": "Keine ausführbaren Updates vorhanden. Richtlinien, aktive Jobs und Prüfergebnisse kontrollieren.", "skipped": run.Skipped}
+		}
+		return 201, run
 	case path == "/api/v1/scans" && method == "POST":
 		if !s.Engine.ScanMu.TryLock() {
 			return 409, map[string]string{"code": "SCAN_RUNNING", "message": "Eine Prüfung läuft bereits"}

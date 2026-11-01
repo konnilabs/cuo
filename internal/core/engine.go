@@ -24,6 +24,7 @@ type Engine struct {
 	Wake       chan struct{}
 	Mu         sync.Mutex
 	ScanMu     sync.Mutex
+	DiscoverMu sync.Mutex
 }
 
 func ID() string {
@@ -47,6 +48,8 @@ func (e *Engine) agent(ctx context.Context, method, path string, input any) (*ht
 	return e.Client.Do(r)
 }
 func (e *Engine) Discover(ctx context.Context) ([]Container, error) {
+	e.DiscoverMu.Lock()
+	defer e.DiscoverMu.Unlock()
 	r, err := e.agent(ctx, "GET", "/inventory", nil)
 	if err != nil {
 		return nil, err
@@ -151,9 +154,27 @@ func (e *Engine) Notify() {
 	}
 }
 func (e *Engine) CreateJob(c Container, p Principal, reason string, automatic bool) (Job, error) {
+	j, err := e.prepareJob(c, p, reason, automatic, false)
+	if err != nil {
+		return Job{}, err
+	}
+	if err = e.Store.Put("job", j.ID, j); err != nil {
+		return j, err
+	}
+	_ = e.Store.Event(Event{JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: j.State, Severity: "info", Message: c.Name + ": Update angelegt"})
+	e.Notify()
+	return j, nil
+}
+func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, immediate bool) (Job, error) {
 	policy := ResolvePolicy(c, e.Store.Policies())
 	if policy.Excluded || policy.Mode == "disabled" || policy.Mode == "scan-only" {
 		return Job{}, errors.New("policy does not permit execution")
+	}
+	if !p.Host(c.HostID) {
+		return Job{}, errors.New("host access denied")
+	}
+	if immediate && (!p.Can("Administrator") || c.State != "running") {
+		return Job{}, errors.New("immediate updates require administrator access and a running container")
 	}
 	if c.Candidate == nil || c.Candidate.Target == "" || c.Candidate.Error != "" {
 		return Job{}, errors.New("no valid update candidate")
@@ -178,11 +199,12 @@ func (e *Engine) CreateJob(c Container, p Principal, reason string, automatic bo
 	}
 	now := time.Now().UTC().Format(time.RFC3339)
 	j := Job{ID: ID(), EngineID: c.EngineID, HostID: c.HostID, ContainerID: c.ID, Name: c.Name, State: state, Target: c.Candidate.Target, Source: c.Candidate.Source, Image: c.Image, Platform: c.Platform, Requester: p.ID, Reason: reason, WindowID: policy.WindowID, Created: now, Updated: now}
-	if err := e.Store.Put("job", j.ID, j); err != nil {
-		return j, err
+	if immediate {
+		j.State = "queued"
+		j.WindowID = ""
+		j.Approved = true
+		j.Immediate = true
 	}
-	_ = e.Store.Event(Event{JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: state, Severity: "info", Message: c.Name + ": Update angelegt"})
-	e.Notify()
 	return j, nil
 }
 func terminal(s string) bool {
@@ -206,6 +228,9 @@ func (e *Engine) update(j *Job, state, message string) {
 	}
 }
 func (e *Engine) execute(j Job) {
+	e.executeContext(context.Background(), j)
+}
+func (e *Engine) executeContext(parent context.Context, j Job) {
 	e.Mu.Lock()
 	var persisted Job
 	if e.Store.Get("job", j.ID, &persisted) != nil || persisted.State != "queued" {
@@ -226,7 +251,7 @@ func (e *Engine) execute(j Job) {
 		e.Mu.Unlock()
 		return
 	}
-	if p.WindowID != "" {
+	if p.WindowID != "" && !j.Immediate {
 		var window Window
 		_ = e.Store.Get("window", p.WindowID, &window)
 		if active, _ := ActiveWindow(window, time.Now()); !active {
@@ -238,7 +263,7 @@ func (e *Engine) execute(j Job) {
 	}
 	e.update(&j, "preflight", "Vorprüfung gestartet")
 	e.Mu.Unlock()
-	ctx, cancel := context.WithTimeout(context.Background(), 16*time.Minute)
+	ctx, cancel := context.WithTimeout(parent, 16*time.Minute)
 	defer cancel()
 	r, err := e.agent(ctx, "POST", "/execute", map[string]any{"jobId": j.ID, "containerId": j.EngineID, "sourceDigest": j.Source, "targetDigest": j.Target, "image": j.Image, "platform": j.Platform})
 	if err != nil {
@@ -274,7 +299,9 @@ func (e *Engine) execute(j Job) {
 	if !done {
 		e.update(&j, "intervention_required", "Ausführung ohne Abschluss; Agent-Journal prüfen")
 	}
-	_, _ = e.Discover(context.Background())
+	discoverCtx, discoverCancel := context.WithTimeout(parent, 15*time.Second)
+	defer discoverCancel()
+	_, _ = e.Discover(discoverCtx)
 }
 func (e *Engine) Tick(now time.Time) {
 	e.Mu.Lock()
@@ -322,20 +349,21 @@ func (e *Engine) Tick(now time.Time) {
 func (e *Engine) Worker(ctx context.Context) {
 	timer := time.NewTicker(15 * time.Second)
 	defer timer.Stop()
+	completed := make(chan string, 4)
+	active := map[string]Container{}
+	var workers sync.WaitGroup
+	defer workers.Wait()
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		case <-e.Wake:
+		case id := <-completed:
+			delete(active, id)
 		case <-timer.C:
 		}
 		e.Tick(time.Now())
-		jobs := e.Store.Jobs()
-		for _, j := range jobs {
-			if j.State == "queued" {
-				e.execute(j)
-			}
-		}
+		e.dispatch(ctx, active, completed, &workers)
 	}
 }
 func NewEngine(s *Store) *Engine {

@@ -1,4 +1,6 @@
 import { appearance, bindAppearance, oidcSettings } from "./account.mjs";
+import { executableCandidates } from "./update-candidates.mjs";
+import { loadNotices, tutorial } from "./help.mjs";
 import {
   Widget,
   register,
@@ -44,7 +46,8 @@ export class XCUOAuth extends Widget {
             ? "Lege den ersten lokalen Administrator an. Deine Daten bleiben auf diesem Host."
             : "Melde dich an, um deine Container zu verwalten.",
         ),
-        vm.auth === "loading"
+        vm.auth === "loading" ||
+          (!enroll && vm.oidc?.localLoginEnabled === false)
           ? null
           : h(
               "form",
@@ -118,6 +121,20 @@ export class XApprovalDialog extends Widget {
   }
   update() {
     super.update();
+    if (this.vm.dialog === "help" && !this.noticesState) {
+      this.noticesState = "loading";
+      loadNotices()
+        .then((notices) => {
+          this.notices = notices;
+          this.noticesState = "ready";
+        })
+        .catch(() => {
+          this.noticesState = "failed";
+        })
+        .finally(() => {
+          if (this.isConnected && this.vm.dialog === "help") this.update();
+        });
+    }
     const dialog = this.content.querySelector("dialog");
     if (!dialog) return;
     if (this.vm.dialog && !dialog.open) {
@@ -135,7 +152,10 @@ export class XApprovalDialog extends Widget {
     const kind = vm.dialog;
     let title = "",
       body = [];
-    if (kind === "container") {
+    if (kind === "help") {
+      title = "CUO – Kurzanleitung & Lizenzen";
+      body = tutorial(this.notices, this.noticesState);
+    } else if (kind === "container") {
       title = c?.name || "Update-Lauf";
       body = c
         ? [
@@ -372,7 +392,7 @@ export class XApprovalDialog extends Widget {
             "concurrency",
             String(selected.concurrency),
             "number",
-            { min: 1, max: 1, required: true },
+            { min: 1, max: 4, required: true },
           ),
           h(
             "label",
@@ -387,7 +407,7 @@ export class XApprovalDialog extends Widget {
           h(
             "p",
             { class: "callout small" },
-            "Die lokale Ausführung erfolgt seriell. Ein Ausschluss auf einer übergeordneten Ebene bleibt wirksam.",
+            "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
           ),
           h(
             "button",
@@ -398,22 +418,28 @@ export class XApprovalDialog extends Widget {
       ];
     } else if (kind === "run") {
       title = "Update-Lauf starten";
-      const candidates = (vm.containers || []).filter(
-        (c) =>
-          c.candidate?.targetDigest && !c.excluded && c.mode !== "scan-only",
-      );
+      const candidates = executableCandidates(vm);
+      const canRunAll = ["Owner", "Administrator"].includes(vm.user?.role);
       body = [
         h(
           "form",
           { "data-form": "execute" },
           select("Container", "containerId", c?.id || candidates[0]?.id || "", [
             ["", "Container auswählen"],
+            ...(canRunAll
+              ? [
+                  [
+                    "__all__",
+                    `Alle auswählen – ${candidates.length} ausführbare Updates`,
+                  ],
+                ]
+              : []),
             ...candidates.map((c) => [c.id, c.name]),
           ]),
           h(
             "p",
             { class: "callout" },
-            "Der ausgewählte Container wird neu erstellt und ist kurzzeitig nicht erreichbar. Datenbanken und Volumes werden nicht zurückgesetzt. Ein fehlgeschlagener Healthcheck erfordert einen manuellen Eingriff.",
+            "Container werden neu erstellt und sind kurzzeitig nicht erreichbar. Datenbanken und Volumes werden nicht zurückgesetzt. Einzeljobs beachten Freigaben und Wartungsfenster. „Alle auswählen“ startet als bestätigter Administrator-Sofortlauf außerhalb der Wartungsfenster und gibt die ausgewählten Updates frei; Ausschlüsse und Parallelitätsgrenzen bleiben wirksam. Ein fehlgeschlagener Healthcheck erfordert einen manuellen Eingriff.",
           ),
           field("Grund / Ticket", "reason", "", "text", {
             required: true,
@@ -433,7 +459,7 @@ export class XApprovalDialog extends Widget {
               class: "btn primary",
               disabled: !candidates.length,
             },
-            "Update-Job anlegen",
+            "Update-Lauf starten",
           ),
         ),
         !candidates.length
@@ -508,7 +534,10 @@ export class XApprovalDialog extends Widget {
     return [
       h(
         "dialog",
-        { "aria-labelledby": "dialog-title" },
+        {
+          "aria-labelledby": "dialog-title",
+          class: kind === "help" ? "help-dialog" : "",
+        },
         h(
           "div",
           { class: "dialog-heading" },
@@ -558,7 +587,12 @@ export class XCUOWorkspace extends Widget {
   submit(form) {
     if (form.dataset.form !== "saveOIDC") return;
     const data = Object.fromEntries(new FormData(form));
-    for (const key of ["enabled", "clearSecret", "autoProvision"])
+    for (const key of [
+      "enabled",
+      "clearSecret",
+      "autoProvision",
+      "localLoginEnabled",
+    ])
       data[key] = form.elements[key].checked;
     this.emit("saveOIDC", "", "", data);
     form.elements.clientSecret.value = "";

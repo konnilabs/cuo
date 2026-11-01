@@ -3,6 +3,7 @@ import { randomBytes, createHash, timingSafeEqual } from "node:crypto";
 const hash = (value) => createHash("sha256").update(value).digest("hex");
 const defaults = {
   enabled: false,
+  localLoginEnabled: true,
   label: "Mit SSO anmelden",
   issuer: "",
   discoveryUrl: "",
@@ -36,7 +37,11 @@ export class OIDC {
           secretConfigured: !!clientSecret,
           redirectUri: this.redirectUri,
         }
-      : { enabled: config.enabled, label: config.label };
+      : {
+          enabled: config.enabled,
+          label: config.label,
+          localLoginEnabled: config.localLoginEnabled,
+        };
   }
   url(value) {
     const url = new URL(value);
@@ -115,10 +120,19 @@ export class OIDC {
     return client;
   }
   async save(data) {
+    if (
+      data.localLoginEnabled !== undefined &&
+      typeof data.localLoginEnabled !== "boolean"
+    )
+      throw Error("Die lokale Anmeldeoption muss ein boolescher Wert sein");
     const current = this.config();
     const config = {
       ...defaults,
       enabled: data.enabled === true,
+      localLoginEnabled:
+        data.localLoginEnabled === undefined
+          ? current.localLoginEnabled
+          : data.localLoginEnabled !== false,
       label: String(data.label || defaults.label)
         .trim()
         .slice(0, 80),
@@ -149,6 +163,10 @@ export class OIDC {
       config.clientSecret.length > 4096
     )
       throw Error("OIDC-Konfiguration zu lang");
+    if (!config.localLoginEnabled && !config.enabled)
+      throw Error(
+        "OIDC muss aktiviert sein, bevor die lokale Anmeldung deaktiviert wird",
+      );
     if (config.enabled) {
       if (
         !config.clientId ||
