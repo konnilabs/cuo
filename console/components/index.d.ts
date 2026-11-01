@@ -33,5 +33,8 @@ declare global {
     "x-update-status-badge": CUOWidget;
     "x-cuo-auth": CUOWidget;
     "x-cuo-workspace": CUOWidget;
+    "x-cuo-notifications": CUOWidget;
+    "x-cuo-profile": CUOWidget;
+    "x-cuo-toasts": CUOWidget;
   }
 }

@@ -1,0 +1,16 @@
+[
+  {
+    "component": "xrouter",
+    "source": "XTend 49166cbe/components/xrouter.js",
+    "before": "278058d2786497811f1d0ff1fdd0a5959d1b899583e8ff6d9fde88f3c9b298ab",
+    "after": "37435be110270a369ab885d9ae56c3d96867cacc71544f50c94a1e6f6d97dbfa",
+    "adaptation": "Static DOM construction and text-only error rendering"
+  },
+  {
+    "component": "xdrawer",
+    "source": "XTend 49166cbe/components/xdrawer.js",
+    "before": "ad04b0095e0aa4e72371666a512c60c3bed269ca0ba1e5f8c53101ccf8cc9bde",
+    "after": "d13d8741f3d58ade60032faa144f598015e59a7289fc24e36c817b1abf1ca9a9",
+    "adaptation": "Static DOM construction and text-only error rendering"
+  }
+]

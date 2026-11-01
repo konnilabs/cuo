@@ -1,0 +1,8 @@
+{
+  "name": "cuo-auth-runtime",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "openid-client": "6.8.8"
+  }
+}

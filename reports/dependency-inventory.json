@@ -118,7 +118,23 @@
   },
   "server": {
     "node": "24.22.1",
-    "npmRuntimeDependencies": [],
+    "npmRuntimeDependencies": [
+      {
+        "name": "jose",
+        "version": "6.2.14",
+        "integrity": "sha512-3JasLuki1NRLQvY4wCoC37KZk4qxoBx2k2aFqLxT84IezqW0bkJKnNtxnZj/Fu1xsQivoc/lytxaRHJoGLjJ1A=="
+      },
+      {
+        "name": "oauth4webapi",
+        "version": "3.8.8",
+        "integrity": "sha512-8N28E+a/oxfXWBgOMt+ZP/JUf/XR+IFbvkAEPP3gznXOMv9BpAAwiIj0TFNz3tGTPc0ZQ8zmWBNgN1nAys0gng=="
+      },
+      {
+        "name": "openid-client",
+        "version": "6.8.8",
+        "integrity": "sha512-ZsucJA5Ad04Uv7YN4ql+s4GXNmb9uAYQwyJTsJx7CH/MX3JZioLE2pVKi1SC+YrbSLA4Px3Gi30dMjgOZtb6pA=="
+      }
+    ],
     "maraca": "bundled AppServices host"
   },
   "archives": [

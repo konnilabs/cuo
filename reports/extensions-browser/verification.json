@@ -1,0 +1,16 @@
+{
+  "passed": true,
+  "checks": [
+    "XRouter URL/back/forward/reload",
+    "XToggle and live OS theme",
+    "durable individual/clear-all notifications",
+    "XDrawer profile and persistence",
+    "owner-only OIDC configuration and redirect URI",
+    "cross-site signed OIDC browser flow with PKCE and explicit discovery URL",
+    "provider user provisioned as Viewer",
+    "mobile drawer",
+    "logs terminal fills card at 1122x892 viewport",
+    "real XToast in top layer above active drawer; pointer dismissal and timeout"
+  ],
+  "browserErrors": []
+}

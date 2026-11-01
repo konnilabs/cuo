@@ -332,7 +332,7 @@ export function select(label, name, value, options) {
     h("span", {}, label),
     h(
       "select",
-      { name, value },
+      { name, value, "aria-label": label },
       options.map(([v, l]) => h("option", { value: v }, l)),
     ),
   );

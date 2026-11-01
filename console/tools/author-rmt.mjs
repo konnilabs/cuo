@@ -1,5 +1,5 @@
 import fs from "node:fs";
-import { initial, present } from "../src/view.ts";
+import { pageNames as initialPages, initial, present } from "../src/view.ts";
 const el = (tag, attrs = {}, children = [], extra = {}) => ({
   type: "element",
   tag,
@@ -135,13 +135,20 @@ const topbar = el("header", { class: "topbar" }, [
         type: "button",
         class: "icon-btn notification cuo-action",
         "data-id": "",
-        "aria-label": "Updates anzeigen",
-        "data-kind": "navigate",
-        "data-value": "updates",
+        "aria-label": "Benachrichtigungen",
+        id: "cuo-notifications-trigger",
+        "aria-controls": "cuo-notification-center",
+        "aria-expanded": "$model.cuo.vm.notificationsExpanded",
+        "data-kind": "notifications",
+        "data-value": "",
       },
       [
         ic("bell", "cuo"),
-        text("span", "$model.cuo.vm.updateCount", "notification-count"),
+        text(
+          "span",
+          "$model.cuo.vm.notificationCount",
+          "$model.cuo.vm.notificationClass",
+        ),
       ],
     ),
     el(
@@ -149,12 +156,28 @@ const topbar = el("header", { class: "topbar" }, [
       {
         type: "button",
         class: "user-menu cuo-action",
+        "aria-label": "Dein Profil öffnen",
+        "aria-haspopup": "dialog",
+        "aria-expanded": "$model.cuo.vm.profileExpanded",
         "data-id": "",
-        "data-kind": "navigate",
-        "data-value": "settings",
+        "data-kind": "profile",
+        "data-value": "",
       },
       [
-        text("span", "$model.cuo.vm.userInitials", "avatar"),
+        el("span", { class: "avatar" }, [
+          text(
+            "span",
+            "$model.cuo.vm.userInitials",
+            "$model.cuo.vm.avatarTextClass",
+          ),
+          el("x-icon", {
+            name: "$model.cuo.vm.avatarName",
+            pack: "$model.cuo.vm.avatarPack",
+            size: "20px",
+            class: "$model.cuo.vm.avatarIconClass",
+            decorative: true,
+          }),
+        ]),
         el("span", { class: "user-info" }, [
           text("strong", "$model.cuo.vm.user.name"),
           text("small", "$model.cuo.vm.user.role"),
@@ -162,6 +185,7 @@ const topbar = el("header", { class: "topbar" }, [
         ic("chevron-down"),
       ],
     ),
+    widget("x-cuo-notifications", { id: "cuo-notification-center" }),
   ]),
 ]);
 const stat = (symbol, pack, cls, children) =>
@@ -241,7 +265,7 @@ const routed = [
   ],
   ["policies", [widget("x-policy-editor")]],
   ["history", [widget("x-update-run-timeline")]],
-  ["logs", [widget("x-log-stream")]],
+  ["logs", [widget("x-log-stream", { expanded: true })]],
   ["hosts", [widget("x-host-health")]],
   ["users", [widget("x-cuo-workspace", { section: "users" })]],
   ["settings", [widget("x-cuo-workspace", { section: "settings" })]],
@@ -257,12 +281,47 @@ const shell = el(
   "div",
   { class: "$model.cuo.vm.shellClass", "data-theme": "$model.cuo.vm.theme" },
   [
+    el(
+      "x-router",
+      {
+        id: "cuo-router",
+        class: "cuo-router",
+        mode: "hash",
+        "navigation-policy": "spa",
+        "reuse-component": true,
+        "data-kind": "route",
+        "data-id": "",
+      },
+      Object.keys(initialPages)
+        .map((page) =>
+          el(
+            "x-route",
+            {
+              path: "/" + page,
+              component: "x-cuo-route",
+              title: initialPages[page],
+            },
+            [],
+          ),
+        )
+        .concat([
+          el(
+            "x-route",
+            { path: "/", component: "x-cuo-route", title: "Dashboard" },
+            [],
+          ),
+        ]),
+    ),
     sidebar,
     el("div", { class: "main-shell" }, [
       topbar,
       el(
         "main",
-        { class: "main-content", id: "main-content", tabindex: "-1" },
+        {
+          class: "$model.cuo.vm.mainContentClass",
+          id: "main-content",
+          tabindex: "-1",
+        },
         [
           el("div", { class: "$model.cuo.vm.demoClass" }, [
             text(
@@ -295,9 +354,6 @@ const shell = el(
               ),
             ]),
           ]),
-          el("div", { class: "$model.cuo.vm.noticeClass", role: "status" }, [
-            text("span", "$model.cuo.vm.notice"),
-          ]),
           stats,
           dashboard,
           el("div", { class: "$model.cuo.vm.workspaceClass" }, routed),
@@ -305,6 +361,7 @@ const shell = el(
       ),
     ]),
     widget("x-approval-dialog"),
+    widget("x-cuo-profile"),
   ],
 );
 const tree = {
@@ -318,6 +375,13 @@ const tree = {
       }),
       el("div", { class: "$model.cuo.vm.authClass" }, [widget("x-cuo-auth")]),
       shell,
+      widget("x-cuo-toasts", {
+        id: "cuo-toast-layer",
+        popover: "manual",
+        "data-toast-layer": true,
+        role: "region",
+        "aria-label": "Statusmeldungen",
+      }),
     ],
   },
 };
@@ -387,6 +451,11 @@ template cuo.app {
    payload value from source.dataset.value
    payload id from source.dataset.id
   }
+  on route-changed ".cuo-router" -> action cuo.intent {
+   payload kind from source.dataset.kind
+   payload value from detail.path
+   payload id from source.dataset.id
+  }
   on input ".cuo-query" -> action cuo.intent {
    payload kind from source.dataset.kindInput
    payload value from source.value
@@ -406,6 +475,14 @@ fs.writeFileSync(
   JSON.stringify(
     {
       "x-icon": "../.framework/components/xicon.js",
+      "x-router": "../vendor/xrouter.mjs",
+      "x-route": "../vendor/xrouter.mjs",
+      "x-toggle": "../.framework/components/xtoggle.js",
+      "x-drawer": "../vendor/xdrawer.mjs",
+      "x-toast": "../.framework/components/xtoast.js",
+      "x-cuo-toasts": "./toasts.mjs",
+      "x-cuo-notifications": "./account.mjs",
+      "x-cuo-profile": "./account.mjs",
       ...Object.fromEntries(
         [
           "x-container-table",

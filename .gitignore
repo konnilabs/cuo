@@ -12,3 +12,6 @@ bin/
 work/
 projects/*
 !projects/.gitkeep
+
+console/runtime/node_modules/
+console/vendor/

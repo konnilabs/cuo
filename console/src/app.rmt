@@ -3,9 +3,22 @@ template cuo.app {
  state cuo.vm type object preserve { initial {
     auth "loading"
     theme "light"
+    themeMode "system"
+    notificationsOpen false
+    profileOpen false
+    dismissed [
+
+    ]
+    oidc {
+
+    }
+    oidcConfig null
     page "dashboard"
     mobile false
     notice ""
+    toasts [
+
+    ]
     error false
     demo false
     user {
@@ -42,6 +55,17 @@ template cuo.app {
     dialog ""
     selected ""
     live true
+    notifications [
+
+    ]
+    notificationCount "0"
+    notificationClass "is-hidden"
+    notificationsExpanded "false"
+    profileExpanded "false"
+    avatarTextClass ""
+    avatarIconClass "is-hidden"
+    avatarName "user"
+    avatarPack "cuo"
     title "Dashboard"
     description "Übersicht über deine Container, Updates und den Systemstatus."
     total "0"
@@ -57,7 +81,7 @@ template cuo.app {
     authClass "auth-wrap"
     dashboardClass "dashboard-grid"
     workspaceClass "is-hidden"
-    noticeClass "is-hidden"
+    mainContentClass "main-content"
     demoClass "is-hidden"
     pageTitle "Dashboard"
     nextDate "Kein Fenster geplant"
@@ -84,7 +108,7 @@ template cuo.app {
     routeusers "is-hidden"
     navintegrations "nav-item cuo-action"
     routeintegrations "is-hidden"
-    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-01\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"noticeClass\":\"is-hidden\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
+    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-01\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
   } }
  state cuo.shell type object preserve { initial {
     id "cuo-shell"
@@ -134,6 +158,165 @@ template cuo.app {
             data-theme "$model.cuo.vm.theme"
           }
           children [
+            {
+              type "element"
+              tag "x-router"
+              class "cuo-router"
+              attributes {
+                id "cuo-router"
+                mode "hash"
+                navigation-policy "spa"
+                reuse-component true
+                data-kind "route"
+                data-id ""
+              }
+              children [
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/dashboard"
+                    component "x-cuo-route"
+                    title "Dashboard"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/containers"
+                    component "x-cuo-route"
+                    title "Container"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/updates"
+                    component "x-cuo-route"
+                    title "Updates"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/schedule"
+                    component "x-cuo-route"
+                    title "Zeitplanung"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/policies"
+                    component "x-cuo-route"
+                    title "Richtlinien"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/history"
+                    component "x-cuo-route"
+                    title "Historie"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/logs"
+                    component "x-cuo-route"
+                    title "Logs"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/settings"
+                    component "x-cuo-route"
+                    title "Einstellungen"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/hosts"
+                    component "x-cuo-route"
+                    title "Hosts"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/users"
+                    component "x-cuo-route"
+                    title "Benutzer"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/integrations"
+                    component "x-cuo-route"
+                    title "Integrationen"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/"
+                    component "x-cuo-route"
+                    title "Dashboard"
+                  }
+                  children [
+
+                  ]
+                }
+              ]
+            }
             {
               type "element"
               tag "aside"
@@ -869,9 +1052,12 @@ template cuo.app {
                           attributes {
                             type "button"
                             data-id ""
-                            aria-label "Updates anzeigen"
-                            data-kind "navigate"
-                            data-value "updates"
+                            aria-label "Benachrichtigungen"
+                            id "cuo-notifications-trigger"
+                            aria-controls "cuo-notification-center"
+                            aria-expanded "$model.cuo.vm.notificationsExpanded"
+                            data-kind "notifications"
+                            data-value ""
                           }
                           children [
                             {
@@ -890,14 +1076,14 @@ template cuo.app {
                             {
                               type "element"
                               tag "span"
-                              class "notification-count"
+                              class "$model.cuo.vm.notificationClass"
                               attributes {
 
                               }
                               children [
 
                               ]
-                              text "$model.cuo.vm.updateCount"
+                              text "$model.cuo.vm.notificationCount"
                             }
                           ]
                         }
@@ -907,9 +1093,12 @@ template cuo.app {
                           class "user-menu cuo-action"
                           attributes {
                             type "button"
+                            aria-label "Dein Profil öffnen"
+                            aria-haspopup "dialog"
+                            aria-expanded "$model.cuo.vm.profileExpanded"
                             data-id ""
-                            data-kind "navigate"
-                            data-value "settings"
+                            data-kind "profile"
+                            data-value ""
                           }
                           children [
                             {
@@ -920,9 +1109,33 @@ template cuo.app {
 
                               }
                               children [
+                                {
+                                  type "element"
+                                  tag "span"
+                                  class "$model.cuo.vm.avatarTextClass"
+                                  attributes {
 
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.userInitials"
+                                }
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  class "$model.cuo.vm.avatarIconClass"
+                                  attributes {
+                                    name "$model.cuo.vm.avatarName"
+                                    pack "$model.cuo.vm.avatarPack"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
                               ]
-                              text "$model.cuo.vm.userInitials"
                             }
                             {
                               type "element"
@@ -971,6 +1184,19 @@ template cuo.app {
                             }
                           ]
                         }
+                        {
+                          type "element"
+                          tag "x-cuo-notifications"
+                          class "cuo-widget"
+                          attributes {
+                            data-cuo-widget "true"
+                            data-view "$model.cuo.vm.serialized"
+                            id "cuo-notification-center"
+                          }
+                          children [
+
+                          ]
+                        }
                       ]
                     }
                   ]
@@ -978,7 +1204,7 @@ template cuo.app {
                 {
                   type "element"
                   tag "main"
-                  class "main-content"
+                  class "$model.cuo.vm.mainContentClass"
                   attributes {
                     id "main-content"
                     tabindex "-1"
@@ -1205,27 +1431,6 @@ template cuo.app {
                               ]
                             }
                           ]
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "div"
-                      class "$model.cuo.vm.noticeClass"
-                      attributes {
-                        role "status"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "$model.cuo.vm.notice"
                         }
                       ]
                     }
@@ -2153,6 +2358,7 @@ template cuo.app {
                               attributes {
                                 data-cuo-widget "true"
                                 data-view "$model.cuo.vm.serialized"
+                                expanded true
                               }
                               children [
 
@@ -2269,6 +2475,35 @@ template cuo.app {
 
               ]
             }
+            {
+              type "element"
+              tag "x-cuo-profile"
+              class "cuo-widget"
+              attributes {
+                data-cuo-widget "true"
+                data-view "$model.cuo.vm.serialized"
+              }
+              children [
+
+              ]
+            }
+          ]
+        }
+        {
+          type "element"
+          tag "x-cuo-toasts"
+          class "cuo-widget"
+          attributes {
+            data-cuo-widget "true"
+            data-view "$model.cuo.vm.serialized"
+            id "cuo-toast-layer"
+            popover "manual"
+            data-toast-layer true
+            role "region"
+            aria-label "Statusmeldungen"
+          }
+          children [
+
           ]
         }
       ]
@@ -2300,6 +2535,11 @@ template cuo.app {
    preventDefault true
    payload kind from source.dataset.kind
    payload value from source.dataset.value
+   payload id from source.dataset.id
+  }
+  on route-changed ".cuo-router" -> action cuo.intent {
+   payload kind from source.dataset.kind
+   payload value from detail.path
    payload id from source.dataset.id
   }
   on input ".cuo-query" -> action cuo.intent {

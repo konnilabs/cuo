@@ -38,3 +38,12 @@ if (!fs.existsSync(".framework/node_modules/@ccslabs/xtend"))
   fs.symlinkSync("../..", ".framework/node_modules/@ccslabs/xtend");
 if (!fs.existsSync("node_modules"))
   fs.symlinkSync(".framework/node_modules", "node_modules");
+
+run("npm", [
+  "ci",
+  "--prefix",
+  "runtime",
+  "--ignore-scripts",
+  "--no-audit",
+  "--no-fund",
+]);

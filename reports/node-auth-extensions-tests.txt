@@ -1,0 +1,14 @@
+✔ scrypt enrollment, HttpOnly session, revocation and password validation (135.591229ms)
+✔ users cannot self-assign Owner and identity audit is durable (2.196988ms)
+✔ RMT service contract and registry are complete (1.452019ms)
+✔ schema v1 migration preserves existing owners and sessions (41.851413ms)
+✔ OIDC discovery, PKCE, signed ID tokens, account isolation and replay protection (175.107351ms)
+✔ profile and notification preferences are durable and cannot change privileges (41.505539ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 312.478444

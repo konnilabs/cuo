@@ -687,7 +687,7 @@ export class XLogStream extends Widget {
               .toLowerCase()
               .includes((vm.query || "").toLowerCase()),
           )
-          .slice(-12)
+          .slice(this.hasAttribute("expanded") ? -200 : -12)
           .map((e) =>
             h(
               "div",
@@ -807,8 +807,8 @@ export class XHostHealth extends Widget {
           "div",
           { class: "core-line" },
           icon("shield"),
-          h("span", {}, "Lokale Anmeldung"),
-          h("b", {}, "Aktiv"),
+          h("span", {}, "Anmeldung"),
+          h("b", {}, vm.oidc?.enabled ? "SSO + lokal" : "Lokal"),
         ),
         h(
           "div",

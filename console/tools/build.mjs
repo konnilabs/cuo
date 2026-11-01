@@ -16,6 +16,7 @@ function run(args, report) {
   }
   return r.stdout;
 }
+run(["tools/prepare-xtend.mjs"]);
 run(["tools/author-rmt.mjs"]);
 run(["tools/audit-source.mjs"]);
 run([".framework/node_modules/typescript/bin/tsc", "--noEmit"]);

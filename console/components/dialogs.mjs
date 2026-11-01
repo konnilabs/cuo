@@ -1,3 +1,4 @@
+import { appearance, bindAppearance, oidcSettings } from "./account.mjs";
 import {
   Widget,
   register,
@@ -73,8 +74,15 @@ export class XCUOAuth extends Widget {
                 enroll ? "Administrator anlegen" : "Anmelden",
               ),
             ),
-        vm.notice
-          ? h("p", { class: "form-error", role: "alert" }, vm.notice)
+        !enroll && vm.oidc?.enabled
+          ? button(
+              String(vm.oidc.label || "Mit SSO anmelden"),
+              "oidcLogin",
+              "",
+              "",
+              "btn full",
+              "shield",
+            )
           : null,
         h(
           "div",
@@ -501,14 +509,7 @@ export class XApprovalDialog extends Widget {
           h("h2", { id: "dialog-title" }, title),
           button("", "close", "", "", "icon-btn", "close"),
         ),
-        h(
-          "div",
-          { class: "dialog-content" },
-          body,
-          vm.notice && vm.error
-            ? h("p", { role: "alert", class: "form-error" }, vm.notice)
-            : null,
-        ),
+        h("div", { class: "dialog-content" }, body),
       ),
     ];
   }
@@ -544,6 +545,18 @@ export class XApprovalDialog extends Widget {
 }
 register("x-approval-dialog", XApprovalDialog);
 export class XCUOWorkspace extends Widget {
+  connectedCallback() {
+    super.connectedCallback();
+    bindAppearance(this);
+  }
+  submit(form) {
+    if (form.dataset.form !== "saveOIDC") return;
+    const data = Object.fromEntries(new FormData(form));
+    for (const key of ["enabled", "clearSecret", "autoProvision"])
+      data[key] = form.elements[key].checked;
+    this.emit("saveOIDC", "", "", data);
+    form.elements.clientSecret.value = "";
+  }
   render() {
     const vm = this.vm;
     switch (this.getAttribute("section")) {
@@ -588,7 +601,7 @@ export class XCUOWorkspace extends Widget {
           h("h2", {}, "Integrationen"),
           h(
             "div",
-            { class: "policy-list" },
+            { class: "integrations-grid" },
             h(
               "article",
               { class: "policy-card" },
@@ -600,17 +613,7 @@ export class XCUOWorkspace extends Widget {
                 "Interner Host-Agent mit expliziter Container-Freigabe.",
               ),
             ),
-            h(
-              "article",
-              { class: "policy-card" },
-              h("h3", {}, "Nextcloud / OIDC"),
-              h("span", { class: "badge muted" }, "Optional · nicht aktiviert"),
-              h(
-                "p",
-                { class: "muted" },
-                "Das lokale MVP nutzt eigene Benutzerkonten. OIDC ist eine Erweiterung der Architektur.",
-              ),
-            ),
+            oidcSettings(vm),
           ),
         ];
       default:
@@ -626,9 +629,9 @@ export class XCUOWorkspace extends Widget {
               h(
                 "p",
                 { class: "muted" },
-                "Helles oder dunkles Farbschema für diese Sitzung.",
+                "Wähle dein Farbschema oder übernimm die Systemeinstellung.",
               ),
-              button("Farbschema wechseln", "theme", "", "", "btn", "sun"),
+              appearance(vm),
             ),
             h(
               "article",

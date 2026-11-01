@@ -7,12 +7,14 @@ import { Readable } from "node:stream";
 import { createNodeAppServiceHost } from "../.framework/xtend-maraca/node-app-service-host.mjs";
 import services from "../dist/server/xtend.maraca.services.mjs";
 import { Auth, ranks } from "./auth.mjs";
+import { OIDC } from "./oidc.mjs";
 const root = fileURLToPath(new URL("../dist", import.meta.url)),
   auth = new Auth(process.env.CUO_AUTH_DATA || "/data"),
   origin = process.env.CUO_ORIGIN || "http://127.0.0.1:8095",
   secure = origin.startsWith("https:");
 if (!secure && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin))
   throw Error("Non-loopback ingress requires HTTPS CUO_ORIGIN");
+const oidc = new OIDC(auth, origin);
 const host = createNodeAppServiceHost({
   services,
   historyLimit: 50,
@@ -91,6 +93,45 @@ const server = http.createServer(async (req, res) => {
       json(res, 200, { ok: true, version: "0.1.0" });
       return;
     }
+    if (url.pathname === "/auth/oidc/start" && req.method === "GET") {
+      if (limited(req.socket.remoteAddress + ":oidc", 12)) {
+        json(res, 429, { message: "Zu viele Anmeldeversuche" });
+        return;
+      }
+      try {
+        res.writeHead(303, {
+          Location: await oidc.start(res),
+          "Cache-Control": "no-store",
+        });
+        res.end();
+      } catch {
+        json(res, 400, {
+          message:
+            "SSO konnte nicht gestartet werden. Bitte Konfiguration und Provider-Erreichbarkeit prüfen.",
+        });
+      }
+      return;
+    }
+    if (url.pathname === "/auth/oidc/callback" && req.method === "GET") {
+      try {
+        const user = await oidc.callback(url, req);
+        auth.issue(res, user, secure);
+        const sessionCookie = res.getHeader("Set-Cookie");
+        res.setHeader("Set-Cookie", [sessionCookie, oidc.cookie("", 0)]);
+        audit(user, "oidc.login");
+        res.writeHead(303, { Location: "/", "Cache-Control": "no-store" });
+        res.end();
+      } catch {
+        audit(null, "oidc.login.failed");
+        res.setHeader("Set-Cookie", oidc.cookie("", 0));
+        res.writeHead(303, {
+          Location: "/?login_error=oidc",
+          "Cache-Control": "no-store",
+        });
+        res.end();
+      }
+      return;
+    }
     if (modifying) {
       if (req.headers.origin !== origin) {
         json(res, 403, {
@@ -127,9 +168,12 @@ const server = http.createServer(async (req, res) => {
               name: session.name,
               role: session.role,
               hosts: session.hosts,
+              profile: session.profile,
             }
           : null,
         csrf: session?.csrf || null,
+        oidc: oidc.publicConfig(),
+        dismissed: session ? auth.dismissed(session) : [],
       });
       return;
     }
@@ -179,6 +223,36 @@ const server = http.createServer(async (req, res) => {
         json(res, 401, { code: "UNAUTHENTICATED", message: "Bitte anmelden" });
         return;
       }
+      if (url.pathname === "/auth/profile" && req.method === "POST") {
+        const profile = auth.saveProfile(session, await body(req));
+        audit(session, "profile.update");
+        json(res, 200, { profile });
+        return;
+      }
+      if (
+        url.pathname === "/auth/notifications/dismiss" &&
+        req.method === "POST"
+      ) {
+        auth.dismiss(session, (await body(req)).ids);
+        json(res, 200, { dismissed: auth.dismissed(session) });
+        return;
+      }
+      if (
+        url.pathname === "/auth/oidc/config" &&
+        ["GET", "POST"].includes(req.method)
+      ) {
+        if (session.role !== "Owner") {
+          json(res, 403, { message: "Owner erforderlich" });
+          return;
+        }
+        if (req.method === "GET") json(res, 200, oidc.publicConfig(true));
+        else {
+          const config = await oidc.save(await body(req));
+          audit(session, "oidc.configure");
+          json(res, 200, config);
+        }
+        return;
+      }
       if (url.pathname === "/auth/logout" && req.method === "POST") {
         auth.revoke(session.id);
         res.setHeader(
@@ -199,7 +273,11 @@ const server = http.createServer(async (req, res) => {
             "SELECT id,name,role,hosts,disabled FROM users ORDER BY name",
           )
           .all()
-          .map((u) => ({ ...u, hosts: JSON.parse(u.hosts) }));
+          .map((u) => ({
+            ...u,
+            name: auth.profile(u).displayName,
+            hosts: JSON.parse(u.hosts),
+          }));
         json(res, 200, { items: users });
         return;
       }

@@ -1,0 +1,10 @@
+{
+  "origin": "http://127.0.0.1:8095",
+  "demoOnly": true,
+  "routerURL": "http://127.0.0.1:8095/?demo=1#/logs",
+  "toastZIndex": "2147483647",
+  "toastAboveActiveDrawer": true,
+  "logsTerminalHeight": 477,
+  "pageErrors": [],
+  "passed": true
+}

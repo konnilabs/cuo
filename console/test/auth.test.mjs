@@ -82,6 +82,8 @@ test("RMT service contract and registry are complete", () => {
   );
   for (const tag of [
     "x-icon",
+    "x-toast",
+    "x-cuo-toasts",
     "x-container-table",
     "x-maintenance-planner",
     "x-policy-editor",
@@ -89,4 +91,41 @@ test("RMT service contract and registry are complete", () => {
     "x-approval-dialog",
   ])
     assert.ok(registry[tag]);
+});
+
+test("schema v1 migration preserves existing owners and sessions", async () => {
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), "cuo-migration-"));
+  let auth = new Auth(dir);
+  try {
+    const user = await auth.create(
+      { name: "existing-owner", password: "existing-local-password" },
+      true,
+    );
+    let cookie;
+    auth.issue(
+      {
+        setHeader(k, v) {
+          cookie = v.split(";")[0];
+        },
+      },
+      user,
+      false,
+    );
+    auth.db.exec(
+      "DROP TABLE profiles;DROP TABLE settings;DROP TABLE oidc_identities;DROP TABLE oidc_flows;DROP TABLE notification_dismissals;PRAGMA user_version=1;",
+    );
+    auth.db.close();
+    auth = new Auth(dir);
+    assert.equal(auth.count(), 1);
+    assert.equal(auth.session({ headers: { cookie } }).id, user.id);
+    assert.equal(auth.session({ headers: { cookie } }).role, "Owner");
+    assert.equal(auth.db.prepare("PRAGMA user_version").get().user_version, 2);
+    assert.equal(
+      auth.db.prepare("PRAGMA integrity_check").get().integrity_check,
+      "ok",
+    );
+  } finally {
+    auth.db.close();
+    fs.rmSync(dir, { recursive: true, force: true });
+  }
 });

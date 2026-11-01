@@ -16,3 +16,11 @@ No changes are made to the retained upstream archive.
 
 Roboto fonts: Copyright Google, Apache License 2.0.
 Local redistributable regular and medium fonts are bundled, no remote CDN.
+
+XRouter and XDrawer static templates are adapted to native DOM construction by
+console/tools/prepare-xtend.mjs; router errors render as text. The upstream archive
+is retained unchanged and per-component hashes are recorded by the build.
+
+OIDC runtime: openid-client 6.8.8, oauth4webapi 3.8.8, jose 6.2.14.
+Copyright Filip Skokan and contributors, MIT License. Package licenses are
+included with the runtime dependency tree installed from its lockfile.

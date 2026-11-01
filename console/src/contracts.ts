@@ -29,12 +29,29 @@ export type Container = {
 export type VM = {
   auth: string;
   theme: string;
+  themeMode: string;
+  notificationsOpen: boolean;
+  profileOpen: boolean;
+  dismissed: string[];
+  oidc: Record<string, unknown>;
+  oidcConfig: Record<string, unknown> | null;
   page: string;
   mobile: boolean;
   notice: string;
+  toasts: { id: string; message: string; type: string; duration: number }[];
   error: boolean;
   demo: boolean;
-  user: { name: string; role: string };
+  user: {
+    id?: string;
+    name: string;
+    role: string;
+    profile?: {
+      displayName: string;
+      avatar: string;
+      theme: string;
+      updateNotifications: boolean;
+    };
+  };
   containers: Container[];
   jobs: Record<string, unknown>[];
   events: Record<string, unknown>[];

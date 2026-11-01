@@ -151,7 +151,10 @@ try {
   await dialog.getByLabel("Name", { exact: true }).fill("Overlap draft");
   await dialog.getByLabel("Startzeit").fill("03:15");
   await dialog.getByRole("button", { name: "Fenster speichern" }).click();
-  await dialog.getByRole("alert").waitFor({ state: "visible" });
+  await page
+    .locator("x-cuo-toasts x-toast[type=error]")
+    .getByRole("alert")
+    .waitFor({ state: "visible" });
   assert.equal(
     await dialog.getByLabel("Name", { exact: true }).inputValue(),
     "Overlap draft",

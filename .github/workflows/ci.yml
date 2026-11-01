@@ -23,6 +23,7 @@ jobs:
           npm run setup
           npm run build
           npm test
+          npm audit --prefix runtime --audit-level=high
           cd .framework
           npm audit --audit-level=high --workspace=@ccslabs/xtend-cli --workspace=@ccslabs/xtend-maraca --workspace=@ccslabs/xtend-rmt --workspace=@ccslabs/xtend-compiler --include-workspace-root
       - name: Disposable Docker update
@@ -46,6 +47,7 @@ jobs:
           CUO_TEST_OUTPUT: reports/browser
         run: |
           CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" node console/test/browser.mjs
+          CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_EXTENSIONS_OUTPUT=reports/extensions-browser node console/test/extensions-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

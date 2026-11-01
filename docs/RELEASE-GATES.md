@@ -8,8 +8,8 @@ CUO 0.1.0 is delivered as a local source-build MVP. The repository is prepared f
 | Application and emitted-runtime HTML sinks | Build source gate and `runtime-hardening.json`; fail on new sink sites |
 | Domain and recovery | Go race tests, DST/repeated/skipped time, one-minute collisions, policy inheritance, idempotency, cancellation, restart |
 | Docker execution | Opt-in disposable real Docker E2E; verifies changed image, volume data, environment, labels, health and retained stopped original |
-| UI | Actual browser navigation, filters, dialogs, keyboard, dark/mobile, text-only XSS, first-run enrollment, live inventory, CSRF, Origin, RBAC |
-| SCA | `govulncheck` against patched Go 1.27.3; npm audit scoped to the actual build workspaces |
+| UI | Actual browser navigation, filters, dialogs, keyboard, dark/mobile, XRouter history/reload, live system theme, durable notification dismissal, profile drawer, signed OIDC browser login, text-only XSS, first-run enrollment, live inventory, CSRF, Origin, RBAC |
+| SCA | `govulncheck` against patched Go 1.27.3; npm audit scoped to the actual build workspaces and the pinned OIDC runtime tree |
 | Backup / restore | Verify all three volumes using isolated restore volumes; protect resolved Compose secrets |
 | Secret review | No `.env`, database, key or runtime credential tracked; inspect `tools/check-secrets.mjs` output |
 | OCI vulnerability scans | Required before public distribution; local source tests do not replace image/OS scans |

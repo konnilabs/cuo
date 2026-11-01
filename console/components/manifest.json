@@ -1,5 +1,13 @@
 {
   "x-icon": "../.framework/components/xicon.js",
+  "x-router": "../vendor/xrouter.mjs",
+  "x-route": "../vendor/xrouter.mjs",
+  "x-toggle": "../.framework/components/xtoggle.js",
+  "x-drawer": "../vendor/xdrawer.mjs",
+  "x-toast": "../.framework/components/xtoast.js",
+  "x-cuo-toasts": "./toasts.mjs",
+  "x-cuo-notifications": "./account.mjs",
+  "x-cuo-profile": "./account.mjs",
   "x-container-table": "./widgets.mjs",
   "x-maintenance-planner": "./widgets.mjs",
   "x-update-run-timeline": "./widgets.mjs",

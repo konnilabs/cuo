@@ -23,6 +23,20 @@ docker compose up -d
 
 Bei abweichendem Port `CUO_PORT` **und** `CUO_ORIGIN` in `.env` anpassen. Für Zugriff von anderen Rechnern einen TLS-Reverse-Proxy verwenden und `CUO_ORIGIN=https://cuo.example.org` setzen. Der BFF verweigert einen unverschlüsselten Origin außerhalb von Loopback. Der Proxy muss den Origin erhalten und SSE ohne Pufferung weiterleiten. Eine optionale Caddy-Vorlage liegt in `deploy/Caddyfile.example`.
 
+## Anmeldung und persönliche Einstellungen
+
+Unter **Integrationen → OpenID Connect** kann der Owner einen OIDC-Provider konfigurieren. Im Provider einen Web-Client für **Authorization Code Flow mit PKCE (S256)** anlegen und die in CUO angezeigte **Redirect-URI** exakt übernehmen, lokal normalerweise `http://127.0.0.1:8095/auth/oidc/callback`. Bei einem Reverse-Proxy zählt der öffentliche `CUO_ORIGIN`.
+
+Issuer, optionale abweichende Discovery-URL, Client-ID, Client-Secret, Scopes und Client-Authentifizierung sind konfigurierbar. Den Provider-Client für signierte RS256-ID-Tokens mit JWKS konfigurieren. Eine abweichende Discovery-URL wird als exakte Dokument-URL verwendet und muss keinen `.well-known`-Pfad enthalten. Unterstützt sind `client_secret_post`, `client_secret_basic` und öffentliche PKCE-Clients. Die Issuer-URL muss exakt dem Discovery-Dokument entsprechen, einschließlich eines eventuellen Pfades oder abschließenden Schrägstrichs. Provider-Endpunkte benötigen HTTPS mit vertrauenswürdiger Zertifikatskette. Keine Zertifikatsprüfung wird abgeschaltet.
+
+**Speichern und Verbindung prüfen** prüft bei aktivierter Anmeldung die Discovery und speichert das Secret ausschließlich im serverseitigen Identity-Volume. Ein leeres Secret-Feld behält den bisherigen Wert; zum Entfernen gibt es eine eigene Checkbox. Bei aktivierter automatischer Benutzeranlage darf jeder vom Provider zugelassene Benutzer mit der gewählten Rolle auf den lokalen Host zugreifen; Standard ist **Viewer**. Die Zugangsbegrenzung erfolgt im Provider. Bestehende CUO-Rollen bleiben erhalten. Konten werden über Issuer und Subject identifiziert, niemals anhand gleicher E-Mail-Adressen mit lokalen Konten verknüpft. Die lokale Anmeldung bleibt als unabhängiger Zugang verfügbar. **Abmelden** beendet CUO-Sitzungen, nicht die Sitzung beim Provider.
+
+Das Benutzermenü öffnet rechts den XTend-Profil-Drawer: Anzeigename, lokales Profil-Icon, Farbschema und Update-Benachrichtigungen lassen sich speichern. Der lokale Loginname bleibt erhalten. Unter **Workspace-Einstellungen → Darstellung** schaltet XToggle zwischen hell und dunkel. **Automatisch** übernimmt die Systemeinstellung und reagiert auch auf spätere Änderungen. Profilpräferenzen gelten pro Benutzer.
+
+Erfolgsmeldungen und Fehler erscheinen als echte **XToasts** rechts oben. Die RMT-gesteuerte Toast-Ebene nutzt die oberste Browser-Ebene und `z-index: 2147483647`, sodass sie über dem Profil-Drawer liegt. Toasts lassen sich schließen und verschwinden nach fünf Sekunden (Fehler nach neun Sekunden) automatisch.
+
+Die Glocke öffnet das Notification Center mit verfügbaren Updates, Freigaben und Ergebnissen der Update-Läufe. Meldungen lassen sich einzeln oder gemeinsam ausblenden. Das wird pro Benutzer gespeichert; ein neuer Image-Digest oder ein neuer Job-Status erzeugt eine neue Meldung. Die Löschung einer Meldung verändert keinen Container und keinen Audit-Eintrag. SPA-Ansichten haben mit XRouter eigene Hash-URLs, beispielsweise `/#/containers`; Zurück/Vorwärts und Neuladen bleiben nutzbar. Die Design-Demo speichert persönliche Darstellungspräferenzen ausschließlich lokal im Browser. Die Logs-Ansicht füllt die Kartenhöhe mit dem Terminal und zeigt bis zu 200 Einträge mit internem Scrollbereich; das Dashboard behält die kompakte Vorschau.
+
 ## Container verwalten
 
 CUO entdeckt vorhandene Container. Die globale Standardrichtlinie lautet **Nur prüfen**. Zur Ausführung sind zwei ausdrückliche Freigaben notwendig:
@@ -97,6 +111,7 @@ cd console
 npm run setup
 npm run build
 npm test
+npm audit --prefix runtime --audit-level=high
 ```
 
 `console/tools/author-rmt.mjs` schreibt die prüfbare kanonische RMT-Datei `console/src/app.rmt`. Änderungen an der Shell dort im Authoring-Modell vornehmen und neu generieren. Im Browser besitzt ausschließlich RMT die Shell, Navigation, Dialogsichtbarkeit und den View-State. Maraca AppServices koordinieren Intents und typisierte BFF-Aufrufe; Server Services rufen die versionierte Core-API auf. Custom-XTend-Komponenten erhalten deklarative Daten und senden `xtend-command`-Events. Native Formulardrafts und Fokus bleiben innerhalb der jeweiligen Komponente. Passwörter werden weder in den View-State noch in Browser-Speicher geschrieben.
@@ -109,11 +124,11 @@ go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableDockerUpdate
 ```
 
-Der optionale Docker-E2E-Test erzeugt ausschließlich eigene Testcontainer und ein eigenes Volume und räumt diese wieder auf. Niemals einen existierenden Produktivcontainer als Testziel verwenden. Browserprüfungen und Screenshots sind unter `console/test/browser.mjs` beschrieben.
+Der optionale Docker-E2E-Test erzeugt ausschließlich eigene Testcontainer und ein eigenes Volume und räumt diese wieder auf. Niemals einen existierenden Produktivcontainer als Testziel verwenden. Browserprüfungen und Screenshots sind unter `console/test/browser.mjs` beschrieben. `console/test/extensions-browser.mjs` startet zusätzlich einen vollständig isolierten BFF mit eigener Identity-Datenbank, Core-Fixture und signierendem OIDC-Testprovider. Dafür Playwright installieren und optional `CUO_PLAYWRIGHT_MODULE` sowie `CUO_CHROMIUM` setzen. Der Test prüft XRouter, Systemfarbschema, Profile, persistente Benachrichtigungen und eine Anmeldung über unterschiedliche Browser-Sites. Er verwendet keine bestehenden CUO-Konten.
 
 ## Grenzen vor einer öffentlichen Veröffentlichung
 
-Das lokale MVP ist noch kein als öffentliches Release freigegebenes Produkt. OIDC / Nextcloud SSO, private Registry-Credentials, Multi-Host-Transport, automatische Daten-Rollbacks und hochverfügbare Datenhaltung sind nicht aktiviert. Ein bestehendes OIDC-Konto wird nicht vorgetäuscht; die Oberfläche zeigt den lokalen Login.
+Das lokale MVP ist noch kein als öffentliches Release freigegebenes Produkt. Private Registry-Credentials, Multi-Host-Transport, automatische Daten-Rollbacks und hochverfügbare Datenhaltung sind nicht aktiviert. OIDC ist optional konfigurierbar; ohne Einrichtung wird ausschließlich die lokale Anmeldung angeboten.
 
 Vor Distribution sind die in `docs/RELEASE-GATES.md` benannten Prüfungen einschließlich signierter OCI-Veröffentlichung, SBOM, Provenance, Image-CVE-Scan, Restore-Test und breiter Barrierefreiheitsprüfung zu erfüllen. Der mitgelieferte CI-Workflow ist auf einen späteren GitHub-Remote vorbereitet. Es wurden weder Images in eine Registry gepusht noch ein GitHub-Repository erstellt.
 

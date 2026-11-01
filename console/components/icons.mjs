@@ -9,6 +9,10 @@ registerIconPack({
   id: "cuo",
   label: "CUO local interface icons",
   icons: {
+    user: { nodes: [c(12, 8, 4), p("M4 22v-2a8 8 0 0 1 16 0v2")] },
+    shield: {
+      nodes: [p("M12 3 20 6v6c0 4.5-3.1 7.3-8 9-4.9-1.7-8-4.5-8-9V6Z")],
+    },
     logo: {
       nodes: [
         {

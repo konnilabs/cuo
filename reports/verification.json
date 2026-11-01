@@ -1,7 +1,7 @@
 {
   "schema": "cuo.local-mvp-verification.v1",
   "version": "0.1.0",
-  "verifiedAt": "2026-11-01T12:58:13.192149+01:00",
+  "verifiedAt": "2026-11-01T13:43:47.677762+01:00",
   "frameworkCommit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
   "watchtowerStartingCommit": "a047c7f9ff11813f930f6998863fa1b8a015985c",
   "rmtPlanOK": true,
@@ -22,10 +22,13 @@
     "standaloneDocker": "PASS",
     "durableCoreDocker": "PASS",
     "composeReconcile": "PASS",
-    "browser": "PASS"
+    "browser": "PASS (fresh isolated Docker stack, current Console image)",
+    "extensionsBrowser": "PASS (isolated BFF, SQLite, signed OIDC provider, cross-site browser flow)",
+    "identityV1Migration": "PASS (existing users and sessions preserved)",
+    "deployedConsoleSmoke": "PASS (current image: toast over drawer and expanded Logs, demo-only)"
   },
   "goRaceAndVet": "PASS",
-  "nodeServiceTests": 3,
+  "nodeServiceTests": 6,
   "goVulnerabilityScan": "No vulnerabilities found.",
   "npmBuildVulnerabilities": {
     "info": 0,
@@ -39,7 +42,7 @@
   "containers": [
     {
       "name": "cuo-console-1",
-      "imageId": "sha256:d2cc7b950197d33ed7feea92196d46a7519bc88dd4224b7a04f20b2eb38d774e",
+      "imageId": "sha256:f52a475436ed0a0eb285b1200de199b48674d28919d4ba075078313dea3ab40c",
       "state": "running",
       "health": "healthy",
       "user": "node",
@@ -77,5 +80,81 @@
     "private registry credentials",
     "signed OCI publication, complete image SBOM/provenance and OS CVE scans",
     "complete accessibility audit and broader supported-runtime matrix"
-  ]
+  ],
+  "npmRuntimeVulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "identityUpgrade": {
+    "schema": 2,
+    "backupCreated": true,
+    "backupIntegrity": "ok",
+    "liveIntegrity": "ok",
+    "existingUserCount": 1,
+    "liveUserCount": 1
+  },
+  "extensions": {
+    "oidc": {
+      "configuration": "Owner-only, generic issuer/discovery/client credentials/scopes/provisioning role",
+      "flow": "Authorization Code + PKCE S256 + nonce + one-use browser-bound state",
+      "idToken": "RS256 signature, issuer, audience, expiry and nonce verified",
+      "userinfo": "Expected subject verified",
+      "discovery": "Default or exact arbitrary metadata URL",
+      "realCustomerProviderConfigured": false,
+      "browserTest": "PASS with distinct loopback sites"
+    },
+    "router": "Real XTend XRouter, hash routes, back/forward and reload",
+    "appearance": "Real XToggle, automatic OS preference and per-user persistence",
+    "notifications": "Per-user stable digest/job-state dismissal; individual/clear-all",
+    "profileDrawer": "Real XTend XDrawer; local snapshot has no XSurfaceDrawer tag; editable name/icon/preferences",
+    "toasts": {
+      "component": "XTend XToast",
+      "owner": "RMT queue, maximum four",
+      "layer": "Native manual popover top layer, z-index 2147483647",
+      "successDurationMs": 5000,
+      "errorDurationMs": 9000,
+      "browser": "PASS: frontmost and pointer-dismissible over active XDrawer; timeout checked"
+    },
+    "logs": "Full route terminal fills card, bounded 200-event internal scrolling; compact dashboard preview retained"
+  },
+  "newFeatureSources": {
+    "console/server/auth.mjs": "8631c11f4863fdb33882e5cc77e75e0d83e5e9eae6f4e693b83e94de88196271",
+    "console/server/oidc.mjs": "d3cb271c9713237bb716c711da21bc93540bdfbc56c242c833c3b4af219f7326",
+    "console/src/services.ts": "d7c88434e64358190424a81f900ac0a38b522be63fdabf689129b4a4ed0f8262",
+    "console/src/app.rmt": "f478107d295438171d5fa87c01c0e1d510aece52298f521af16c5374481cb1ef",
+    "console/components/account.mjs": "41e19fae2dd6c834f8a505e1302abb711d5b20b61d5dbeeb9688e3642317df81",
+    "console/runtime/package-lock.json": "24caeb874b1c61efd40c0cc2809b873baadf7df127d6eef4418418643ebc2caf",
+    "console/components/toasts.mjs": "1b5ba7a9b4d360984323097a81e27aa08dd13c31f75942905dbe085239357a7c",
+    "console/src/app.css": "173d9584aaa794982629515bd0afdfae9c321584bf4b8b4ecc88de7129b98483"
+  },
+  "browserEvidence": {
+    "passed": true,
+    "checks": [
+      "XRouter URL/back/forward/reload",
+      "XToggle and live OS theme",
+      "durable individual/clear-all notifications",
+      "XDrawer profile and persistence",
+      "owner-only OIDC configuration and redirect URI",
+      "cross-site signed OIDC browser flow with PKCE and explicit discovery URL",
+      "provider user provisioned as Viewer",
+      "mobile drawer",
+      "logs terminal fills card at 1122x892 viewport",
+      "real XToast in top layer above active drawer; pointer dismissal and timeout"
+    ],
+    "browserErrors": []
+  },
+  "deployedSmoke": {
+    "origin": "http://127.0.0.1:8095",
+    "demoOnly": true,
+    "routerURL": "http://127.0.0.1:8095/?demo=1#/logs",
+    "toastZIndex": "2147483647",
+    "toastAboveActiveDrawer": true,
+    "logsTerminalHeight": 477,
+    "pageErrors": [],
+    "passed": true
+  }
 }

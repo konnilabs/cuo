@@ -529,19 +529,6 @@ x-icon {
   padding: 22px;
   min-height: 500px;
 }
-.notice {
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #e0f6eb;
-  border: 1px solid #b2e6cd;
-  color: #11623d;
-  margin: 0 0 12px;
-}
-.notice.error {
-  background: #fff0f0;
-  color: #a12838;
-  border-color: #f8cdd2;
-}
 .demo-note {
   display: flex;
   justify-content: space-between;
@@ -982,4 +969,43 @@ x-icon {
 }
 .cuo-shell[data-theme="dark"] .icon-btn {
   color: var(--cuo-muted);
+}
+.cuo-router {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
+  --xtend-router-reserved-block-size: 0px;
+}
+x-cuo-notifications {
+  display: contents;
+}
+
+.main-content.logs-page {
+  display: flex;
+  flex-direction: column;
+  min-height: calc(100dvh - 66px);
+}
+.logs-page .page-heading,
+.logs-page .stats {
+  flex-shrink: 0;
+}
+.logs-workspace {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.logs-workspace > .route-panel {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
+}
+.logs-workspace x-log-stream {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+  min-width: 0;
 }

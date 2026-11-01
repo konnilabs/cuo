@@ -1066,3 +1066,300 @@ dialog::backdrop {
 .badge.warning {
   color: #925000;
 }
+/* Account surfaces inherit the same CUO tokens as the RMT shell. */
+.notification-center {
+  position: fixed;
+  top: 64px;
+  right: 24px;
+  z-index: 120;
+  width: min(420px, calc(100vw - 24px));
+  background: var(--cuo-surface, #fff);
+  color: var(--cuo-text, #11152d);
+  border: 1px solid var(--cuo-border, #e2e7f1);
+  border-radius: 15px;
+  box-shadow: 0 16px 48px #0b1d4a28;
+  padding: 16px;
+  text-align: left;
+}
+.notification-center h2 {
+  font-size: 16px;
+  margin: 0;
+}
+.notification-tools {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.notification-list {
+  max-height: min(460px, 65vh);
+  overflow: auto;
+  margin-top: 10px;
+}
+.notification-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--cuo-border, #e2e7f1);
+}
+.notification-symbol {
+  padding: 9px;
+  color: #2459ee;
+  background: #edf3ff;
+  border-radius: 10px;
+}
+.notification-link {
+  flex: 1;
+  min-width: 0;
+  text-align: left;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  padding: 3px 0;
+}
+.notification-link strong,
+.notification-link span {
+  display: block;
+}
+.notification-link span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--cuo-muted, #657293);
+  margin-top: 5px;
+}
+.notification-item .icon-btn {
+  flex-shrink: 0;
+  min-width: 28px;
+  width: 28px;
+  height: 28px;
+  padding: 4px;
+}
+.notification-empty {
+  padding: 32px 12px;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+}
+.notification-empty > x-icon {
+  color: #04a35f;
+}
+.notification-empty p {
+  margin: 0;
+  color: var(--cuo-muted, #657293);
+  font-size: 13px;
+}
+.notification-footer {
+  margin: 14px 0 0;
+}
+.appearance-controls {
+  display: grid;
+  gap: 12px;
+  margin: 14px 0;
+}
+.appearance-controls x-toggle {
+  max-width: 100%;
+}
+.appearance-controls p {
+  margin: 0;
+}
+.check {
+  display: flex;
+  gap: 9px;
+  align-items: center;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.check input {
+  width: 16px;
+  height: 16px;
+  accent-color: #2459ee;
+}
+.profile-form {
+  display: grid;
+  gap: 16px;
+  padding: 8px 0 20px;
+}
+.profile-form h3 {
+  font-size: 14px;
+  margin: 8px 0 0;
+}
+.profile-summary {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 8px;
+}
+.profile-summary h2 {
+  font-size: 19px;
+  margin: 0 0 8px;
+}
+.profile-avatar {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  flex: none;
+  background: #173d80;
+  color: white;
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 600;
+}
+.profile-avatar x-icon {
+  --xicon-size: 26px;
+}
+.profile-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.oidc-card {
+  max-width: 780px;
+}
+.oidc-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 20px;
+}
+.redirect-uri {
+  font-family: monospace;
+  font-size: 12px;
+}
+.oidc-form .callout {
+  margin: 0;
+}
+.oidc-form .btn {
+  justify-self: start;
+}
+.appearance-controls x-toggle {
+  --xtend-color-primary: #2459ee;
+}
+x-drawer {
+  --drawer-bg: var(--cuo-surface, #fff);
+  --drawer-color: var(--cuo-text, #11152d);
+  --drawer-border: var(--cuo-border, #e2e7f1);
+  --drawer-bg-dark: var(--cuo-surface, #182235);
+  --drawer-color-dark: var(--cuo-text, #edf1fa);
+  --drawer-border-dark: var(--cuo-border, #344259);
+}
+@media (max-width: 600px) {
+  .notification-center {
+    top: 66px;
+    right: 12px;
+  }
+  .notification-tools {
+    gap: 4px;
+  }
+  .notification-tools .small {
+    font-size: 11px;
+  }
+  .profile-summary h2 {
+    font-size: 17px;
+  }
+}
+.integrations-grid {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.65fr) minmax(420px, 1.4fr);
+  gap: 16px;
+  align-items: start;
+  margin: 20px 0;
+}
+.integrations-grid .policy-card {
+  min-width: 0;
+}
+.oidc-card {
+  max-width: none;
+}
+.oidc-form .field,
+.profile-form .field {
+  margin: 0;
+}
+.oidc-form {
+  gap: 18px;
+}
+.profile-form {
+  gap: 18px;
+}
+.profile-form .appearance-controls {
+  margin: 0;
+}
+.appearance-controls x-toggle {
+  --xtend-toggle-text: var(--cuo-text);
+  --xtend-toggle-label-text: var(--cuo-text);
+  --xtend-toggle-track-on-color: var(--cuo-primary);
+  --xtend-toggle-font-size: 13px;
+}
+x-drawer::part(surface) {
+  width: min(380px, 94vw);
+}
+@media (max-width: 1050px) {
+  .integrations-grid {
+    grid-template-columns: 1fr;
+  }
+}
+/* This host is a root RMT sibling and enters the browser top layer. */
+:host([data-toast-layer]) {
+  position: fixed;
+  inset: auto;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  z-index: 2147483647;
+  width: min(390px, calc(100vw - 32px));
+  height: auto;
+  max-height: calc(100dvh - 32px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  overflow: visible;
+  pointer-events: none;
+  --xtend-font-family: var(--font, Roboto, Arial, sans-serif);
+  --xtend-success-bg: #087f5b;
+  --xtend-error-bg: #be123c;
+  --xtend-info-bg: #2458e8;
+  --xtend-warning-bg: #fef3c7;
+  --xtend-warning-fg: #7c2d12;
+  --toast-radius: 12px;
+  --toast-width: 100%;
+  --toast-padding: 16px 52px 16px 18px;
+}
+:host([data-toast-layer]:not(:popover-open):not([data-fallback-open])) {
+  display: none;
+}
+:host([data-toast-layer])::backdrop {
+  background: transparent;
+  pointer-events: none;
+}
+.toast-stack {
+  display: grid;
+  gap: 10px;
+  max-height: calc(100dvh - 32px);
+  overflow: auto;
+  padding: 3px 4px 16px;
+}
+.toast-stack x-toast {
+  pointer-events: auto;
+  margin: 0;
+  font-size: 12px;
+  --toast-animation-duration: 180ms;
+}
+
+:host([expanded]) > div {
+  display: flex;
+  flex: 1 1 0;
+  flex-direction: column;
+  min-height: 0;
+  min-width: 0;
+}
+:host([expanded]) .panel-heading {
+  flex-shrink: 0;
+}
+:host([expanded]) .log-screen {
+  flex: 1 1 0;
+  height: auto;
+  min-height: 320px;
+  max-height: none;
+}

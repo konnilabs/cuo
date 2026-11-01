@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "sourceHash": "904c188e78ed904f030bf33a1098845ed780439a785218dadbe394cfbcad4efc",
+  "sourceHash": "f478107d295438171d5fa87c01c0e1d510aece52298f521af16c5374481cb1ef",
   "strictModes": {
     "orchestration": "strict",
     "kernel": "strict",
@@ -8,147 +8,305 @@
     "services": "planned"
   },
   "components": {
+    "requiredTags": [
+      "a",
+      "aside",
+      "button",
+      "div",
+      "header",
+      "input",
+      "label",
+      "main",
+      "nav",
+      "p",
+      "section",
+      "span",
+      "strong",
+      "x-approval-dialog",
+      "x-container-table",
+      "x-cuo-auth",
+      "x-cuo-notifications",
+      "x-cuo-profile",
+      "x-cuo-toasts",
+      "x-cuo-workspace",
+      "x-host-health",
+      "x-icon",
+      "x-log-stream",
+      "x-maintenance-planner",
+      "x-policy-editor",
+      "x-route",
+      "x-router",
+      "x-update-run-timeline"
+    ],
     "selected": [
       {
         "tag": "a",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "aside",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "button",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "div",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "header",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "input",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "label",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "main",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "nav",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "p",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "section",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "span",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "strong",
+        "module": null,
+        "absolutePath": null,
         "source": "browser-native-element",
-        "importPath": null,
-        "native": true
+        "known": true,
+        "native": true,
+        "lazy": false,
+        "sideEffectBoundary": "browser-native-element"
       },
       {
         "tag": "x-approval-dialog",
+        "module": "./dialogs.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/dialogs.mjs",
         "source": "components/dialogs.mjs",
-        "importPath": "../components/dialogs.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-container-table",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-cuo-auth",
+        "module": "./dialogs.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/dialogs.mjs",
         "source": "components/dialogs.mjs",
-        "importPath": "../components/dialogs.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
+      },
+      {
+        "tag": "x-cuo-notifications",
+        "module": "./account.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/account.mjs",
+        "source": "components/account.mjs",
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
+      },
+      {
+        "tag": "x-cuo-profile",
+        "module": "./account.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/account.mjs",
+        "source": "components/account.mjs",
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
+      },
+      {
+        "tag": "x-cuo-toasts",
+        "module": "./toasts.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/toasts.mjs",
+        "source": "components/toasts.mjs",
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-cuo-workspace",
+        "module": "./dialogs.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/dialogs.mjs",
         "source": "components/dialogs.mjs",
-        "importPath": "../components/dialogs.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-host-health",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-icon",
+        "module": "../.framework/components/xicon.js",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/.framework/components/xicon.js",
         "source": ".framework/components/xicon.js",
-        "importPath": "../.framework/components/xicon.js",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-log-stream",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-maintenance-planner",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-policy-editor",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
+      },
+      {
+        "tag": "x-route",
+        "module": "../vendor/xrouter.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/vendor/xrouter.mjs",
+        "source": "vendor/xrouter.mjs",
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
+      },
+      {
+        "tag": "x-router",
+        "module": "../vendor/xrouter.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/vendor/xrouter.mjs",
+        "source": "vendor/xrouter.mjs",
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       },
       {
         "tag": "x-update-run-timeline",
+        "module": "./widgets.mjs",
+        "absolutePath": "/home/konni/Documents/Codex/2026-11-01/kan/outputs/cuo/console/components/widgets.mjs",
         "source": "components/widgets.mjs",
-        "importPath": "../components/widgets.mjs",
-        "native": false
+        "known": true,
+        "lazy": false,
+        "sideEffectBoundary": "selected-component-module"
       }
     ],
-    "unknown": []
+    "unknown": [],
+    "allowDynamicComponents": false
   },
   "loader": {
     "mode": "inline-registry",

@@ -1,4 +1,5 @@
 import type { VM } from "./contracts.ts";
+import { notifications } from "./notifications.ts";
 export const pageNames: Record<string, string> = {
   dashboard: "Dashboard",
   containers: "Container",
@@ -29,9 +30,16 @@ export function initial(): VM {
   return {
     auth: "loading",
     theme: "light",
+    themeMode: "system",
+    notificationsOpen: false,
+    profileOpen: false,
+    dismissed: [],
+    oidc: {},
+    oidcConfig: null,
     page: "dashboard",
     mobile: false,
     notice: "",
+    toasts: [],
     error: false,
     demo: false,
     user: { name: "", role: "" },
@@ -65,8 +73,27 @@ export function present(vm: VM): VM {
       .length;
   const title = pageNames[vm.page] || "Dashboard";
   const auth = vm.auth === "ready" || vm.demo;
+  const items = notifications(vm);
   const result: VM = {
     ...vm,
+    notifications: items,
+    notificationCount: String(items.length),
+    notificationClass: items.length ? "notification-count" : "is-hidden",
+    notificationsExpanded: String(vm.notificationsOpen),
+    profileExpanded: String(vm.profileOpen),
+    avatarTextClass:
+      !vm.user.profile || vm.user.profile.avatar === "initials"
+        ? ""
+        : "is-hidden",
+    avatarIconClass:
+      !vm.user.profile || vm.user.profile.avatar === "initials"
+        ? "is-hidden"
+        : "",
+    avatarName:
+      vm.user.profile?.avatar === "initials"
+        ? "user"
+        : vm.user.profile?.avatar || "user",
+    avatarPack: "cuo",
     title,
     description: descriptions[vm.page] || "",
     total: String(total),
@@ -95,10 +122,14 @@ export function present(vm: VM): VM {
     shellClass: `cuo-shell${vm.mobile ? " mobile-open" : ""}${auth ? "" : " is-hidden"}`,
     authClass: auth ? "is-hidden" : "auth-wrap",
     dashboardClass: vm.page === "dashboard" ? "dashboard-grid" : "is-hidden",
-    workspaceClass: vm.page === "dashboard" ? "is-hidden" : "workspace-panel",
-    noticeClass: vm.notice
-      ? `notice ${vm.error ? "error" : "success"}`
-      : "is-hidden",
+    workspaceClass:
+      vm.page === "dashboard"
+        ? "is-hidden"
+        : vm.page === "logs"
+          ? "workspace-panel logs-workspace"
+          : "workspace-panel",
+    mainContentClass:
+      vm.page === "logs" ? "main-content logs-page" : "main-content",
     demoClass: vm.demo ? "demo-note" : "is-hidden",
     pageTitle: title,
     nextDate: "Kein Fenster geplant",

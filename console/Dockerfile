@@ -3,6 +3,7 @@ WORKDIR /app
 RUN npm install --global npm@11.17.0
 COPY third_party/xtend-49166cb.tar.gz /third_party/xtend-49166cb.tar.gz
 COPY console/package.json ./
+COPY console/runtime ./runtime
 COPY console/tools/setup.mjs ./tools/setup.mjs
 RUN node tools/setup.mjs
 COPY console/src ./src
@@ -17,6 +18,7 @@ WORKDIR /app
 RUN mkdir /data && chown node:node /data
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server ./server
+COPY --from=build /app/runtime ./runtime
 COPY --from=build /app/.framework/xtend-maraca ./.framework/xtend-maraca
 COPY LICENSE NOTICE third_party/XTend-LICENSE /usr/share/licenses/cuo/
 USER node
