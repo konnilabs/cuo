@@ -1,0 +1,18 @@
+CUO Container Update Orchestrator
+Copyright 2026 CUO contributors
+
+This product includes modified code derived from containrrr/watchtower,
+commit a047c7f9ff11813f930f6998863fa1b8a015985c (v1.7.1), Apache License 2.0.
+The adapted GetCreateConfig algorithm is in internal/watchtower/config.go.
+The original source archive and license are retained in third_party/.
+CUO is an independent product; no official Watchtower affiliation is implied.
+
+XTend 0.9.0, konnilabs/xtend commit
+49166cbe96d91049634fbe03eb48c04edb6e70cd, Apache License 2.0.
+Original license: third_party/XTend-LICENSE.
+Two unused legacy HTML materialization paths are disabled in the generated
+browser runtime by console/tools/harden-runtime.mjs, with hash evidence.
+No changes are made to the retained upstream archive.
+
+Roboto fonts: Copyright Google, Apache License 2.0.
+Local redistributable regular and medium fonts are bundled, no remote CDN.

@@ -1,0 +1,60 @@
+name: CUO checks
+on: [push, pull_request, workflow_dispatch]
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.27.3'}
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.22.1'}
+      - run: npm install --global npm@11.17.0
+      - run: |
+          go test -race ./...
+          go vet ./...
+          go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
+          node tools/generate-api.mjs
+          git diff --exit-code docs/openapi.json console/src/generated-api.ts
+      - working-directory: console
+        run: |
+          npm run setup
+          npm run build
+          npm test
+          cd .framework
+          npm audit --audit-level=high --workspace=@ccslabs/xtend-cli --workspace=@ccslabs/xtend-maraca --workspace=@ccslabs/xtend-rmt --workspace=@ccslabs/xtend-compiler --include-workspace-root
+      - name: Disposable Docker update
+        run: |
+          CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableDockerUpdate -count=1
+          CUO_DOCKER_E2E=1 go test -v ./internal/core -run TestDurableCoreDockerUpdate -count=1
+      - name: Install fresh test stack
+        run: |
+          mkdir -p work
+          umask 077
+          node -e "const c=require('node:crypto');require('node:fs').writeFileSync('work/ci.env','CUO_CORE_TOKEN='+c.randomBytes(32).toString('hex')+'\nCUO_AGENT_TOKEN='+c.randomBytes(32).toString('hex')+'\nCUO_ORIGIN=http://127.0.0.1:8096\nCUO_PORT=8096\n')"
+          docker run -d --name cuo-ci-fixture busybox:1.37.0 sleep 3600
+          docker compose --env-file work/ci.env -p cuo-ci up -d --build --wait
+          npm install --prefix work/browser playwright@1.62.1
+          work/browser/node_modules/.bin/playwright install --with-deps chromium
+      - name: Disposable Compose reconciliation
+        run: CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile -count=1
+      - name: Browser and auth integration
+        env:
+          CUO_TEST_ORIGIN: http://127.0.0.1:8096
+          CUO_TEST_OUTPUT: reports/browser
+        run: |
+          CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" node console/test/browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CUO verification
+          path: |
+            reports/
+            console/reports/
+      - name: Clean up test resources
+        if: always()
+        run: |
+          docker compose --env-file work/ci.env -p cuo-ci down -v
+          docker rm -f cuo-ci-fixture

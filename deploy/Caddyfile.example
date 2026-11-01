@@ -1,0 +1,6 @@
+# Run your existing TLS ingress on the host, or connect it to CUO's console network.
+cuo.example.org {
+    reverse_proxy 127.0.0.1:8095 {
+        flush_interval -1
+    }
+}

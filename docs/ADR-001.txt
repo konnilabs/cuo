@@ -1,0 +1,95 @@
+CUO — Container Update Orchestrator
+Architecture & Implementation Specification | ADR-001 | Proposed | 01.11.2026
+Product vision: a self-contained, third-party deployable Docker update orchestration product for self-hosters and SMEs, with a modern XTend console. This document is a proposed implementation baseline, not a claim that the listed XTend APIs have already been validated.
+1. ADR-001 — Architectural decision
+1.1 Rationale and consequences
+RMT owns view composition, state, navigation, transitions and component lifecycle. A separate React/Vue shell, ad-hoc DOM state and browser-side Docker access are rejected. This improves architectural consistency, at the cost of implementing reusable widgets and strict component contracts. The Go Core must remain operable when the UI is offline.
+2. Logical architecture
+Browser [RMT + XTend components + CSS] → Maraca App Services → same-origin BFF / Server Services [session, CSRF, RBAC] → versioned CUO Core API [Go] → durable scheduler, policy engine, job queue, registry scanner → constrained host execution boundary → Docker Engine. SQLite stores policies, history, jobs and audit events. SSE delivers authorized event streams to the UI.
+The BFF never forwards arbitrary Docker operations. The Core owns all long-running execution and must recover durable jobs after restarts. A multi-host agent protocol is a forward-compatible extension, not a prerequisite for the first release.
+3. Binding UI architecture rules
+All shell regions — sidebar, dashboard, tables, detail drawers, calendar, logs, dialogs, settings — are declared in RMT; no second client router or parallel state owner.
+Maraca App Services handle user intents, validate input and coordinate typed server-side calls; server services handle authentication and authorization.
+Specialized components must be implemented as Custom-XTend components and registered before use. Each requires prop schema, event contract, slots, lifecycle, accessibility behavior and tests.
+Untrusted image names, log lines, errors and registry metadata render as text, never as HTML. No HTML-string templating or DOM replacement shortcuts.
+Any exceptional imperative DOM integration requires a documented security review and must not use raw HTML sinks. Enforce lint/static checks and CSP; use Trusted Types where supported.
+3.1 Custom component registry
+Registry naming/versioning and exact APIs must be verified against the targeted XTend release. Components expose semantic events to RMT and never mutate the surrounding shell.
+3.2 Interaction flow
+RMT action → Maraca App Service → typed BFF endpoint (RBAC, CSRF, idempotency key) → CUO Core creates a durable job → Core emits structured events → SSE updates RMT state → registered components re-render. No direct client-to-Core privileged channel.
+4. Visual specification and CSS
+The generated reference defines a dark navy left sidebar, light neutral workspace, rounded white cards, restrained shadows, blue primary controls, status colors, compact tables, calendar pane and live activity log. Build this with responsive semantic layout and CSS design tokens, not baked-in image elements.
+Figure 1. CUO concept dashboard — illustrative data only.
+Initial tokens: --cuo-navy:#17243a; --cuo-primary:#2d63e2; --cuo-canvas:#f4f7fb; --cuo-surface:#fff; --cuo-border:#e4eaf2; --cuo-radius:14px. These are provisional and require visual calibration. Implement dark mode, mobile navigation, keyboard focus, reduced motion and WCAG 2.2 AA contrast targets.
+5. Domain model and update engine
+Job states: discovered → pending_approval/scheduled → queued → preflight → pulling → recreating → verifying → succeeded/failed/intervention_required. Define cancellation points and restart recovery. Digest comparisons must account for architecture/platform. Compose-managed services require declarative reconciliation rather than silent configuration drift.
+Policy precedence: global < host/group < container, with explicit exclusion semantics. Support scan-only, automatic, approval-required and disabled modes. Scheduling must define DST skipped/repeated hours, overlapping windows, concurrency limits and missed-run recovery. Rollback of container images is not rollback of databases or volumes; automatic rollback is out of scope until backup contracts are proven.
+6. Identity, security and isolation
+Support local first-run administrator enrollment and recovery; OIDC Authorization Code + PKCE is optional, including compatible Nextcloud OIDC IdP deployments. OAuth2 alone is not an identity protocol.
+BFF-managed HttpOnly, Secure, SameSite sessions; CSRF protection; explicit logout and session revocation. No browser token storage in localStorage.
+Server-enforced roles: Viewer, Operator, Administrator, Owner; per-host authorization and audit trails.
+No exposed Docker socket. Evaluate constrained host agent versus socket access; Docker write privileges can amount to host-level control even through a proxy.
+TLS ingress, internal service authentication, rate limiting, secrets redaction, registry credential protection and confirmation for disruptive operations.
+Separate untrusted logs and image metadata from markup; use a strict CSP and prohibit remote scripts by default.
+7. Versioned API contract
+GET /api/v1/hosts; GET /api/v1/containers; POST /api/v1/scans; GET /api/v1/update-candidates; POST /api/v1/update-jobs; GET /api/v1/update-jobs/{id}; POST /api/v1/update-jobs/{id}/approve; GET /api/v1/events (SSE); GET/PUT /api/v1/policies/{id}; GET/POST /api/v1/maintenance-windows.
+Specify OpenAPI/JSON Schema and typed client generation. Mutating requests require idempotency keys; SSE must support resume via event IDs and authorization-filtered delivery. Use stable error codes and pagination.
+8. Packaging and third-party deployment
+Publish versioned signed OCI images, a documented Compose stack, persistent volume paths, healthchecks, upgrade/restore instructions, supported Docker versions and a security policy. SQLite is the default single-host datastore; optional external database support may follow. The product must operate without Nextcloud, XTend development tooling or an external SaaS account.
+Before distribution, audit the exact Watchtower upstream commit, Apache-2.0 license/NOTICE obligations, transitive dependencies and trademarks. Preserve required attribution and mark modified code. Avoid implying official Watchtower affiliation.
+9. Implementation plan and release gates
+CI fails on prohibited HTML sinks and direct browser imports of privileged server/Docker modules.
+RMT compile/contract validation, component unit tests and Maraca service tests are mandatory.
+Integration tests cover idempotency, DST behavior, policy precedence, job restart recovery and failure handling.
+Isolated disposable Docker E2E tests; never execute destructive tests against production hosts.
+Playwright keyboard, responsive and visual regression tests compare CSS output with approved baselines.
+SCA, SBOM, vulnerability scans, provenance and secret scanning are release requirements.
+10. Open decisions
+Host privilege model and optional multi-host agent transport.
+Compose desired-state reconciliation and digest pinning strategy.
+SQLite migration, backup retention and event log pruning.
+OIDC group mapping, local break-glass access and account recovery.
+Precise XTend registry and RMT lifecycle APIs for the target release.
+Scope of health-based rollback, data backups and external registry support.
+11. Definition of done — public MVP
+A third party can install CUO from documented images, enroll an administrator, optionally configure OIDC, discover and filter containers, exclude workloads, scan for image changes, schedule or approve updates, execute durable jobs and inspect persistent history and logs. All UI is RMT-orchestrated; custom widgets are registered XTend components; Maraca App Services own user intents; no prohibited HTML injection sinks exist; security and release gates pass.
+
+TABLE 1
+Decision | Binding direction
+Core | Independent headless Go orchestration engine; Watchtower fork as audited starting point
+Console | 100% RMT-orchestrated XTend Maraca application shell
+Application logic | Maraca App Services; privileged operations through server services and typed Core API
+UI extensions | Custom-XTend components, registered with typed contracts and lifecycle
+Rendering safety | No innerHTML, outerHTML, insertAdjacentHTML, document.write or equivalent raw HTML sinks
+Visual language | CSS implementation of approved CUO dashboard reference
+Identity | Local bootstrap authentication; optional OIDC including Nextcloud identity provider
+
+TABLE 2
+Registered component | Primary contract
+XContainerTable | Sorting, filters, selection, virtualization, status updates
+XCalendar / XMaintenancePlanner | Time-zone-aware recurring windows, exceptions, collision warnings
+XUpdateRunTimeline | Durable job stages, event history, failures
+XLogStream | Text-only SSE streaming, bounded buffer, pause/search
+XPolicyEditor | Policy inheritance, exclusions, approvals, validation
+XHostHealth | Host connectivity, Docker version, health and agent state
+XApprovalDialog | Disruption summary, confirmation, reason and audit trail
+XUpdateStatusBadge | Semantic and accessible status indicators
+
+TABLE 3
+Entity | Essential attributes
+Host | id, endpoint/agent, capabilities, connectivity
+Container | hostId, engineId, image ref/digest, Compose ownership
+UpdateCandidate | source/target digests, platform, discovery timestamp
+Policy | scope, mode, exclusions, approvals, window, concurrency
+MaintenanceWindow | IANA time zone, recurrence, duration, blackout dates
+UpdateJob | id, idempotency key, requester, state, timestamps
+UpdateEvent / AuditEvent | job, actor, operation, stage, severity, immutable timestamp
+
+TABLE 4
+Stage | Deliverable / acceptance gate
+M0 Foundation | Fork and license audit, threat model, dependency inventory, Docker API tests
+M1 Core | Digest scanner, durable jobs, policy precedence, execution and recovery tests
+M2 Console | RMT-only shell, custom component registry, Maraca services, responsive CSS
+M3 Operations | XCalendar, approval workflow, SSE logs, history and Compose awareness
+M4 Security | Local bootstrap, optional OIDC, RBAC, CSRF, audit logging
+M5 Public release | Signed images, docs, backup/restore, E2E and accessibility gates

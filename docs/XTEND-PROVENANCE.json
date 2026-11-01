@@ -1,0 +1,37 @@
+{
+  "server": "local Docker xtend-mcp-mcp-1, 127.0.0.1:31415",
+  "repository": "konnilabs/xtend",
+  "commit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+  "toolsUsed": [
+    "xtend_knowledge_search",
+    "xtend_knowledge_context",
+    "resources/read"
+  ],
+  "resources": [
+    {
+      "uri": "xtend://docs/en/maraca-app-services",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "xtend://docs/en/components",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "xtend://docs/en/components-xicon",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "xtend://docs/en/xtend-maraca",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "xtend://docs/en/learn-rmt-actions-events",
+      "mimeType": "text/markdown"
+    },
+    {
+      "uri": "xtend://docs/en/xtend-maraca-orchestration",
+      "mimeType": "text/markdown"
+    }
+  ],
+  "runtimeRequiresMCP": false
+}

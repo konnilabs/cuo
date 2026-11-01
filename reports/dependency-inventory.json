@@ -1,0 +1,134 @@
+{
+  "schema": "cuo.source-dependency-inventory.v1",
+  "note": "Source inventory; complete OCI/OS SBOM is a separate release gate.",
+  "version": "0.1.0",
+  "goToolchain": "go version go1.27.3 linux/amd64",
+  "goModules": [
+    {
+      "name": "cuo.local/cuo",
+      "version": "0.1.0"
+    },
+    {
+      "name": "github.com/dustin/go-humanize",
+      "version": "v1.0.1"
+    },
+    {
+      "name": "github.com/google/go-cmp",
+      "version": "v0.6.0"
+    },
+    {
+      "name": "github.com/google/pprof",
+      "version": "v0.0.0-20250317173921-a4b03ec1a45e"
+    },
+    {
+      "name": "github.com/google/uuid",
+      "version": "v1.6.0"
+    },
+    {
+      "name": "github.com/mattn/go-isatty",
+      "version": "v0.0.20"
+    },
+    {
+      "name": "github.com/ncruces/go-strftime",
+      "version": "v0.1.9"
+    },
+    {
+      "name": "github.com/remyoudompheng/bigfft",
+      "version": "v0.0.0-20230129092748-24d4a6f8daec"
+    },
+    {
+      "name": "golang.org/x/exp",
+      "version": "v0.0.0-20250620022241-b7579e27df2b"
+    },
+    {
+      "name": "golang.org/x/mod",
+      "version": "v0.27.0"
+    },
+    {
+      "name": "golang.org/x/sync",
+      "version": "v0.16.0"
+    },
+    {
+      "name": "golang.org/x/sys",
+      "version": "v0.44.0"
+    },
+    {
+      "name": "golang.org/x/tools",
+      "version": "v0.36.0"
+    },
+    {
+      "name": "modernc.org/cc/v4",
+      "version": "v4.26.5"
+    },
+    {
+      "name": "modernc.org/ccgo/v4",
+      "version": "v4.28.1"
+    },
+    {
+      "name": "modernc.org/fileutil",
+      "version": "v1.3.40"
+    },
+    {
+      "name": "modernc.org/gc/v2",
+      "version": "v2.6.5"
+    },
+    {
+      "name": "modernc.org/goabi0",
+      "version": "v0.2.0"
+    },
+    {
+      "name": "modernc.org/libc",
+      "version": "v1.66.10"
+    },
+    {
+      "name": "modernc.org/mathutil",
+      "version": "v1.7.1"
+    },
+    {
+      "name": "modernc.org/memory",
+      "version": "v1.11.0"
+    },
+    {
+      "name": "modernc.org/opt",
+      "version": "v0.1.4"
+    },
+    {
+      "name": "modernc.org/sortutil",
+      "version": "v1.2.1"
+    },
+    {
+      "name": "modernc.org/sqlite",
+      "version": "v1.39.1"
+    },
+    {
+      "name": "modernc.org/strutil",
+      "version": "v1.2.1"
+    },
+    {
+      "name": "modernc.org/token",
+      "version": "v1.1.0"
+    }
+  ],
+  "browser": {
+    "framework": "XTend 0.9.0",
+    "commit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "thirdPartyScripts": "bundled local XTend only",
+    "icons": "XIcon local node-based packs",
+    "fonts": "Roboto regular and medium"
+  },
+  "server": {
+    "node": "24.22.1",
+    "npmRuntimeDependencies": [],
+    "maraca": "bundled AppServices host"
+  },
+  "archives": [
+    {
+      "name": "watchtower-a047c7f.tar.gz",
+      "sha256": "761d1134dccac8a03d9a77512b22fd99a7c30a7a11196a5b522744e9f6d32355"
+    },
+    {
+      "name": "xtend-49166cb.tar.gz",
+      "sha256": "dfee7d8f8efeac0235e507ffc25772150ca6f9de30f5716d714101341f4d74dd"
+    }
+  ]
+}

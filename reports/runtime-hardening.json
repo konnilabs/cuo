@@ -1,0 +1,8 @@
+[
+  {
+    "file": "dist/runtime/xtendrmt-runtime.esm.mjs",
+    "count": 2,
+    "before": "615372ec62d51598913826e0ac9e4c381573e41e6c1e761b99b8b02e7f20fb9c",
+    "after": "9b4c526af4e45b18d9d04ba9e0385e52da2d142675e17332d5b696c84c076796"
+  }
+]

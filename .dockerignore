@@ -1,0 +1,11 @@
+.git
+.env
+.data
+bin
+reports
+console/.framework
+console/node_modules
+console/dist
+console/.xtend-build
+console/reports
+third_party/watchtower-a047c7f.tar.gz

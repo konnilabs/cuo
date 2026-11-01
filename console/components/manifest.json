@@ -1,0 +1,13 @@
+{
+  "x-icon": "../.framework/components/xicon.js",
+  "x-container-table": "./widgets.mjs",
+  "x-maintenance-planner": "./widgets.mjs",
+  "x-update-run-timeline": "./widgets.mjs",
+  "x-log-stream": "./widgets.mjs",
+  "x-policy-editor": "./widgets.mjs",
+  "x-host-health": "./widgets.mjs",
+  "x-update-status-badge": "./widgets.mjs",
+  "x-cuo-auth": "./dialogs.mjs",
+  "x-approval-dialog": "./dialogs.mjs",
+  "x-cuo-workspace": "./dialogs.mjs"
+}

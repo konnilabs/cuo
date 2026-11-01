@@ -1,0 +1,2316 @@
+// CUO shell. Authoring source: tools/author-rmt.mjs. Runtime ownership: RMT only.
+template cuo.app {
+ state cuo.vm type object preserve { initial {
+    auth "loading"
+    theme "light"
+    page "dashboard"
+    mobile false
+    notice ""
+    error false
+    demo false
+    user {
+      name ""
+      role ""
+    }
+    containers [
+
+    ]
+    jobs [
+
+    ]
+    events [
+
+    ]
+    policies [
+
+    ]
+    windows [
+
+    ]
+    hosts [
+
+    ]
+    users [
+
+    ]
+    query ""
+    filter "all"
+    sort "name"
+    offset 0
+    calendar "2026-11"
+    selectedDate "2026-11-01"
+    dialog ""
+    selected ""
+    live true
+    title "Dashboard"
+    description "Übersicht über deine Container, Updates und den Systemstatus."
+    total "0"
+    monitored "0"
+    excludedCount "0"
+    updateCount "0"
+    updateHint "0 Image-Änderungen verfügbar"
+    currentCount "0"
+    systemTitle "Alles in Ordnung"
+    systemDetail "0 Fehler · 0 ausstehende Jobs"
+    userInitials "CU"
+    shellClass "cuo-shell is-hidden"
+    authClass "auth-wrap"
+    dashboardClass "dashboard-grid"
+    workspaceClass "is-hidden"
+    noticeClass "is-hidden"
+    demoClass "is-hidden"
+    pageTitle "Dashboard"
+    nextDate "Kein Fenster geplant"
+    nextTime "Wartungsfenster erstellen"
+    navdashboard "nav-item cuo-action active"
+    routedashboard "is-hidden"
+    navcontainers "nav-item cuo-action"
+    routecontainers "is-hidden"
+    navupdates "nav-item cuo-action"
+    routeupdates "is-hidden"
+    navschedule "nav-item cuo-action"
+    routeschedule "is-hidden"
+    navpolicies "nav-item cuo-action"
+    routepolicies "is-hidden"
+    navhistory "nav-item cuo-action"
+    routehistory "is-hidden"
+    navlogs "nav-item cuo-action"
+    routelogs "is-hidden"
+    navsettings "nav-item cuo-action"
+    routesettings "is-hidden"
+    navhosts "nav-item cuo-action"
+    routehosts "is-hidden"
+    navusers "nav-item cuo-action"
+    routeusers "is-hidden"
+    navintegrations "nav-item cuo-action"
+    routeintegrations "is-hidden"
+    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-01\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"noticeClass\":\"is-hidden\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
+  } }
+ state cuo.shell type object preserve { initial {
+    id "cuo-shell"
+    layoutEngine "document-flow"
+    viewTemplate {
+      class "cuo-root"
+      children [
+        {
+          type "element"
+          tag "a"
+          class "skip-link"
+          attributes {
+            href "#main-content"
+          }
+          children [
+
+          ]
+          text "Zum Inhalt springen"
+        }
+        {
+          type "element"
+          tag "div"
+          class "$model.cuo.vm.authClass"
+          attributes {
+
+          }
+          children [
+            {
+              type "element"
+              tag "x-cuo-auth"
+              class "cuo-widget"
+              attributes {
+                data-cuo-widget "true"
+                data-view "$model.cuo.vm.serialized"
+              }
+              children [
+
+              ]
+            }
+          ]
+        }
+        {
+          type "element"
+          tag "div"
+          class "$model.cuo.vm.shellClass"
+          attributes {
+            data-theme "$model.cuo.vm.theme"
+          }
+          children [
+            {
+              type "element"
+              tag "aside"
+              class "sidebar"
+              attributes {
+                aria-label "Hauptnavigation"
+              }
+              children [
+                {
+                  type "element"
+                  tag "a"
+                  class "brand cuo-action"
+                  attributes {
+                    data-id ""
+                    href "#"
+                    aria-label "CUO Dashboard"
+                    data-kind "navigate"
+                    data-value "dashboard"
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "span"
+                      class "brand-cube"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "logo"
+                            pack "cuo"
+                            size "44px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "div"
+                          class "brand-name"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "strong"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "CUO"
+                            }
+                            {
+                              type "element"
+                              tag "small"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "v0.1.0"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "p"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Container Update Orchestrator"
+                        }
+                      ]
+                    }
+                  ]
+                }
+                {
+                  type "element"
+                  tag "nav"
+                  class "nav-main"
+                  attributes {
+
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navdashboard"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "dashboard"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "home"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Dashboard"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navcontainers"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "containers"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "cube"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Container"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navupdates"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "updates"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "refresh"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Updates"
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          class "nav-badge"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "$model.cuo.vm.updateCount"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navschedule"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "schedule"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "calendar"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Zeitplanung"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navpolicies"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "policies"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "shield"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Richtlinien"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navhistory"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "history"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "history"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Historie"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navlogs"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "logs"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "docs"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Logs"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navsettings"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "settings"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "settings"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Einstellungen"
+                        }
+                      ]
+                    }
+                  ]
+                }
+                {
+                  type "element"
+                  tag "div"
+                  class "system-nav"
+                  attributes {
+
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "p"
+                      class "nav-label"
+                      attributes {
+
+                      }
+                      children [
+
+                      ]
+                      text "SYSTEM"
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navhosts"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "hosts"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "server"
+                            pack "lucide"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Hosts"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navusers"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "users"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "users"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Benutzer"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navintegrations"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "integrations"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "link"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Integrationen"
+                        }
+                      ]
+                    }
+                  ]
+                }
+                {
+                  type "element"
+                  tag "div"
+                  class "core-status"
+                  attributes {
+
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "x-host-health"
+                      class "cuo-widget"
+                      attributes {
+                        data-cuo-widget "true"
+                        data-view "$model.cuo.vm.serialized"
+                        compact true
+                      }
+                      children [
+
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            {
+              type "element"
+              tag "div"
+              class "main-shell"
+              attributes {
+
+              }
+              children [
+                {
+                  type "element"
+                  tag "header"
+                  class "topbar"
+                  attributes {
+
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "button"
+                      class "icon-btn mobile-toggle cuo-action"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        aria-label "Menü"
+                        data-kind "menu"
+                        data-value ""
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "menu"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Menü"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "label"
+                      class "global-search"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "search"
+                            pack "core"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "input"
+                          class "cuo-query"
+                          attributes {
+                            type "search"
+                            accesskey "k"
+                            aria-keyshortcuts "Alt+K"
+                            placeholder "Container, Images, Tags oder Events suchen ..."
+                            aria-label "Globale Suche"
+                            maxlength 160
+                            data-global-search "true"
+                            data-kind-input "query"
+                          }
+                          children [
+
+                          ]
+                          props {
+                            value "$model.cuo.vm.query"
+                          }
+                        }
+                        {
+                          type "element"
+                          tag "kbd"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Alt K"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "topbar-tools"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "button"
+                          class "icon-btn cuo-action"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            aria-label "Farbschema wechseln"
+                            data-kind "theme"
+                            data-value ""
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "sun"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "Farbschema wechseln"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "icon-btn notification cuo-action"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            aria-label "Updates anzeigen"
+                            data-kind "navigate"
+                            data-value "updates"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "bell"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "notification-count"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "$model.cuo.vm.updateCount"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "user-menu cuo-action"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "settings"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "span"
+                              class "avatar"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "$model.cuo.vm.userInitials"
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "user-info"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "strong"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.user.name"
+                                }
+                                {
+                                  type "element"
+                                  tag "small"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.user.role"
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "chevron-down"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+                {
+                  type "element"
+                  tag "main"
+                  class "main-content"
+                  attributes {
+                    id "main-content"
+                    tabindex "-1"
+                  }
+                  children [
+                    {
+                      type "element"
+                      tag "div"
+                      class "$model.cuo.vm.demoClass"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Design-Demo · Beispieldaten · Aktionen ohne Docker-Ausführung"
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "text-btn cuo-action"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            aria-label "Live-Ansicht öffnen"
+                            data-kind "exitDemo"
+                            data-value ""
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "arrow-right"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "Live-Ansicht öffnen"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "page-heading"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "div"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "h1"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "$model.cuo.vm.title"
+                            }
+                            {
+                              type "element"
+                              tag "p"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "$model.cuo.vm.description"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "div"
+                          class "heading-actions"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "button"
+                              class "btn cuo-action"
+                              attributes {
+                                type "button"
+                                data-id ""
+                                aria-label "Jetzt prüfen"
+                                data-kind "scan"
+                                data-value ""
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "search"
+                                    pack "core"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "span"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Jetzt prüfen"
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "button"
+                              class "btn cuo-action"
+                              attributes {
+                                type "button"
+                                data-id ""
+                                aria-label "Update-Lauf starten"
+                                data-kind "run"
+                                data-value ""
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "play"
+                                    pack "core"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "span"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Update-Lauf starten"
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "button"
+                              class "btn primary cuo-action"
+                              attributes {
+                                type "button"
+                                data-id ""
+                                aria-label "Container hinzufügen"
+                                data-kind "add"
+                                data-value ""
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "plus"
+                                    pack "cuo"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "span"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Container hinzufügen"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "$model.cuo.vm.noticeClass"
+                      attributes {
+                        role "status"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "$model.cuo.vm.notice"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "stats"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "section"
+                          class "stat-card"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-icon blue"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "cube"
+                                    pack "cuo"
+                                    size "32px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-content"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "strong"
+                                  class "stat-number"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.total"
+                                }
+                                {
+                                  type "element"
+                                  tag "p"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Container"
+                                }
+                                {
+                                  type "element"
+                                  tag "small"
+                                  attributes {
+
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "$model.cuo.vm.monitored"
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text " überwacht · "
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "$model.cuo.vm.excludedCount"
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text " ausgeschlossen"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "stat-card"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-icon green"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "refresh"
+                                    pack "core"
+                                    size "32px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-content"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "strong"
+                                  class "stat-number"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.updateCount"
+                                }
+                                {
+                                  type "element"
+                                  tag "p"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Updates verfügbar"
+                                }
+                                {
+                                  type "element"
+                                  tag "small"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.updateHint"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "stat-card"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-icon violet"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "calendar"
+                                    pack "cuo"
+                                    size "32px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-content"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "small"
+                                  class "stat-label"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Nächster Update-Lauf"
+                                }
+                                {
+                                  type "element"
+                                  tag "strong"
+                                  class "stat-date"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.nextDate"
+                                }
+                                {
+                                  type "element"
+                                  tag "p"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.nextTime"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "stat-card"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-icon green"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "shield-check"
+                                    pack "lucide"
+                                    size "32px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "div"
+                              class "stat-content"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "small"
+                                  class "stat-label"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Systemstatus"
+                                }
+                                {
+                                  type "element"
+                                  tag "strong"
+                                  class "stat-date"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.systemTitle"
+                                }
+                                {
+                                  type "element"
+                                  tag "p"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "$model.cuo.vm.systemDetail"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "$model.cuo.vm.dashboardClass"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "section"
+                          class "card container-panel"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-container-table"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "card calendar-panel"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-maintenance-planner"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "card history-panel"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-update-run-timeline"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                                compact true
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "card activity-panel"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-log-stream"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "card quick-panel"
+                          attributes {
+
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "h2"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "Schnellaktionen"
+                            }
+                            {
+                              type "element"
+                              tag "div"
+                              class "quick-actions"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Jetzt nach Updates suchen"
+                                    data-kind "scan"
+                                    data-value ""
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "search"
+                                        pack "core"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Jetzt nach Updates suchen"
+                                    }
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Update-Lauf starten"
+                                    data-kind "run"
+                                    data-value ""
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "play"
+                                        pack "core"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Update-Lauf starten"
+                                    }
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Neues Wartungsfenster erstellen"
+                                    data-kind "window"
+                                    data-value ""
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "calendar"
+                                        pack "cuo"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Neues Wartungsfenster erstellen"
+                                    }
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Container ausschließen"
+                                    data-kind "navigate"
+                                    data-value "containers"
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "ban"
+                                        pack "cuo"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Container ausschließen"
+                                    }
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Protokolle anzeigen"
+                                    data-kind "navigate"
+                                    data-value "logs"
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "docs"
+                                        pack "core"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Protokolle anzeigen"
+                                    }
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "quick-action cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Einstellungen öffnen"
+                                    data-kind "navigate"
+                                    data-value "settings"
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "settings"
+                                        pack "core"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Einstellungen öffnen"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "div"
+                      class "$model.cuo.vm.workspaceClass"
+                      attributes {
+
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routecontainers"
+                          attributes {
+                            aria-label "containers"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-container-table"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeupdates"
+                          attributes {
+                            aria-label "updates"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-update-run-timeline"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "x-container-table"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeschedule"
+                          attributes {
+                            aria-label "schedule"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "div"
+                              class "panel-heading"
+                              attributes {
+
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "h2"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Wartungsfenster"
+                                }
+                                {
+                                  type "element"
+                                  tag "button"
+                                  class "btn primary cuo-action"
+                                  attributes {
+                                    type "button"
+                                    data-id ""
+                                    aria-label "Neues Fenster"
+                                    data-kind "window"
+                                    data-value ""
+                                  }
+                                  children [
+                                    {
+                                      type "element"
+                                      tag "x-icon"
+                                      attributes {
+                                        name "plus"
+                                        pack "cuo"
+                                        size "20px"
+                                        decorative true
+                                      }
+                                      children [
+
+                                      ]
+                                    }
+                                    {
+                                      type "element"
+                                      tag "span"
+                                      attributes {
+
+                                      }
+                                      children [
+
+                                      ]
+                                      text "Neues Fenster"
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "x-maintenance-planner"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routepolicies"
+                          attributes {
+                            aria-label "policies"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-policy-editor"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routehistory"
+                          attributes {
+                            aria-label "history"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-update-run-timeline"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routelogs"
+                          attributes {
+                            aria-label "logs"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-log-stream"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routehosts"
+                          attributes {
+                            aria-label "hosts"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-host-health"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeusers"
+                          attributes {
+                            aria-label "users"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-workspace"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                                section "users"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routesettings"
+                          attributes {
+                            aria-label "settings"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-workspace"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                                section "settings"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeintegrations"
+                          attributes {
+                            aria-label "integrations"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-workspace"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                                section "integrations"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+            {
+              type "element"
+              tag "x-approval-dialog"
+              class "cuo-widget"
+              attributes {
+                data-cuo-widget "true"
+                data-view "$model.cuo.vm.serialized"
+              }
+              children [
+
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  } }
+ selector cuo.shell from state cuo.shell { output CUOShell }
+ datasource cuo.intent from host cuo.intent { mode invoke
+  contract "cuo.intent.v1" }
+ datasource cuo.core from host cuo.core { mode invoke
+  contract "cuo.core.v1" }
+ action cuo.intent {
+  input kind string { trust boundary "xtend.security.sanitizing-boundary.v1"
+   sanitize text }
+  input value string optional
+  input id string optional
+  input data object optional
+  effect fetch datasource cuo.intent
+  reduce state.cuo.vm = result.vm
+ }
+ resource cuo.events kind stream owner surface.cuo.shell { dispose on surface.destroy }
+ portal cuo.root root "#xtend-maraca-root" layer surface
+ surface cuo.shell kind region component section {
+  source selector cuo.shell
+  key shell.id
+  portal cuo.root
+  lane visible weight 100 { hydrate cuo-shell from selector cuo.shell }
+  destroy releases resource cuo.events
+  on click ".cuo-action" -> action cuo.intent {
+   preventDefault true
+   payload kind from source.dataset.kind
+   payload value from source.dataset.value
+   payload id from source.dataset.id
+  }
+  on input ".cuo-query" -> action cuo.intent {
+   payload kind from source.dataset.kindInput
+   payload value from source.value
+  }
+  on xtend-command ".cuo-widget" -> action cuo.intent {
+   payload kind from detail.kind
+   payload value from detail.value
+   payload id from detail.id
+   payload data from detail.data
+  }
+ }
+}

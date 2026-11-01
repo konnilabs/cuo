@@ -1,0 +1,87 @@
+name: cuo
+services:
+  console:
+    image: cuo-console:0.1.0
+    build:
+      context: .
+      dockerfile: console/Dockerfile
+    ports:
+      - "127.0.0.1:${CUO_PORT:-8095}:8095"
+    environment:
+      CUO_ORIGIN: ${CUO_ORIGIN:-http://127.0.0.1:8095}
+      CUO_CORE_URL: http://core:8091
+      CUO_CORE_TOKEN: ${CUO_CORE_TOKEN:?Run ./tools/install.sh first}
+    volumes:
+      - identity:/data
+    networks: [console, core]
+    depends_on:
+      core: {condition: service_healthy}
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    labels: {cuo.system: "true"}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:8095/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  core:
+    image: cuo-core:0.1.0
+    build:
+      context: .
+      target: core
+    environment:
+      CUO_CORE_TOKEN: ${CUO_CORE_TOKEN}
+      CUO_AGENT_TOKEN: ${CUO_AGENT_TOKEN:?Run ./tools/install.sh first}
+      CUO_AGENT_URL: http://agent:8092
+      CUO_SCAN_INTERVAL: ${CUO_SCAN_INTERVAL:-6h}
+    volumes: ["core:/data"]
+    networks: [core, agent]
+    depends_on:
+      agent: {condition: service_healthy}
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    labels: {cuo.system: "true"}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, "http://127.0.0.1:8091/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+  agent:
+    image: cuo-agent:0.1.0
+    build:
+      context: .
+      target: agent
+    environment:
+      CUO_AGENT_TOKEN: ${CUO_AGENT_TOKEN}
+      CUO_REGISTRIES: ${CUO_REGISTRIES:-}
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - agent:/data
+      - ${CUO_PROJECTS_DIR:-./projects}:/projects:ro
+    networks: [agent, registry]
+    restart: unless-stopped
+    read_only: true
+    tmpfs: [/tmp]
+    security_opt: ["no-new-privileges:true"]
+    cap_drop: [ALL]
+    labels: {cuo.system: "true"}
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, "http://127.0.0.1:8092/health"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+networks:
+  console: {}
+  core: {internal: true}
+  agent: {internal: true}
+  registry: {}
+volumes:
+  identity: {}
+  core: {}
+  agent: {}

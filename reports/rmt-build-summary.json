@@ -1,0 +1,165 @@
+{
+  "ok": true,
+  "sourceHash": "904c188e78ed904f030bf33a1098845ed780439a785218dadbe394cfbcad4efc",
+  "strictModes": {
+    "orchestration": "strict",
+    "kernel": "strict",
+    "hydration": "strict",
+    "services": "planned"
+  },
+  "components": {
+    "selected": [
+      {
+        "tag": "a",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "aside",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "button",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "div",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "header",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "input",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "label",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "main",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "nav",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "p",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "section",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "span",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "strong",
+        "source": "browser-native-element",
+        "importPath": null,
+        "native": true
+      },
+      {
+        "tag": "x-approval-dialog",
+        "source": "components/dialogs.mjs",
+        "importPath": "../components/dialogs.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-container-table",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-cuo-auth",
+        "source": "components/dialogs.mjs",
+        "importPath": "../components/dialogs.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-cuo-workspace",
+        "source": "components/dialogs.mjs",
+        "importPath": "../components/dialogs.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-host-health",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-icon",
+        "source": ".framework/components/xicon.js",
+        "importPath": "../.framework/components/xicon.js",
+        "native": false
+      },
+      {
+        "tag": "x-log-stream",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-maintenance-planner",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-policy-editor",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      },
+      {
+        "tag": "x-update-run-timeline",
+        "source": "components/widgets.mjs",
+        "importPath": "../components/widgets.mjs",
+        "native": false
+      }
+    ],
+    "unknown": []
+  },
+  "loader": {
+    "mode": "inline-registry",
+    "usesExternalManifest": false,
+    "usesXtendLoader": false,
+    "manifestParseAtRuntime": false
+  },
+  "forbiddenRuntimeDependencies": {
+    "componentManifestJson": false,
+    "dataManifestAttribute": false,
+    "xtendLoader": false
+  },
+  "diagnostics": []
+}

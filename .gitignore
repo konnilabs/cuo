@@ -1,0 +1,14 @@
+.env
+.data/
+console/.framework
+console/node_modules
+console/dist/
+console/.xtend-build/
+console/reports/
+bin/
+*.db
+*.db-*
+*.log
+work/
+projects/*
+!projects/.gitkeep

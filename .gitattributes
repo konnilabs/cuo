@@ -1,0 +1,6 @@
+*.sh text eol=lf
+*.rmt text eol=lf
+*.tar.gz binary
+LICENSE -whitespace
+third_party/* -whitespace
+console/assets/Roboto-LICENSE.txt -whitespace

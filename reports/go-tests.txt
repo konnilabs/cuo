@@ -1,0 +1,4 @@
+?   	cuo.local/cuo/cmd/cuo	[no test files]
+ok  	cuo.local/cuo/internal/agent	1.020s
+ok  	cuo.local/cuo/internal/core	1.555s
+ok  	cuo.local/cuo/internal/watchtower	(cached)

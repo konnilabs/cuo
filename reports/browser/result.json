@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "checks": [
+    "RMT navigation",
+    "filters",
+    "native dialog keyboard",
+    "dark mode",
+    "mobile overflow and menu",
+    "text-only XSS",
+    "real enrollment and Docker inventory",
+    "maintenance persistence",
+    "CSRF",
+    "Origin",
+    "RBAC",
+    "static allowlist",
+    "anonymous rejection"
+  ],
+  "errors": []
+}

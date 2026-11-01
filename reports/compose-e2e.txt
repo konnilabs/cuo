@@ -1,0 +1,5 @@
+=== RUN   TestDisposableComposeReconcile
+    compose_e2e_test.go:149: two real Compose reconciliations preserved desired pins, .env, env_file, named volume and relative host bind across engine-ID changes
+--- PASS: TestDisposableComposeReconcile (41.26s)
+PASS
+ok  	cuo.local/cuo/internal/agent	41.262s

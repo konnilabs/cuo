@@ -1,0 +1,5 @@
+=== RUN   TestDurableCoreDockerUpdate
+    docker_e2e_test.go:159: real Core API -> durable approval/job -> authenticated agent -> Docker update; stable policy/history and full event stages verified
+--- PASS: TestDurableCoreDockerUpdate (42.31s)
+PASS
+ok  	cuo.local/cuo/internal/core	42.319s

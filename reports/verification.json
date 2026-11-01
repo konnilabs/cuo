@@ -1,0 +1,81 @@
+{
+  "schema": "cuo.local-mvp-verification.v1",
+  "version": "0.1.0",
+  "verifiedAt": "2026-11-01T12:58:13.192149+01:00",
+  "frameworkCommit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+  "watchtowerStartingCommit": "a047c7f9ff11813f930f6998863fa1b8a015985c",
+  "rmtPlanOK": true,
+  "maracaBuildOK": true,
+  "strictModes": {
+    "orchestration": "strict",
+    "kernel": "strict",
+    "hydration": "strict",
+    "services": "planned"
+  },
+  "loader": {
+    "mode": "inline-registry",
+    "usesExternalManifest": false,
+    "usesXtendLoader": false,
+    "manifestParseAtRuntime": false
+  },
+  "tests": {
+    "standaloneDocker": "PASS",
+    "durableCoreDocker": "PASS",
+    "composeReconcile": "PASS",
+    "browser": "PASS"
+  },
+  "goRaceAndVet": "PASS",
+  "nodeServiceTests": 3,
+  "goVulnerabilityScan": "No vulnerabilities found.",
+  "npmBuildVulnerabilities": {
+    "info": 0,
+    "low": 0,
+    "moderate": 0,
+    "high": 0,
+    "critical": 0,
+    "total": 0
+  },
+  "restoreIntegrity": "/core/cuo.db: integrity_check OK\n/identity/identity.db: integrity_check OK",
+  "containers": [
+    {
+      "name": "cuo-console-1",
+      "imageId": "sha256:d2cc7b950197d33ed7feea92196d46a7519bc88dd4224b7a04f20b2eb38d774e",
+      "state": "running",
+      "health": "healthy",
+      "user": "node",
+      "publishedPorts": {
+        "8095/tcp": [
+          {
+            "HostIp": "127.0.0.1",
+            "HostPort": "8095"
+          }
+        ]
+      }
+    },
+    {
+      "name": "cuo-core-1",
+      "imageId": "sha256:f863bdbe00f5d5feee3940a61df536ecd923162a815a3d2801f549d6788212f1",
+      "state": "running",
+      "health": "healthy",
+      "user": "10001:10001",
+      "publishedPorts": {}
+    },
+    {
+      "name": "cuo-agent-1",
+      "imageId": "sha256:c12025c5c43809e38521e5d336f75a52c26663688774379567d52396af2aa35f",
+      "state": "running",
+      "health": "healthy",
+      "user": "",
+      "publishedPorts": {}
+    }
+  ],
+  "gitBranch": "main",
+  "githubRemoteConfigured": false,
+  "publicReleaseReady": false,
+  "remainingReleaseGates": [
+    "optional OIDC/Nextcloud integration",
+    "private registry credentials",
+    "signed OCI publication, complete image SBOM/provenance and OS CVE scans",
+    "complete accessibility audit and broader supported-runtime matrix"
+  ]
+}

@@ -1,0 +1,5 @@
+=== RUN   TestDisposableDockerUpdate
+    docker_e2e_test.go:113: real Docker update preserved volume, environment, labels and healthcheck; old workload retained stopped
+--- PASS: TestDisposableDockerUpdate (35.45s)
+PASS
+ok  	cuo.local/cuo/internal/agent	35.455s

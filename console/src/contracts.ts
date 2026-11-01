@@ -1,0 +1,55 @@
+export type Intent = {
+  kind: string;
+  value?: string;
+  id?: string;
+  data?: Record<string, unknown>;
+};
+export type Request = {
+  method: "GET" | "POST" | "PUT";
+  path: string;
+  body?: unknown;
+  key?: string;
+};
+export type CoreResponse = { status: number; body: unknown };
+export type Container = {
+  id: string;
+  name: string;
+  image: string;
+  imageId: string;
+  state: string;
+  platform: string;
+  group: string;
+  compose: boolean;
+  managed: boolean;
+  excluded: boolean;
+  mode: string;
+  reason: string;
+  candidate?: { targetDigest: string; sourceDigest: string; error?: string };
+};
+export type VM = {
+  auth: string;
+  theme: string;
+  page: string;
+  mobile: boolean;
+  notice: string;
+  error: boolean;
+  demo: boolean;
+  user: { name: string; role: string };
+  containers: Container[];
+  jobs: Record<string, unknown>[];
+  events: Record<string, unknown>[];
+  policies: Record<string, unknown>[];
+  windows: Record<string, unknown>[];
+  hosts: Record<string, unknown>[];
+  users: Record<string, unknown>[];
+  query: string;
+  filter: string;
+  sort: string;
+  offset: number;
+  calendar: string;
+  selectedDate: string;
+  dialog: string;
+  selected: string;
+  live: boolean;
+  [key: string]: unknown;
+};
