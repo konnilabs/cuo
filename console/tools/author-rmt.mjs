@@ -128,7 +128,13 @@ const topbar = el("header", { class: "topbar" }, [
     text("kbd", "Alt K"),
   ]),
   el("div", { class: "topbar-tools" }, [
-    cmd("Farbschema wechseln", "theme", "", "sun", "icon-btn"),
+    cmd(
+      "$model.cuo.vm.themeToggleLabel",
+      "theme",
+      "",
+      "$model.cuo.vm.themeToggleIcon",
+      "icon-btn",
+    ),
     el(
       "button",
       {
@@ -334,6 +340,7 @@ const shell = el(
               "",
               "arrow-right",
               "text-btn",
+              "lucide",
             ),
           ]),
           el("div", { class: "page-heading" }, [

@@ -443,7 +443,22 @@ td:last-child {
   align-items: center;
 }
 .calendar-grid {
-  row-gap: 3px;
+  border: 1px solid var(--cuo-border, #e3e9f3);
+  border-radius: 8px;
+}
+.calendar-cell {
+  display: grid;
+  place-items: center;
+  min-width: 0;
+  padding-block: 4px;
+  border-inline-end: 1px solid var(--cuo-border, #e3e9f3);
+  border-block-end: 1px solid var(--cuo-border, #e3e9f3);
+}
+.calendar-cell:nth-child(7n) {
+  border-inline-end: 0;
+}
+.calendar-cell:nth-last-child(-n + 7) {
+  border-block-end: 0;
 }
 .day {
   border: 0;
@@ -983,8 +998,8 @@ dialog::backdrop {
   .panel-heading {
     gap: 8px;
   }
-  .calendar-grid {
-    row-gap: 7px;
+  .calendar-cell {
+    padding-block: 6px;
   }
   .day {
     width: 35px;

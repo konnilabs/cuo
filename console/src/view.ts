@@ -76,6 +76,11 @@ export function present(vm: VM): VM {
   const items = notifications(vm);
   const result: VM = {
     ...vm,
+    themeToggleIcon: vm.theme === "dark" ? "sun" : "moon",
+    themeToggleLabel:
+      vm.theme === "dark"
+        ? "Farbschema wechseln: Hellen Modus aktivieren"
+        : "Farbschema wechseln: Dunklen Modus aktivieren",
     notifications: items,
     notificationCount: String(items.length),
     notificationClass: items.length ? "notification-count" : "is-hidden",
