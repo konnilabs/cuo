@@ -21,7 +21,7 @@ Native dialog `showModal/close`, the Toast host’s manual `showPopover/hidePopo
 
 The deployed CSP disallows remote scripts, inline scripts, object embedding and framing. It requires Trusted Types where supported. Inline **styles** remain allowed because XTend XIcon creates a local style element and sets documented icon variables. No remote fonts or script CDNs are used.
 
-The pinned framework contains legacy raw-HTML paths that CUO does not use. `console/tools/harden-runtime.mjs` replaces the two actual assignment sites in the emitted runtime with fail-closed errors, records before/after hashes, and rejects any unreviewed HTML sink. This is an explicit deployment adaptation; the original third-party source archive is unchanged. Switching the application to legacy HTML templates requires a separate security review and is unsupported. The framework's legacy `x-input` HTML implementation is not included in CUO's selected component graph.
+The pinned framework contains legacy raw-HTML paths that CUO does not use. `console/tools/harden-runtime.mjs` replaces the two actual assignment sites in the emitted runtime with fail-closed errors, records before/after hashes, and rejects any unreviewed HTML sink. This is an explicit deployment adaptation; the pinned external source dependency is unchanged. Switching the application to legacy HTML templates requires a separate security review and is unsupported. The framework's legacy `x-input` HTML implementation is not included in CUO's selected component graph.
 
 ## OIDC and profiles
 
@@ -41,7 +41,7 @@ Agent journals and Compose desired-state files are persisted; the latter may con
 
 ## Dependency and release review
 
-`third_party/` contains exact upstream source snapshots and licenses. Only the modified Watchtower configuration-override algorithm is compiled into CUO; the upstream Watchtower daemon, webhook handlers, notification stack and their dependency graph are not linked. The source commit is `a047c7f9ff11813f930f6998863fa1b8a015985c`.
+`third_party/` contains the Watchtower source snapshot and retained licenses. XTend is an external source dependency pinned by repository, immutable commit and archive SHA-256 in `console/xtend.lock.json`. The resolver verifies downloads before extraction, never deletes the target of a pre-existing symlink, and preserves replaced dependency directories in an ignored cache. No mutable branch or unverified archive is accepted. The selected XTend workspaces use their upstream npm lockfile and installation scripts are disabled. Only the modified Watchtower configuration-override algorithm is compiled into CUO; the upstream Watchtower daemon, webhook handlers, notification stack and their dependency graph are not linked. The source commit is `a047c7f9ff11813f930f6998863fa1b8a015985c`.
 
 The original XTend workspace includes MCP-server packages unrelated to this product. The build selects only Maraca/CLI/RMT/compiler workspaces. The deployed Node process uses Node built-ins, bundled Maraca server-service host files and the pinned OIDC runtime tree (`openid-client`, `oauth4webapi`, `jose`) from `console/runtime/package-lock.json`. This runtime tree is separately audited. Record build-tool audit results separately from runtime applicability, never silently suppress findings.
 

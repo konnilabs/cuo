@@ -1,6 +1,6 @@
 # Public release gates
 
-CUO 0.1.0 is delivered as a local source-build MVP. The repository is prepared for GitHub, but no public repository, OCI push, image signature or public release is created by this implementation task.
+CUO 0.1.0 is delivered as a local source-build MVP. The source repository is hosted on GitHub. No OCI push, image signature or public image release is created by this implementation task.
 
 | Gate | Local evidence / required release evidence |
 |---|---|

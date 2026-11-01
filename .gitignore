@@ -15,3 +15,5 @@ projects/*
 
 console/runtime/node_modules/
 console/vendor/
+
+console/.cache/

@@ -33,6 +33,7 @@ const inventory = {
   browser: {
     framework: "XTend 0.9.0",
     commit: "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    dependency: JSON.parse(fs.readFileSync("console/xtend.lock.json", "utf8")),
     thirdPartyScripts: "bundled local XTend only",
     icons: "XIcon local node-based packs",
     fonts: "Roboto regular and medium",

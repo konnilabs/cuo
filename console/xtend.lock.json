@@ -1,0 +1,17 @@
+{
+  "schema": "cuo.xtend-dependency-lock.v1",
+  "name": "@ccslabs/xtend",
+  "version": "0.9.0",
+  "repository": "https://github.com/konnilabs/xtend",
+  "revision": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+  "source": {
+    "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "sha256": "5c96147b712180125ff660b0a3a5be4fd87e230816dfffb0cb70111c993074b3"
+  },
+  "workspaces": [
+    "@ccslabs/xtend-cli",
+    "@ccslabs/xtend-maraca",
+    "@ccslabs/xtend-rmt",
+    "@ccslabs/xtend-compiler"
+  ]
+}

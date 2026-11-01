@@ -12,13 +12,13 @@ XTend 0.9.0, konnilabs/xtend commit
 Original license: third_party/XTend-LICENSE.
 Two unused legacy HTML materialization paths are disabled in the generated
 browser runtime by console/tools/harden-runtime.mjs, with hash evidence.
-No changes are made to the retained upstream archive.
+The upstream source is fetched as a commit/SHA-256 locked external dependency.
 
 Roboto fonts: Copyright Google, Apache License 2.0.
 Local redistributable regular and medium fonts are bundled, no remote CDN.
 
 XRouter and XDrawer static templates are adapted to native DOM construction by
-console/tools/prepare-xtend.mjs; router errors render as text. The upstream archive
+console/tools/prepare-xtend.mjs; router errors render as text. The external dependency
 is retained unchanged and per-component hashes are recorded by the build.
 
 OIDC runtime: openid-client 6.8.8, oauth4webapi 3.8.8, jose 6.2.14.

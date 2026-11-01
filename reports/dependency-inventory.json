@@ -112,6 +112,23 @@
   "browser": {
     "framework": "XTend 0.9.0",
     "commit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "dependency": {
+      "schema": "cuo.xtend-dependency-lock.v1",
+      "name": "@ccslabs/xtend",
+      "version": "0.9.0",
+      "repository": "https://github.com/konnilabs/xtend",
+      "revision": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+      "source": {
+        "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/49166cbe96d91049634fbe03eb48c04edb6e70cd",
+        "sha256": "5c96147b712180125ff660b0a3a5be4fd87e230816dfffb0cb70111c993074b3"
+      },
+      "workspaces": [
+        "@ccslabs/xtend-cli",
+        "@ccslabs/xtend-maraca",
+        "@ccslabs/xtend-rmt",
+        "@ccslabs/xtend-compiler"
+      ]
+    },
     "thirdPartyScripts": "bundled local XTend only",
     "icons": "XIcon local node-based packs",
     "fonts": "Roboto regular and medium"
@@ -141,10 +158,6 @@
     {
       "name": "watchtower-a047c7f.tar.gz",
       "sha256": "761d1134dccac8a03d9a77512b22fd99a7c30a7a11196a5b522744e9f6d32355"
-    },
-    {
-      "name": "xtend-49166cb.tar.gz",
-      "sha256": "dfee7d8f8efeac0235e507ffc25772150ca6f9de30f5716d714101341f4d74dd"
     }
   ]
 }

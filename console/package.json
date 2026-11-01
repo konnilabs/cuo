@@ -1,1 +1,23 @@
-{"name":"cuo-console","version":"0.1.0","private":true,"type":"module","scripts":{"setup":"node tools/setup.mjs","generate":"node tools/author-rmt.mjs","build":"node tools/build.mjs","start":"node server/index.mjs","test":"node --test test/*.test.mjs"},"engines":{"node":">=24.18"},"dependencies":{"@ccslabs/xtend":"file:.framework","@ccslabs/xtend-maraca":"file:.framework/xtend-maraca"}}
+{
+  "name": "cuo-console",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "setup": "node --use-env-proxy tools/setup.mjs",
+    "generate": "node tools/author-rmt.mjs",
+    "build": "node tools/build.mjs",
+    "start": "node server/index.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "engines": {
+    "node": ">=24.18"
+  },
+  "dependencies": {
+    "@ccslabs/xtend": "file:.framework",
+    "@ccslabs/xtend-maraca": "file:.framework/xtend-maraca"
+  },
+  "config": {
+    "xtendLockfile": "xtend.lock.json"
+  }
+}

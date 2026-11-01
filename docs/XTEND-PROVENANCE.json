@@ -33,5 +33,7 @@
       "mimeType": "text/markdown"
     }
   ],
-  "runtimeRequiresMCP": false
+  "runtimeRequiresMCP": false,
+  "dependencyLock": "console/xtend.lock.json",
+  "dependencyMode": "immutable HTTPS source archive, external and SHA-256 verified"
 }

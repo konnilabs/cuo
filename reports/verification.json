@@ -28,7 +28,7 @@
     "deployedConsoleSmoke": "PASS (current image: toast over drawer and expanded Logs, demo-only)"
   },
   "goRaceAndVet": "PASS",
-  "nodeServiceTests": 6,
+  "nodeServiceTests": 9,
   "goVulnerabilityScan": "No vulnerabilities found.",
   "npmBuildVulnerabilities": {
     "info": 0,
@@ -156,5 +156,13 @@
     "logsTerminalHeight": 477,
     "pageErrors": [],
     "passed": true
+  },
+  "xtendDependency": {
+    "lockfile": "console/xtend.lock.json",
+    "revision": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "archiveSha256": "5c96147b712180125ff660b0a3a5be4fd87e230816dfffb0cb70111c993074b3",
+    "mode": "External, immutable HTTPS source dependency",
+    "freshDockerBuild": "PASS, no framework source archive in build context",
+    "integrityAndCacheTests": "PASS"
   }
 }

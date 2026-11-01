@@ -1,11 +1,10 @@
 FROM node:24.22.1-bookworm-slim@sha256:be8204d4bd327363357f532187b752ff62759c31bedf98e9e18fc08c9cbd605c AS build
 WORKDIR /app
 RUN npm install --global npm@11.17.0
-COPY third_party/xtend-49166cb.tar.gz /third_party/xtend-49166cb.tar.gz
-COPY console/package.json ./
+COPY console/package.json console/xtend.lock.json ./
 COPY console/runtime ./runtime
-COPY console/tools/setup.mjs ./tools/setup.mjs
-RUN node tools/setup.mjs
+COPY console/tools/setup.mjs console/tools/resolve-framework.mjs ./tools/
+RUN node --use-env-proxy tools/setup.mjs
 COPY console/src ./src
 COPY console/components ./components
 COPY console/assets ./assets

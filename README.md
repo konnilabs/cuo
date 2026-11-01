@@ -1,6 +1,6 @@
 # CUO
 
-CUO ist ein lokal installierbarer **Container Update Orchestrator** mit eigenständigem Go-Core und einer XTend Maraca / RMT-Konsole nach der mitgelieferten Designreferenz. Version **0.1.0** ist ein lokales MVP für einen Docker-Host. Das Repository hat noch keinen GitHub-Remote und veröffentlicht keine Images.
+CUO ist ein lokal installierbarer **Container Update Orchestrator** mit eigenständigem Go-Core und einer XTend Maraca / RMT-Konsole nach der mitgelieferten Designreferenz. Version **0.1.0** ist ein lokales MVP für einen Docker-Host. Quellcode: [konnilabs/cuo](https://github.com/konnilabs/cuo). Es werden keine Images automatisch veröffentlicht.
 
 ## Installation
 
@@ -116,7 +116,7 @@ npm audit --prefix runtime --audit-level=high
 
 `console/tools/author-rmt.mjs` schreibt die prüfbare kanonische RMT-Datei `console/src/app.rmt`. Änderungen an der Shell dort im Authoring-Modell vornehmen und neu generieren. Im Browser besitzt ausschließlich RMT die Shell, Navigation, Dialogsichtbarkeit und den View-State. Maraca AppServices koordinieren Intents und typisierte BFF-Aufrufe; Server Services rufen die versionierte Core-API auf. Custom-XTend-Komponenten erhalten deklarative Daten und senden `xtend-command`-Events. Native Formulardrafts und Fokus bleiben innerhalb der jeweiligen Komponente. Passwörter werden weder in den View-State noch in Browser-Speicher geschrieben.
 
-Der lokale XTend-MCP-Server wurde zur Prüfung der tatsächlichen APIs genutzt: XTend `49166cbe96d91049634fbe03eb48c04edb6e70cd`. Die Anwendung benötigt den MCP-Server zur Laufzeit nicht. Der originale Framework-Stand und Watchtower-Ausgangspunkt sind in `third_party/` enthalten. Loader/Manifest-Zugriff im Browser ist nicht erforderlich; Maraca erzeugt eine statische Komponentenregistry.
+Der lokale XTend-MCP-Server wurde zur Prüfung der tatsächlichen APIs genutzt: XTend `49166cbe96d91049634fbe03eb48c04edb6e70cd`. Die Anwendung benötigt den MCP-Server zur Laufzeit nicht. XTend wird als externe Source-Dependency über `console/xtend.lock.json` bezogen: Repository, exakter Commit, Version und SHA-256 des Upstream-Downloads sind festgeschrieben. `npm run setup` und der Docker-Build laden ausschließlich diesen Stand, prüfen den Hash und installieren nur die benötigten Workspaces mit dem Upstream-npm-Lockfile. Ein Framework-Archiv wird nicht im aktuellen Projektstand mitgeführt. `.framework`, Download-Cache und `node_modules` sind generierte, ignorierte Dependency-Verzeichnisse. Die verwendete Maraca-Version ist noch nicht als eigenes npm-Paket verfügbar; nach Veröffentlichung kann die Einbindung auf Registry-Pakete wechseln. Updates erfordern eine bewusste Änderung des Pins und eine Prüfung der DOM-Anpassungen. Der Watchtower-Ausgangspunkt liegt weiterhin in `third_party/`. Loader/Manifest-Zugriff im Browser ist nicht erforderlich; Maraca erzeugt eine statische Komponentenregistry.
 
 ```sh
 node tools/generate-api.mjs       # OpenAPI und TypeScript-Client
@@ -130,6 +130,6 @@ Der optionale Docker-E2E-Test erzeugt ausschließlich eigene Testcontainer und e
 
 Das lokale MVP ist noch kein als öffentliches Release freigegebenes Produkt. Private Registry-Credentials, Multi-Host-Transport, automatische Daten-Rollbacks und hochverfügbare Datenhaltung sind nicht aktiviert. OIDC ist optional konfigurierbar; ohne Einrichtung wird ausschließlich die lokale Anmeldung angeboten.
 
-Vor Distribution sind die in `docs/RELEASE-GATES.md` benannten Prüfungen einschließlich signierter OCI-Veröffentlichung, SBOM, Provenance, Image-CVE-Scan, Restore-Test und breiter Barrierefreiheitsprüfung zu erfüllen. Der mitgelieferte CI-Workflow ist auf einen späteren GitHub-Remote vorbereitet. Es wurden weder Images in eine Registry gepusht noch ein GitHub-Repository erstellt.
+Vor Distribution sind die in `docs/RELEASE-GATES.md` benannten Prüfungen einschließlich signierter OCI-Veröffentlichung, SBOM, Provenance, Image-CVE-Scan, Restore-Test und breiter Barrierefreiheitsprüfung zu erfüllen. Der mitgelieferte CI-Workflow ist auf einen späteren GitHub-Remote vorbereitet. Es wurden keine Images in eine Registry gepusht.
 
 Architektur: `docs/ADR-001.docx`, `docs/ARCHITECTURE.md`. Sicherheitsmodell und Dependency-Bewertung: `SECURITY.md`. Versionierter API-Vertrag: `docs/openapi.json`.

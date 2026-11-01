@@ -12,3 +12,5 @@ third_party/watchtower-a047c7f.tar.gz
 
 console/runtime/node_modules
 console/vendor
+
+console/.cache
