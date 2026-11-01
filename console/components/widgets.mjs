@@ -389,19 +389,23 @@ export class XMaintenancePlanner extends Widget {
           );
       days.push(
         h(
-          "button",
-          {
-            type: "button",
-            class: `day${day.getMonth() !== m - 1 ? " outside" : ""}${vm.selectedDate === date ? " chosen" : ""}`,
-            "data-kind": "date",
-            "data-value": date,
-            "aria-label":
-              day.toLocaleDateString("de-DE", { dateStyle: "full" }) +
-              (planned ? ", Wartungsfenster" : ""),
-            "aria-pressed": String(vm.selectedDate === date),
-          },
-          String(day.getDate()),
-          planned ? h("i", { class: "calendar-dot" }) : null,
+          "div",
+          { class: "calendar-cell" },
+          h(
+            "button",
+            {
+              type: "button",
+              class: `day${day.getMonth() !== m - 1 ? " outside" : ""}${vm.selectedDate === date ? " chosen" : ""}`,
+              "data-kind": "date",
+              "data-value": date,
+              "aria-label":
+                day.toLocaleDateString("de-DE", { dateStyle: "full" }) +
+                (planned ? ", Wartungsfenster" : ""),
+              "aria-pressed": String(vm.selectedDate === date),
+            },
+            String(day.getDate()),
+            planned ? h("i", { class: "calendar-dot" }) : null,
+          ),
         ),
       );
     }

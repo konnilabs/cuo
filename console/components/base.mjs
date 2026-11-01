@@ -17,6 +17,29 @@ export function button(
   className = "btn",
   symbol,
 ) {
+  const mark = symbol
+    ? icon(
+        symbol,
+        symbol === "arrow-right"
+          ? "lucide"
+          : [
+                "calendar",
+                "clock",
+                "history",
+                "bell",
+                "users",
+                "link",
+                "plus",
+                "filter",
+                "more",
+                "ban",
+                "cube",
+                "docker",
+              ].includes(symbol)
+            ? "cuo"
+            : "core",
+      )
+    : null;
   return h(
     "button",
     {
@@ -36,28 +59,7 @@ export function button(
       "data-value": value,
       "data-id": id,
     },
-    symbol
-      ? icon(
-          symbol,
-          [
-            "calendar",
-            "clock",
-            "history",
-            "bell",
-            "users",
-            "link",
-            "plus",
-            "filter",
-            "more",
-            "ban",
-            "cube",
-            "docker",
-          ].includes(symbol)
-            ? "cuo"
-            : "core",
-        )
-      : null,
-    label,
+    ...(symbol === "arrow-right" ? [label, mark] : [mark, label]),
   );
 }
 // Small keyed reconciler restricted to a custom element's own shadow root.

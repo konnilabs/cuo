@@ -55,6 +55,8 @@ template cuo.app {
     dialog ""
     selected ""
     live true
+    themeToggleIcon "moon"
+    themeToggleLabel "Farbschema wechseln: Dunklen Modus aktivieren"
     notifications [
 
     ]
@@ -108,7 +110,7 @@ template cuo.app {
     routeusers "is-hidden"
     navintegrations "nav-item cuo-action"
     routeintegrations "is-hidden"
-    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-01\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
+    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-01\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"themeToggleIcon\":\"moon\",\"themeToggleLabel\":\"Farbschema wechseln: Dunklen Modus aktivieren\",\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
   } }
  state cuo.shell type object preserve { initial {
     id "cuo-shell"
@@ -1014,7 +1016,7 @@ template cuo.app {
                           attributes {
                             type "button"
                             data-id ""
-                            aria-label "Farbschema wechseln"
+                            aria-label "$model.cuo.vm.themeToggleLabel"
                             data-kind "theme"
                             data-value ""
                           }
@@ -1023,7 +1025,7 @@ template cuo.app {
                               type "element"
                               tag "x-icon"
                               attributes {
-                                name "sun"
+                                name "$model.cuo.vm.themeToggleIcon"
                                 pack "core"
                                 size "20px"
                                 decorative true
@@ -1041,7 +1043,7 @@ template cuo.app {
                               children [
 
                               ]
-                              text "Farbschema wechseln"
+                              text "$model.cuo.vm.themeToggleLabel"
                             }
                           ]
                         }
@@ -1246,7 +1248,7 @@ template cuo.app {
                               tag "x-icon"
                               attributes {
                                 name "arrow-right"
-                                pack "core"
+                                pack "lucide"
                                 size "20px"
                                 decorative true
                               }
