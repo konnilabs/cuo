@@ -482,6 +482,7 @@ fs.writeFileSync(
   JSON.stringify(
     {
       "x-icon": "../.framework/components/xicon.js",
+      "x-container-icon": "./container-icon.mjs",
       "x-router": "../vendor/xrouter.mjs",
       "x-route": "../vendor/xrouter.mjs",
       "x-toggle": "../.framework/components/xtoggle.js",

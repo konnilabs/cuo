@@ -405,6 +405,7 @@ const server = http.createServer(async (req, res) => {
         ".css": "text/css; charset=utf-8",
         ".woff2": "font/woff2",
         ".svg": "image/svg+xml",
+        ".json": "application/json; charset=utf-8",
       }[path.extname(filename)] || "application/octet-stream";
     const headers = { "Content-Type": type, "Cache-Control": "no-cache" };
     if (req.method === "HEAD") {

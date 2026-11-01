@@ -295,6 +295,20 @@ td:last-child {
   height: 22px;
   border-radius: 6px;
 }
+:host(x-container-icon) {
+  display: inline-flex;
+  flex: 0 0 22px;
+  width: 22px;
+  height: 22px;
+  vertical-align: middle;
+}
+.container-icon-preview {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 18px;
+  font-weight: 700;
+}
 .app-symbol x-icon {
   --xtend-icon-size: 22px;
 }

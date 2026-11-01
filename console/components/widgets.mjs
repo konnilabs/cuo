@@ -11,6 +11,7 @@ import {
   field,
   select,
 } from "./base.mjs";
+import "./container-icon.mjs";
 function status(c) {
   return c.candidate?.error
     ? ["Prüfung fehlgeschlagen", "warning"]
@@ -210,24 +211,10 @@ export class XContainerTable extends Widget {
                           class:
                             "dot " + (c.state === "running" ? "green" : "gray"),
                         }),
-                        h(
-                          "span",
-                          { class: "app-symbol app-" + (i % 8) },
-                          icon(
-                            name.includes("nextcloud")
-                              ? "cloud"
-                              : name.includes("redis")
-                                ? "database"
-                                : name.includes("postgres")
-                                  ? "database"
-                                  : "cube",
-                            name.includes("nextcloud") ||
-                              (!name.includes("redis") &&
-                                !name.includes("postgres"))
-                              ? "cuo"
-                              : "lucide",
-                          ),
-                        ),
+                        h("x-container-icon", {
+                          image: c.image,
+                          theme: vm.theme,
+                        }),
                         h(
                           "button",
                           {
