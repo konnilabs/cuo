@@ -24,6 +24,43 @@ The local deployment has a single host ID, `local`. Per-host ACLs are enforced a
 
 Custom components expose typed props, semantic command events, lifecycle cleanup and a footer slot. Tables use bounded pagination, sortable headers, search and filters. The calendar handles month navigation, selection and keyboard focus. Native forms enforce constraints, while the Core performs authoritative validation. RMT input trust policies validate service intents. Orchestration, kernel, hydration and service graphs use strict mode; optional framework form-validation/transition planners remain auto because these widgets use their own native form contracts and there is no multi-surface transition plan. This avoids including the framework's legacy raw-HTML form renderer.
 
+## Product icons and future container settings
+
+`x-container-icon` is a registered custom XTend component used by the container
+table and detail dialog. RMT owns its containing views; the component owns only
+its shadow DOM and asynchronous display state. It accepts `image`, `theme` and an
+optional `icon-key` catalog override. It renders real XIcon components throughout,
+including its existing cloud/database/cube placeholder and error fallback. A fixed
+22 px slot prevents layout shifts. Image identity is an exact, normalized registry
+and repository match, independent of tag, digest, container name or row position.
+The catalog includes the eight demo products, explicit real repository aliases,
+and the legacy short demo references. Unknown repositories never receive a brand
+mark because their name happens to contain a known product name.
+
+`console/brands/sources.lock.json` pins selected source files to upstream commits
+and SHA-256 hashes. Sources, collection licenses and upstream disclaimers are
+retained locally. `build-brands.mjs` verifies their bytes offline and compiles them
+to XIcon's supported geometry. It resolves inherited fills/transforms, inline
+styles and PostgreSQL's presentation classes; Portainer's redundant viewport clip
+is checked and removed. Theme variants preserve contrast without global color
+inversion. Appsmith's original compact favicon is converted losslessly to SVG
+rectangles at build time. The generated pack contains geometry only, no executable SVG, external
+URLs or image/HTML nodes. XTend itself is unchanged.
+
+One shared request loads `/assets/container-brands.json` from CUO's own origin;
+the pack is validated before registration. Loading is bounded to five seconds.
+Unknown images require no request, failures remain on the placeholder until a
+page reload, and outdated asynchronous completions cannot replace a newer image
+or theme choice. No runtime icon request leaves the installation. Upstream
+collection licenses do not transfer ownership of individual marks; see NOTICE.
+
+A later tabbed container editor can persist a manual `icon-key` choice without
+changing Docker labels or recreating workloads. A future upload source should be
+a separate, authenticated server-side asset identifier, with ownership checks,
+size/type validation and image normalization before same-origin delivery. It must
+not turn `icon-key` into an arbitrary URL or raw SVG field. The current add dialog
+continues to explain discovery; no nonfunctional upload tab is presented.
+
 ## Identity and personal state
 
 The session BFF implements generic OpenID Connect using pinned `openid-client` with signed ID-token verification, issuer/audience/expiry checks, Authorization Code + PKCE S256, nonce, one-time state and a browser-bound five-minute HttpOnly SameSite Lax correlation cookie. Session cookies remain SameSite Strict. Only the Owner may configure the provider; secrets and transient flow records stay in `identity.db`. Identity schema v2 adds tables without replacing existing accounts or sessions. Active login flows are invalidated when configuration changes. Provider tokens are consumed server-side and are not persisted or sent to the browser. No email-based implicit account linking or provider role-claim trust is performed. New accounts receive an explicitly configured role and the local-host ACL. Existing roles are preserved. Disabling automatic provisioning retains access for existing federated accounts. Logout revokes CUO sessions only.

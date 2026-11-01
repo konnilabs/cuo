@@ -8,6 +8,7 @@ RUN node --use-env-proxy tools/setup.mjs
 COPY console/src ./src
 COPY console/components ./components
 COPY console/assets ./assets
+COPY console/brands ./brands
 COPY console/tools ./tools
 COPY console/server ./server
 COPY console/maraca.config.json console/tsconfig.json ./
@@ -20,6 +21,7 @@ COPY --from=build /app/server ./server
 COPY --from=build /app/runtime ./runtime
 COPY --from=build /app/.framework/xtend-maraca ./.framework/xtend-maraca
 COPY LICENSE NOTICE third_party/XTend-LICENSE /usr/share/licenses/cuo/
+COPY console/brands/LICENSES /usr/share/licenses/cuo/product-icons/
 USER node
 ENV CUO_AUTH_DATA=/data
 EXPOSE 8095

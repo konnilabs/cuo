@@ -23,6 +23,16 @@ export interface CUOComponentContract {
 }
 declare global {
   interface HTMLElementTagNameMap {
+    "x-container-icon": HTMLElement & {
+      image: string;
+      theme: string;
+      iconKey: string;
+      snapshot(): {
+        key: string | null;
+        state: "loading" | "ready" | "fallback" | "error";
+        source: "catalog" | "override" | "fallback";
+      };
+    };
     "x-container-table": CUOWidget;
     "x-maintenance-planner": CUOWidget;
     "x-update-run-timeline": CUOWidget;

@@ -24,3 +24,16 @@ is retained unchanged and per-component hashes are recorded by the build.
 OIDC runtime: openid-client 6.8.8, oauth4webapi 3.8.8, jose 6.2.14.
 Copyright Filip Skokan and contributors, MIT License. Package licenses are
 included with the runtime dependency tree installed from its lockfile.
+
+Product icon sources: homarr-labs/dashboard-icons, commit
+83f32e08257b66fbd971ac8d7645f5b38d52e85d (Apache License 2.0 collection),
+and the original Appsmith favicon from appsmithorg/appsmith, commit
+7bf6d367d0d0cd2f3b3e43d9678caad2dae03ca3 (Apache License 2.0).
+Source URLs and original SHA-256 values are in console/brands/sources.lock.json.
+Collection licenses and upstream disclaimers are in console/brands/LICENSES.
+Collection licensing does not imply ownership of the individual brand marks;
+names and marks remain with their respective owners. No affiliation is implied.
+CUO's build normalizes SVG presentation attributes and flattens groups/classes
+to XIcon geometry. Portainer's redundant viewport clip is removed. Appsmith's
+original 16-pixel favicon is represented as SVG rectangles without altering its
+pixels. Original source files are retained.

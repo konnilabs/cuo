@@ -14,3 +14,4 @@ console/runtime/node_modules
 console/vendor
 
 console/.cache
+console/assets/container-brands.json

@@ -1,0 +1,96 @@
+{
+  "schema": "cuo.brand-sources.v1",
+  "sources": [
+    {
+      "id": "nextcloud",
+      "file": "sources/nextcloud.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/nextcloud.svg",
+      "sha256": "892404c0c7c74cb22d6c728e967fcf5cb680f7d343db1cdfef92186d44cce6d3",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "nginx",
+      "file": "sources/nginx.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/nginx.svg",
+      "sha256": "3860f0d399e48fcaa30f2b21d3cd5e0d693267140f1e28cb2d341981ab8d2f4c",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "redis",
+      "file": "sources/redis.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/redis.svg",
+      "sha256": "9c3d4a6458094687a5b035b1d890b808b3d6d06584625e0cbe38054d24e3b86d",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "postgresql",
+      "file": "sources/postgresql.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/postgresql.svg",
+      "sha256": "15392b515335ffd08a5a58cb9ed697772b4cf17f4a6af216900f2c774a951da2",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "vaultwarden",
+      "file": "sources/vaultwarden.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/vaultwarden.svg",
+      "sha256": "afa3af723b4de7f502d2cc962352842a5cb41026bb5940a9f970cb5271b9472b",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "vaultwarden-light",
+      "file": "sources/vaultwarden-light.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/vaultwarden-light.svg",
+      "sha256": "924d21f0e525d5ae208a0a374db5221e0659fd4ed38ac290f9e875e16f677b35",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "portainer",
+      "file": "sources/portainer.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/portainer.svg",
+      "sha256": "5d1e07021683d15ea67225c60975729f4ee0ed380f3a0fb21ffb2ad00eb6e85b",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "portainer-dark",
+      "file": "sources/portainer-dark.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/portainer-dark.svg",
+      "sha256": "f59db5e3f454a80e316f63781f199c6990721645b837d81218d4c7b9fc8dcfd8",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "immich",
+      "file": "sources/immich.svg",
+      "url": "https://raw.githubusercontent.com/homarr-labs/dashboard-icons/83f32e08257b66fbd971ac8d7645f5b38d52e85d/svg/immich.svg",
+      "sha256": "a5d4a43899e63ffc7e97246034f7f63cdfdc410aa803c5713d545290601c4d89",
+      "repository": "homarr-labs/dashboard-icons",
+      "revision": "83f32e08257b66fbd971ac8d7645f5b38d52e85d",
+      "upstreamLicense": "Apache-2.0"
+    },
+    {
+      "id": "appsmith",
+      "format": "ico",
+      "file": "sources/appsmith.ico",
+      "url": "https://raw.githubusercontent.com/appsmithorg/appsmith/7bf6d367d0d0cd2f3b3e43d9678caad2dae03ca3/app/client/public/favicon-black.ico",
+      "sha256": "0ddb680940067b2285e6b07122d27bf7aba337561ed13e21d9e6bb857641bb27",
+      "repository": "appsmithorg/appsmith",
+      "revision": "7bf6d367d0d0cd2f3b3e43d9678caad2dae03ca3",
+      "upstreamLicense": "Apache-2.0"
+    }
+  ]
+}

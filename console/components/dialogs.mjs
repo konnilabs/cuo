@@ -141,6 +141,12 @@ export class XApprovalDialog extends Widget {
         ? [
             h(
               "div",
+              { class: "container-icon-preview" },
+              h("x-container-icon", { image: c.image, theme: vm.theme }),
+              h("span", {}, c.name),
+            ),
+            h(
+              "div",
               { class: "detail-grid" },
               [
                 ["Image", c.image],
