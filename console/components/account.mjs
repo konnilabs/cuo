@@ -339,6 +339,21 @@ export function oidcSettings(vm) {
         h("input", { name: "enabled", type: "checkbox", checked: c.enabled }),
         "SSO-Anmeldung aktivieren",
       ),
+      h(
+        "label",
+        { class: "check" },
+        h("input", {
+          name: "localLoginEnabled",
+          type: "checkbox",
+          checked: c.localLoginEnabled !== false,
+        }),
+        "Lokale Anmeldung mit Benutzername und Passwort erlauben",
+      ),
+      h(
+        "p",
+        { class: "callout small" },
+        "Ohne lokale Anmeldung zeigt der Login nur SSO; auch der Passwort-Endpunkt wird gesperrt. Aktiviere dies erst nach einem erfolgreichen SSO-Test. Bei Provider-Ausfall und für lokale Owner-Konten lässt sich der Zugang ausschließlich über das Host-Terminal wiederherstellen: ./tools/recover-login.sh. Bestehende Sitzungen bleiben gültig.",
+      ),
       field("Beschriftung der Anmeldung", "label", c.label, "text", {
         maxlength: 80,
       }),
@@ -397,7 +412,7 @@ export function oidcSettings(vm) {
       h(
         "p",
         { class: "callout" },
-        "Bei automatischer Anlage erhalten alle vom Provider zugelassenen Benutzer diese Rolle auf dem lokalen Host. Bestehende Rollen werden beibehalten. Die lokale Anmeldung bleibt verfügbar.",
+        "Bei automatischer Anlage erhalten alle vom Provider zugelassenen Benutzer diese Rolle auf dem lokalen Host. Bestehende Rollen werden beibehalten.",
       ),
       h(
         "button",

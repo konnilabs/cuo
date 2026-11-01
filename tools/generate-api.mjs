@@ -54,6 +54,11 @@ schemas.Approval = {
   required: ["reason", "confirmed"],
   additionalProperties: false,
 };
+schemas.UpdateRunRequest = {
+  ...schemas.Approval,
+  properties: { ...schemas.Approval.properties, all: { const: true } },
+  required: ["all", "reason", "confirmed"],
+};
 for (const name of ["Policy", "Window"]) {
   const original = schemas[name];
   schemas[name + "Request"] = {
@@ -205,6 +210,14 @@ endpoint(
   "Operator",
 );
 endpoint("/api/v1/update-jobs/{id}", "get", "job", "Job");
+endpoint(
+  "/api/v1/update-runs",
+  "post",
+  "createRun",
+  "UpdateRun",
+  "UpdateRunRequest",
+  "Administrator",
+);
 endpoint(
   "/api/v1/update-jobs/{id}/approve",
   "post",

@@ -73,6 +73,16 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 	config := obj(current, "Config")
 	host := obj(current, "HostConfig")
 	labels := obj(config, "Labels")
+	// Compose desired-state pins and reconciliation are shared by the project.
+	// Serialize its services; unrelated projects and standalone containers can run concurrently.
+	if project := str(labels, "com.docker.compose.project"); project != "" {
+		unlock, err := a.projectLock(ctx, project)
+		if err != nil {
+			fail(err, false)
+			return
+		}
+		defer unlock()
+	}
 	if str(labels, "cuo.managed") != "true" || str(labels, "cuo.system") == "true" {
 		fail(errors.New("Container is not explicitly managed by CUO"), false)
 		return

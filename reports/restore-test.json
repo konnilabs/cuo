@@ -1,0 +1,29 @@
+{
+  "schema": "cuo.restore-test.v1",
+  "createdAt": "2026-11-01T21:11:01.432Z",
+  "revision": "eb4b4cd8e5715552cfb018f04cc3d4e69eda77b9",
+  "dirty": true,
+  "images": {
+    "console": "sha256:e0831265c2011caa8b7fb67e2f9f98131df796aa384ae480df76c825b4b149f8",
+    "core": "sha256:8f147f560deb54fc5ed642018852d30f6b1d5423a2682b777f1442cd353cb56e",
+    "agent": "sha256:c7b43223f3b227e4a8323eef27a0b67d0c80a27476c4779df7bc4f614e93cc13"
+  },
+  "passed": true,
+  "isolation": {
+    "disposableVolumes": 3,
+    "dockerSocket": false,
+    "publishedPorts": false,
+    "externalNetwork": false
+  },
+  "checks": [
+    "actual backup.sh/restore.sh",
+    "backup mode 0600",
+    "SQLite identity/Core integrity",
+    "password login and Owner role after restart",
+    "profile, OIDC setting and notification dismissal",
+    "Core policies, jobs and audit history",
+    "Agent journals and Compose desired state",
+    "post-backup files removed",
+    "pre-restore safety snapshot"
+  ]
+}

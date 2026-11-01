@@ -1,6 +1,8 @@
 # CUO
 
-CUO ist ein lokal installierbarer **Container Update Orchestrator** mit eigenständigem Go-Core und einer XTend Maraca / RMT-Konsole nach der mitgelieferten Designreferenz. Version **0.1.0** ist ein lokales MVP für einen Docker-Host. Quellcode: [konnilabs/cuo](https://github.com/konnilabs/cuo). Es werden keine Images automatisch veröffentlicht.
+CUO ist ein lokal installierbarer **Container Update Orchestrator** mit eigenständigem Go-Core und einer XTend Maraca / RMT-Konsole nach der mitgelieferten Designreferenz.
+
+**Status: öffentlicher Entwicklungsstand / Single-Host-MVP (0.1.0), noch kein freigegebenes stabiles Release.** Der Quellcode liegt öffentlich auf [konnilabs/cuo](https://github.com/konnilabs/cuo); die Installation baut die Images lokal. Ein grüner PR-Check bestätigt die dort getesteten Funktionen. Die separaten [Release-Kriterien](docs/RELEASE-GATES.md) einschließlich Image-Sicherheit, signierter Veröffentlichung und vollständiger Barrierefreiheitsprüfung sind noch nicht erfüllt. Es werden keine OCI-Images automatisch veröffentlicht.
 
 ## Installation
 
@@ -29,7 +31,9 @@ Unter **Integrationen → OpenID Connect** kann der Owner einen OIDC-Provider ko
 
 Issuer, optionale abweichende Discovery-URL, Client-ID, Client-Secret, Scopes und Client-Authentifizierung sind konfigurierbar. Den Provider-Client für signierte RS256-ID-Tokens mit JWKS konfigurieren. Eine abweichende Discovery-URL wird als exakte Dokument-URL verwendet und muss keinen `.well-known`-Pfad enthalten. Unterstützt sind `client_secret_post`, `client_secret_basic` und öffentliche PKCE-Clients. Die Issuer-URL muss exakt dem Discovery-Dokument entsprechen, einschließlich eines eventuellen Pfades oder abschließenden Schrägstrichs. Provider-Endpunkte benötigen HTTPS mit vertrauenswürdiger Zertifikatskette. Keine Zertifikatsprüfung wird abgeschaltet.
 
-**Speichern und Verbindung prüfen** prüft bei aktivierter Anmeldung die Discovery und speichert das Secret ausschließlich im serverseitigen Identity-Volume. Ein leeres Secret-Feld behält den bisherigen Wert; zum Entfernen gibt es eine eigene Checkbox. Bei aktivierter automatischer Benutzeranlage darf jeder vom Provider zugelassene Benutzer mit der gewählten Rolle auf den lokalen Host zugreifen; Standard ist **Viewer**. Die Zugangsbegrenzung erfolgt im Provider. Bestehende CUO-Rollen bleiben erhalten. Konten werden über Issuer und Subject identifiziert, niemals anhand gleicher E-Mail-Adressen mit lokalen Konten verknüpft. Die lokale Anmeldung bleibt als unabhängiger Zugang verfügbar. **Abmelden** beendet CUO-Sitzungen, nicht die Sitzung beim Provider.
+**Speichern und Verbindung prüfen** prüft bei aktivierter Anmeldung die Discovery und speichert das Secret ausschließlich im serverseitigen Identity-Volume. Ein leeres Secret-Feld behält den bisherigen Wert; zum Entfernen gibt es eine eigene Checkbox. Bei aktivierter automatischer Benutzeranlage darf jeder vom Provider zugelassene Benutzer mit der gewählten Rolle auf den lokalen Host zugreifen; Standard ist **Viewer**. Die Zugangsbegrenzung erfolgt im Provider. Bestehende CUO-Rollen bleiben erhalten. Konten werden über Issuer und Subject identifiziert, niemals anhand gleicher E-Mail-Adressen mit lokalen Konten verknüpft. **Abmelden** beendet CUO-Sitzungen, nicht die Sitzung beim Provider.
+
+Standardmäßig bleibt die lokale Anmeldung verfügbar. Der Owner kann unter **Integrationen → OpenID Connect** „Lokale Anmeldung mit Benutzername und Passwort erlauben“ abschalten. Das setzt aktiviertes OIDC und eine erfolgreiche Discovery-Prüfung voraus. Danach verschwinden die lokalen Login-Felder; auch direkte Aufrufe von `/auth/login` werden mit `LOCAL_LOGIN_DISABLED` abgewiesen. Bereits bestehende Sitzungen bleiben gültig. Vor dem Umschalten SSO in einer getrennten Browsersitzung erfolgreich testen. Neue SSO-Konten erhalten höchstens Administratorrechte, lokale Owner-Konten bleiben eigenständig: Für einen gesperrten lokalen Owner oder bei Provider-Ausfall über das Host-Terminal `./tools/recover-login.sh` aufrufen. Dies aktiviert nur die lokale Anmeldung wieder und protokolliert die Wiederherstellung; OIDC-Konfiguration und Passwörter bleiben erhalten. Es gibt keinen öffentlichen Login-Bypass.
 
 Das Benutzermenü öffnet rechts den XTend-Profil-Drawer: Anzeigename, lokales Profil-Icon, Farbschema und Update-Benachrichtigungen lassen sich speichern. Der lokale Loginname bleibt erhalten. Unter **Workspace-Einstellungen → Darstellung** schaltet XToggle zwischen hell und dunkel. **Automatisch** übernimmt die Systemeinstellung und reagiert auch auf spätere Änderungen. Profilpräferenzen gelten pro Benutzer.
 
@@ -56,13 +60,19 @@ Unter **Jetzt prüfen** startet ein Registry-Scan. Er löst einen Multi-Arch-Ind
 
 Ein Scan prüft Image-Inhalte; er führt keine automatische Versionsmigration auf einen anderen Tag aus. Ein gepinnter Digest bleibt bewusst unveränderlich. Scannerfehler erscheinen als Fehlerstatus und werden nicht als „aktuell“ ausgegeben.
 
-Die Policy-Reihenfolge ist global → Host → Gruppe → Container. Ein übergeordneter Ausschluss bleibt wirksam. Automatische Ausführung und Wartungsfenster laufen im Core, auch wenn kein Browser geöffnet ist. Der Core prüft standardmäßig alle sechs Stunden erneut (`CUO_SCAN_INTERVAL=6h`). Die lokale Ausführung ist absichtlich seriell; der UI-Editor setzt Parallelität auf eins.
+Die Policy-Reihenfolge ist global → Host → Gruppe → Container. Ein übergeordneter Ausschluss bleibt wirksam. Automatische Ausführung und Wartungsfenster laufen im Core, auch wenn kein Browser geöffnet ist. Der Core prüft standardmäßig alle sechs Stunden erneut (`CUO_SCAN_INTERVAL=6h`). Unter Richtlinien lässt sich die Parallelität von **1 bis 4** einstellen. Die Grenzen aller passenden globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Richtlinie bleibt die Standardgrenze eins. Bereits laufende Updates werden bei einer Reduktion nicht unterbrochen. Der Agent schützt einzelne Container und Journale vor paralleler Ausführung und serialisiert Services desselben Compose-Projekts, damit gemeinsame Image-Pins und Sollzustände erhalten bleiben.
+
+Im Modal **Update-Lauf starten** können Administratoren und Owner **Alle auswählen** wählen. Nach Grund und ausdrücklicher Neustart-Bestätigung erzeugt `POST /api/v1/update-runs` einen dauerhaften Sofortlauf für alle aktuell bekannten ausführbaren Kandidaten. Diese manuelle Freigabe startet auch Richtlinien mit Freigabepflicht außerhalb der Wartungsfenster. Die Grenzen der Parallelität, Host-Berechtigungen, `cuo.managed`, Ausschlüsse und „Nur prüfen“ bleiben wirksam. Veraltete oder fehlerhafte Kandidaten, gestoppte Container und bereits aktive Jobs werden übersprungen. Die Auswahl ist serverseitig, unabhängig von Suche und Tabellen-Seite; ein unveränderter Idempotency-Key wiederholt den Lauf nicht. Einzeljobs behalten ihre bisherigen Freigabe- und Wartungsfenster-Regeln. Eine neue Registry-Prüfung wird dabei nicht automatisch gestartet; vorher bei Bedarf „Jetzt prüfen“ verwenden.
+
+Das **Fragezeichen neben dem Farbschema-Icon** öffnet eine kompakte Kurzanleitung und einen eigenen scrollbaren Bereich für Lizenzhinweise. Die Liste enthält XTend Maraca/RMT/XIcon, den OIDC-Laufzeitbaum, die tatsächlich eingebundenen Go-Module, Schriften und Produkt-Icons samt Lizenztexten. `node tools/generate-notices.mjs` erzeugt diese lokale Liste aus den gepinnten Quellen; CI prüft sie mit `--check`. Die Anwendung lädt dafür keine externen Skripte oder Lizenzdienste.
 
 Für einen manuellen Lauf den Container auswählen, Unterbrechung bestätigen und einen Grund angeben. Eine Richtlinie mit manueller Freigabe erzeugt zunächst einen Job für einen Administrator oder Owner. Viewer lesen nur; Operator dürfen prüfen und Jobs anlegen. Rollen werden im Core geprüft, nicht nur im Browser.
 
 ## Compose-Projekte registrieren
 
 CUO aktualisiert Compose-Services durch **Docker Compose**, nicht durch eine verdeckte Neuerstellung außerhalb des Projekts. Nicht registrierte Compose-Projekte werden vor der Veränderung abgewiesen.
+
+Der Agent enthält **Compose v5.6.1-cuo.1**, einen eigenen Build der stabilen Upstream-Version v5.6.1 mit dem gezielt zurückportierten Dependency-Fix für CVE-2026-78669. Dabei werden `x/net` auf v0.60.0 und die zugehörigen `x/crypto`-/`x/text`-Versionen aktualisiert; der Compose-Programmcode bleibt auf v5.6.1. Quellarchiv, Security-Patch und resultierende Moduldateien sind per Commit/SHA-256 festgeschrieben. Der Build wird ausdrücklich als modifiziert gekennzeichnet. Herkunft, Lizenzhinweise und Ablösung durch ein späteres offizielles Release sind in [dependencies/compose](dependencies/compose/README.md) beschrieben. Der auf dem Host installierte Compose-Befehl wird dabei nicht ersetzt.
 
 1. `CUO_PROJECTS_DIR` in `.env` auf das absolute Stammverzeichnis vertrauenswürdiger Compose-Projekte setzen. Es wird im Agent unter `/projects` schreibgeschützt eingebunden.
 2. Dem Service zusätzlich `cuo.compose.file` mit dem relativen Pfad der Compose-Datei in diesem Stammverzeichnis geben, etwa `nextcloud/compose.yaml`.
@@ -90,7 +100,11 @@ Persistente Volumes: `cuo_identity` (Benutzer/Sitzungen), `cuo_core` (SQLite, Jo
 
 Vor einer Sicherung automatische Update-Richtlinien vorübergehend auf „Nur prüfen“ setzen und aktive bzw. wartende Ausführungen beenden. Das Skript verweigert die Sicherung bei bereits aktiven oder wartenden Jobs. Andere Bediener dürfen währenddessen keine neuen Updates starten.
 
-Für eine konsistente, offline Sicherung und Wiederherstellung die Skripte in `tools/backup.sh` und `tools/restore.sh` verwenden. `.env` separat mit Dateirechten 0600 sichern. Ein Backup umfasst keine Nutzdaten anderer Container. Deren Datenbanken und Volumes benötigen einen eigenen Backup-Vertrag.
+Für eine konsistente, offline Sicherung und Wiederherstellung die Skripte in `tools/backup.sh` und `tools/restore.sh` verwenden. Sie ermitteln die drei benannten Daten-Volumes der gewählten Compose-Instanz, verwenden die installierte Core-Image-ID ohne Pull und prüfen das Archiv vollständig vor einer Wiederherstellung. Pfadwechsel, Links, doppelte Einträge, unvollständige Archive, unbekannte Datenbank-Schemata, beschädigte SQLite-Dateien und offene Jobs werden abgewiesen. Die Grenze liegt bei 2 GiB Dateiinhalten und 100.000 Archiveinträgen; dafür wird zusätzlich temporärer Speicher im Prüfcontainer benötigt.
+
+Das Backup erhält Rechte 0600 und wird erst nach bestandener Prüfung unter dem Zielnamen abgelegt. Restore benötigt die Bestätigung `RESTORE`, erzeugt zuvor eine geschützte Sicherung des aktuellen Datenstands und startet CUO nur nach erfolgreicher Wiederherstellung. Bei einem Kopierfehler bleibt CUO gestoppt; die Wiederherstellung der drei Volumes ist keine atomare Transaktion. Ein Restore benötigt eine bereits angelegte CUO-Instanz mit den aktuellen Images; bei abweichenden Compose-Projekten dieselben `COMPOSE_FILE`-/`COMPOSE_PROJECT_NAME`-Angaben wie beim Betrieb setzen.
+
+`.env`, Reverse-Proxy-Konfiguration und vertrauenswürdige Compose-Quelldateien separat geschützt sichern. Das Archiv ist nicht verschlüsselt und enthält Geheimnisse. Ein Backup umfasst keine Nutzdaten anderer Container. Deren Datenbanken und Volumes benötigen einen eigenen Backup-Vertrag. Nach dem Restore Containerbestand und ungeklärte Jobs vor der erneuten Freigabe automatischer Updates prüfen; laufende Workloads werden durch das Zurücksetzen von CUO-Daten nicht zurückgesetzt.
 
 ```sh
 ./tools/backup.sh /sicherer/pfad/cuo-backup.tar.gz
@@ -122,14 +136,29 @@ Der lokale XTend-MCP-Server wurde zur Prüfung der tatsächlichen APIs genutzt: 
 node tools/generate-api.mjs       # OpenAPI und TypeScript-Client
 go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./...
 CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableDockerUpdate
+node --test tools/test/*.test.mjs
+node tools/test-restore.mjs       # eigene Instanz, drei Wegwerf-Volumes, kein Docker-Socket
 ```
 
 Der optionale Docker-E2E-Test erzeugt ausschließlich eigene Testcontainer und ein eigenes Volume und räumt diese wieder auf. Niemals einen existierenden Produktivcontainer als Testziel verwenden. Browserprüfungen und Screenshots sind unter `console/test/browser.mjs` beschrieben. `console/test/extensions-browser.mjs` startet zusätzlich einen vollständig isolierten BFF mit eigener Identity-Datenbank, Core-Fixture und signierendem OIDC-Testprovider. Dafür Playwright installieren und optional `CUO_PLAYWRIGHT_MODULE` sowie `CUO_CHROMIUM` setzen. Der Test prüft XRouter, Systemfarbschema, Profile, persistente Benachrichtigungen und eine Anmeldung über unterschiedliche Browser-Sites. Er verwendet keine bestehenden CUO-Konten.
 
-## Grenzen vor einer öffentlichen Veröffentlichung
+## MVP-Umfang und Release-Reife
 
-Das lokale MVP ist noch kein als öffentliches Release freigegebenes Produkt. Private Registry-Credentials, Multi-Host-Transport, automatische Daten-Rollbacks und hochverfügbare Datenhaltung sind nicht aktiviert. OIDC ist optional konfigurierbar; ohne Einrichtung wird ausschließlich die lokale Anmeldung angeboten.
+Das erste Release-Ziel ist **eine CUO-Instanz für einen lokalen Linux-Docker-Host** mit einer Console, einem Core, einem Agent und lokaler SQLite-Datenhaltung. Persistente Volumes und Docker-Neustartregeln ersetzen keine Hochverfügbarkeit. Für Datenbank-Migrationen verwalteter Anwendungen bleiben deren Betreiber verantwortlich.
 
-Vor Distribution sind die in `docs/RELEASE-GATES.md` benannten Prüfungen einschließlich signierter OCI-Veröffentlichung, SBOM, Provenance, Image-CVE-Scan, Restore-Test und breiter Barrierefreiheitsprüfung zu erfüllen. Der mitgelieferte CI-Workflow ist auf einen späteren GitHub-Remote vorbereitet. Es wurden keine Images in eine Registry gepusht.
+| Bereich | Aktueller Stand |
+|---|---|
+| Private Registry-Credentials | Noch nicht implementiert. Öffentliche/anonym zugängliche Registry-Images werden unterstützt; eine Host-Allowlist ersetzt keine Zugangsdaten. |
+| Multi-Host-Transport | Noch nicht implementiert; Host-Felder und Berechtigungen sind keine Remote-Agent-Anbindung. Spätere Ausbaustufe. |
+| Automatische Daten-Rollbacks | Nicht implementiert. Der aufbewahrte Standalone-Vorgänger ist kein Volume- oder Datenbank-Backup. Spätere, anwendungsspezifische Ausbaustufe. |
+| Hochverfügbare Datenhaltung | Nicht implementiert. Single-Writer-SQLite, kein Core-Cluster und kein Failover. Spätere Ausbaustufe. |
+| OCI-Publish / Signaturen / Provenance | Noch offen. Das bisherige Entwurfsskript veröffentlicht aus Sicherheitsgründen keine Images mehr. |
+| SBOM und Image-CVE-Scan | Nach Compose-Backport 0 HIGH/CRITICAL in allen drei Images und 0 betroffene Symbole im Go-Binärscan. Drei Modulwarnungen bleiben in den Nachweisen sichtbar; die Bewertung gilt für den geprüften Build. Noch keine signierte Release-SBOM. |
+| Barrierefreiheit | Bisher Bedienungs-Smokes; vollständiges WCAG-2.2-AA-Audit mit assistiven Technologien noch offen. |
+| Restore-Test | Automatischer isolierter Test aller drei CUO-Volumes einschließlich Anmeldung, Einstellungen, Historie und Journale vorhanden; keine Aussage über Workload-Daten oder Wiederherstellung nach Host-Verlust. |
+
+`.github/workflows/ci.yml` prüft Pushes und Pull Requests bereits auf GitHub und führt den isolierten Restore-Test aus. Der separat manuell startbare Workflow **CUO image release preflight (no publication)** erzeugt Image-SBOMs und CVE-Berichte ohne Registry-Schreibrechte. Lokal: Images bauen und mit installiertem Trivy und Syft `node tools/check-images.mjs` starten. Der Befehl exportiert unveränderliche Image-IDs, scannt für jedes Image dieselben Archivbytes und liefert bei einem Scannerfehler oder HIGH-/CRITICAL-Befund einen Fehlerstatus. Ergebnisse liegen standardmäßig im ignorierten `work/image-checks/`; für erneute Läufe ein neues leeres Verzeichnis über `CUO_IMAGE_REPORTS` wählen.
+
+Die [Release-Matrix](docs/RELEASE-GATES.md) beschreibt die noch nötigen Entscheidungen und Abnahmekriterien. [Aktuelle lokale Nachweise](reports/release-readiness.json) sind nach Zeitpunkt, Image-ID und Quellstand begrenzt; ältere Dateien in `reports/` sind historische Testergebnisse und keine Freigabe des aktuellen Stands.
 
 Architektur: `docs/ADR-001.docx`, `docs/ARCHITECTURE.md`. Sicherheitsmodell und Dependency-Bewertung: `SECURITY.md`. Versionierter API-Vertrag: `docs/openapi.json`.

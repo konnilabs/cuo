@@ -178,7 +178,9 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       vm = await snapshot(vm, true);
       if (new URL(location.href).searchParams.get("login_error") === "oidc") {
         vm.notice =
-          "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder lokal anmelden.";
+          vm.oidc.localLoginEnabled === false
+            ? "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder den Betreiber kontaktieren."
+            : "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder lokal anmelden.";
         vm.error = true;
       }
       if (vm.auth === "ready") connect();
@@ -271,6 +273,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
         "window",
         "windowDetails",
         "run",
+        "help",
         "exclude",
         "policy",
         "approve",
@@ -303,6 +306,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
         vm.oidc = {
           enabled: vm.oidcConfig!.enabled,
           label: vm.oidcConfig!.label,
+          localLoginEnabled: vm.oidcConfig!.localLoginEnabled,
         };
         vm.notice = "OIDC-Konfiguration gespeichert und Discovery geprüft.";
       } else if (kind === "scan") {
@@ -322,18 +326,31 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       } else if (kind === "execute") {
         if (data.confirmed !== true)
           throw Error("Neustart muss bestätigt werden.");
-        await coreClient.createJob(
-          {
-            containerId: id,
-            reason: String(data.reason || ""),
-            confirmed: true,
-          },
-          crypto.randomUUID(),
-        );
+        const run =
+          id === "__all__"
+            ? await coreClient.createRun(
+                {
+                  all: true,
+                  reason: String(data.reason || ""),
+                  confirmed: true,
+                },
+                crypto.randomUUID(),
+              )
+            : null;
+        if (!run)
+          await coreClient.createJob(
+            {
+              containerId: id,
+              reason: String(data.reason || ""),
+              confirmed: true,
+            },
+            crypto.randomUUID(),
+          );
         vm.dialog = "";
         vm = await snapshot(vm);
-        vm.notice =
-          "Update-Job angelegt. Freigaben und Fortschritt findest du unter Updates.";
+        vm.notice = run
+          ? `Sofortlauf gestartet: ${run.jobs.length} Updates, ${run.skipped.length} übersprungen. Fortschritt unter Updates.`
+          : "Update-Job angelegt. Freigaben und Fortschritt findest du unter Updates.";
       } else if (kind === "approveJob" || kind === "cancelJob") {
         await api(
           "/api/v1/update-jobs/" +

@@ -1019,6 +1019,44 @@ template cuo.app {
                           attributes {
                             type "button"
                             data-id ""
+                            aria-label "Hilfe und Lizenzen öffnen"
+                            data-kind "help"
+                            data-value ""
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "question"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "Hilfe und Lizenzen öffnen"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "icon-btn cuo-action"
+                          attributes {
+                            type "button"
+                            data-id ""
                             aria-label "$model.cuo.vm.themeToggleLabel"
                             data-kind "theme"
                             data-value ""

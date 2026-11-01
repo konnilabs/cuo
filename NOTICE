@@ -25,6 +25,17 @@ OIDC runtime: openid-client 6.8.8, oauth4webapi 3.8.8, jose 6.2.14.
 Copyright Filip Skokan and contributors, MIT License. Package licenses are
 included with the runtime dependency tree installed from its lockfile.
 
+The Agent includes a locally rebuilt Docker Compose v5.6.1-cuo.1, based on
+docker/compose v5.6.1, commit 6cbc19a3fd59e305fb814dca4d854a4fb67d2941.
+Copyright 2020 Docker Compose authors, Apache License 2.0.
+The dependency-only security fix from upstream commit
+7ad5c58b380038aed842bc1396b091e81a88a0b0 is backported in
+dependencies/compose/security.patch; this is a modified build, not an official
+Docker release. The source and patch are SHA-256 locked in compose.lock.
+Original notices: third_party/Compose-LICENSE and third_party/Compose-NOTICE.
+The Agent ships these notices, linked-module licenses, dependency lock, patch,
+actual Go build info and binary checksum under /usr/share/licenses/cuo/compose/.
+
 Product icon sources: homarr-labs/dashboard-icons, commit
 83f32e08257b66fbd971ac8d7645f5b38d52e85d (Apache License 2.0 collection),
 and the original Appsmith favicon from appsmithorg/appsmith, commit

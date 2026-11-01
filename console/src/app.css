@@ -223,6 +223,7 @@ x-icon {
 }
 .global-search {
   display: flex;
+  min-width: 0;
   align-items: center;
   gap: 12px;
   background: #ffffffb0;
@@ -735,6 +736,10 @@ x-icon {
   }
   .topbar-tools > .icon-btn {
     display: none;
+  }
+  .topbar-tools > .icon-btn[data-kind="help"] {
+    display: inline-flex;
+    flex-shrink: 0;
   }
   .user-menu {
     border: 0;

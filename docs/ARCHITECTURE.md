@@ -14,7 +14,7 @@ flowchart LR
 
 The Console and Core use different persistent databases. The Agent persists execution journals and resolved Compose desired state. No Core or Agent port is published. The console is independently replaceable; the Core worker and periodic scanner operate with no UI connection.
 
-The local deployment has a single host ID, `local`. Per-host ACLs are enforced as part of principal checks; multi-host transport is intentionally absent. Core processing uses a serial worker to preserve one active host execution at a time. Policy schema concurrency values exist for forward compatibility, while the console constrains the local configuration to one.
+The local deployment has a single host ID, `local`. Per-host ACLs are enforced as part of principal checks; multi-host transport is intentionally absent. Core dispatches at most four workers, honoring the concurrent limits of all matching global/host/group policies together. Without a global policy the default remains one. Admission retains container snapshots for accurate counts during recreation. Agent admission independently caps four executions and rejects overlapping container/journal operations. A cancellable project lock serializes services sharing Compose desired state; unrelated projects and standalone workloads can execute concurrently.
 
 ## UI ownership
 
@@ -76,6 +76,12 @@ Transient success/error feedback is an RMT-owned queue of at most four real XTen
 Policy inheritance is global < host < group < container, with sticky exclusion. Default is scan-only and no unlabelled container can be executed. Candidate comparisons resolve an OCI/Docker index to the actual platform manifest, then compare its configuration digest with the running image ID. Execution pins the selected platform manifest digest.
 
 A job is durable before the worker begins. Core recovery retains pending, scheduled and queued jobs. An executing job becomes intervention_required. Agent journals prohibit blind repetition of an uncertain action. Idempotency reservation is persisted before side effects; if the request is interrupted before its final response is stored, the same key returns an explicit uncertain-outcome conflict rather than executing again. Users inspect persistent job/audit state before creating another request.
+
+Administrator-only `POST /api/v1/update-runs` requires `all: true`, a reason and restart confirmation. Selection uses authorized persisted inventory/candidates, rejects stale/error/unmanaged/excluded/scan-only/stopped/active workloads, and atomically commits jobs, run metadata and audit records before waking workers. These explicitly approved immediate jobs bypass maintenance windows; exclusion and execution policy are rechecked when they start. Ordinary jobs retain existing approval/window behavior. The browser dropdown is advisory; its pagination/filtering never limits server selection.
+
+OIDC configuration exposes `localLoginEnabled` (default true). Only the Owner can save it; disabling local login requires enabled, validated OIDC. Public session metadata drives removal of local credentials from the login view. The BFF also rejects password logins before verification and rechecks the flag before issuing a session. Existing sessions remain valid. Host-only `recover-login.mjs` restores local login with an audit event, retaining provider configuration; no query parameter or public route bypasses the mode.
+
+The RMT help intent opens the existing custom XTend dialog. Its static tutorial lazily loads a same-origin notices catalog into the component, outside the serialized application view model. Notices are rendered as text and expose a keyboard-accessible scroll region. Offline generation uses pinned JS licenses and the actual linked Go module graph; CI detects a stale catalog. Full image/OS SBOM publication remains a separate release gate.
 
 Container IDs are stable hashes of host ID and logical name; the Docker engine ID is a separate field. A successful recreation therefore preserves container-scoped policies and history. A queued job refuses execution if an external process replaced its engine instance. Retained predecessor containers are excluded from further orchestration.
 

@@ -1,5 +1,5 @@
 const allowed =
-  /^\/api\/v1\/(hosts|containers|scans|update-candidates|update-jobs(?:\/[a-f0-9]{32}(?:\/(?:approve|cancel))?)?|policies(?:\/[a-zA-Z0-9_.:-]{1,128})?|maintenance-windows|activity|events)(?:\?[^#]*)?$/;
+  /^\/api\/v1\/(hosts|containers|scans|update-candidates|update-runs|update-jobs(?:\/[a-f0-9]{32}(?:\/(?:approve|cancel))?)?|policies(?:\/[a-zA-Z0-9_.:-]{1,128})?|maintenance-windows|activity|events)(?:\?[^#]*)?$/;
 export async function coreRequest(input, context) {
   if (
     !input ||

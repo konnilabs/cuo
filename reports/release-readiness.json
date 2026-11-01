@@ -1,0 +1,312 @@
+{
+  "schema": "cuo.release-readiness.v1",
+  "assessedAt": "2026-11-01T21:13:05.517230+00:00",
+  "status": "development-preview",
+  "stableReleaseReady": false,
+  "scope": "one Linux Docker host; single Core, Agent and Identity writer; local source builds",
+  "git": {
+    "baseRevision": "eb4b4cd8e5715552cfb018f04cc3d4e69eda77b9",
+    "worktreeDirty": true,
+    "note": "Images built and tests performed from the recorded working tree. This is not signed build provenance or evidence for a clean release tag."
+  },
+  "sourceSha256": {
+    "Dockerfile": "7c51603db264c4bb911d2756dfdc7afb8b9da3e595af94844e5f4e340ccba92c",
+    "NOTICE": "d32b4988506a499713063a741492011cb37b91c0348c2ba33c22ea06da3a6d13",
+    "cmd/cuo/main.go": "a025669542b88b0f1fb56b6fd8aecca41828002705d6ffa5eee48c5ccd285d62",
+    "console/Dockerfile": "f268a1b78014cb674f1fbf8ceb080eb5447d1dbc54420f4bd21ecfce93e600f0",
+    "console/assets/third-party-notices.json": "0d9a233bac4a713b34ad6f8fd9d21859e48c1ffeacbefa311fce32f10e391641",
+    "dependencies/compose/collect-licenses.sh": "768186859325f2492cd843698515f75ccb71c95e1ec4294204b4de71a50066e5",
+    "dependencies/compose/compose.lock": "750e4d64b192a00cda5541df124fd30421b71b5070f60fa85c402a761944c04d",
+    "dependencies/compose/prepare.sh": "de1b9b7f953402eedebfe69da8fb19f5c1b6d1bce6c8227d6ecadd814784112a",
+    "dependencies/compose/security.patch": "c9c11ef0705fcfc44813ff9a39ba09a8d787a15b987ff3be851604eccd15720c",
+    "internal/backup/archive.go": "f9927405d14ca787da86106894fe64e38b6e589755b731bfdc0345a5d40afb3f",
+    "third_party/Compose-LICENSE": "58d1e17ffe5109a7ae296caafcadfdbe6a7d176f0bc4ab01e12a689b0499d8bd",
+    "third_party/Compose-NOTICE": "b7dca0a6b01fa7365e4892877a6321179ee343d72ee87a96cfc222141b99a1e6",
+    "tools/backup.sh": "778695c571833c7838991b6553e8d930110bd63dd151121f1ea3fd924f94ed36",
+    "tools/check-images.mjs": "0b4ea887c9bb30dd16753b4072867ae4c5f3a7f5dff814c5d1b94e1354bbad0b",
+    "tools/compose-dependency.mjs": "b2d144e84018f06756f5631165a7a1d4677ae31c42cc65c11c68be590853baf9",
+    "tools/data-common.sh": "90ac8656e6841d5aceb4fea7ee664b6652deccc914547e0cd04f63470d05c37c",
+    "tools/generate-notices.mjs": "c676fe6505dc2141c96581d161c9967ac51c1c26b68397d01b2b1cda0d7d5e41",
+    "tools/restore.sh": "3d7867d00e348dd8ea8e45f0adeb4326b771dbf7b131eb815026b20edd16e615",
+    "tools/test-restore.mjs": "187a2a5b9572e9c7530d3da074951b05eb1fa5dd356f837c446847ea1d9539bb",
+    "tools/verify-compose.mjs": "5d0aef33197f2589d66d314f3456cbbded5e29d4e25129d4cd707a23ea262f5a"
+  },
+  "checks": {
+    "goRace": {
+      "result": "passed",
+      "commandOrScope": "go test -race ./..."
+    },
+    "goVet": {
+      "result": "passed",
+      "commandOrScope": "go vet ./..."
+    },
+    "goVulncheck": {
+      "result": "passed",
+      "commandOrScope": "go run golang.org/x/vuln/cmd/govulncheck@v1.9.0 ./..."
+    },
+    "releaseToolTests": {
+      "result": "passed",
+      "commandOrScope": "node --test tools/test/*.test.mjs (5 passed including dependency tamper tests)"
+    },
+    "imageRuntimeAuthTests": {
+      "result": "passed",
+      "commandOrScope": "Node --test auth, OIDC and login-mode tests inside final Alpine Console image (7 passed)"
+    },
+    "realDockerAgent": {
+      "result": "passed",
+      "commandOrScope": "CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile|TestDisposableDockerUpdate -count=1",
+      "binarySha256": "e9408efd561a2b5c7a3951233123698d41d295be1a0198e9c4b41e9dcce04bb6",
+      "report": "reports/compose-backport-docker-e2e.txt"
+    },
+    "restore": {
+      "result": "passed",
+      "commandOrScope": "node tools/test-restore.mjs"
+    },
+    "notices": {
+      "result": "passed",
+      "commandOrScope": "node tools/generate-notices.mjs --check (17 third-party entries)"
+    },
+    "localBrowser": {
+      "result": "previous smoke retained",
+      "commandOrScope": "Earlier CUA dashboard/help smoke; no new browser interaction performed for this backend update"
+    },
+    "consoleTests": {
+      "result": "passed",
+      "commandOrScope": "npm test (22 passed)"
+    },
+    "composeBackport": {
+      "result": "passed",
+      "commandOrScope": "node tools/verify-compose.mjs; actual build info, versions, hash, symbol table and pinned Go binary SCA"
+    },
+    "localHTTP": {
+      "result": "passed",
+      "commandOrScope": "Installed stack /health=200 and notices catalog serves v5.6.1-cuo.1; all services healthy"
+    },
+    "localBackup": {
+      "result": "passed",
+      "commandOrScope": "Actual backup.sh archive validated before local deployment; protected backup remains outside repository"
+    }
+  },
+  "sourceSCA": {
+    "govulncheck": "No vulnerabilities found.",
+    "npmRuntime": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    },
+    "npmSelectedBuildWorkspaces": {
+      "info": 0,
+      "low": 0,
+      "moderate": 0,
+      "high": 0,
+      "critical": 0,
+      "total": 0
+    }
+  },
+  "images": {
+    "schema": "cuo.image-checks.v1",
+    "createdAt": "2026-11-01T21:10:38.039Z",
+    "revision": "eb4b4cd8e5715552cfb018f04cc3d4e69eda77b9",
+    "dirty": true,
+    "platform": "linux/x86_64",
+    "tools": {
+      "trivy": "Version: 0.76.1\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-11-01 19:08:08.720434681 +0000 UTC\n  NextUpdate: 2026-11-02 19:08:08.720434111 +0000 UTC\n  DownloadedAt: 2026-11-01 20:34:21.380638189 +0000 UTC",
+      "syft": "Application:   syft\nVersion:       1.55.0\nBuildDate:     2026-10-19T18:54:46Z\nGitCommit:     f15c3343e29dfb20cf6d82c820e7090b49808c96\nGitDescription: v1.55.0\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11"
+    },
+    "services": [
+      {
+        "service": "core",
+        "imageId": "sha256:8f147f560deb54fc5ed642018852d30f6b1d5423a2682b777f1442cd353cb56e",
+        "archiveSha256": "sha256:51a5f3e82cd43e8eb163a16694b262d7173a2a034f6dd88d300681ab0a63f6fe",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 838,
+        "scanSha256": "sha256:4da33d19b8aaea33dfda29324c2e9fb8807243a80e94b3e63fe55ee1700bc3a5",
+        "sbomSha256": "sha256:bf62d9f16fe64accbd76a019f8ff6b201dc81008b11469bc7098871ccc3daaf3",
+        "archiveRetained": false
+      },
+      {
+        "service": "agent",
+        "imageId": "sha256:c7b43223f3b227e4a8323eef27a0b67d0c80a27476c4779df7bc4f614e93cc13",
+        "archiveSha256": "sha256:9d0c8738279147934618695eb631f27294cb3a25c443bf766c751df7390546d1",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 3
+        },
+        "sbomComponents": 1092,
+        "scanSha256": "sha256:a8d02aba1701c00644dbe1338d8d1db750555ad408a08d9870279f98e07ee83c",
+        "sbomSha256": "sha256:668508b43f7b75a53ef6ab1463df8405b988b18aad53dadfc0da9ed192712ed5",
+        "archiveRetained": false
+      },
+      {
+        "service": "console",
+        "imageId": "sha256:e0831265c2011caa8b7fb67e2f9f98131df796aa384ae480df76c825b4b149f8",
+        "archiveSha256": "sha256:058d87ad416e0a530467fa5c3efad9e007866775352a4d304877ec694a45e9c0",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 114,
+        "scanSha256": "sha256:0a2606f3d58cb6c9a7d4145ac5275a28483f3dfedbbb7e3e7da467f638412dde",
+        "sbomSha256": "sha256:cc04195fed2cace0309120840ca64fa7555fb43ee0f534a891ea79bf6ae22aeb",
+        "archiveRetained": false
+      }
+    ],
+    "passed": true,
+    "completedAt": "2026-11-01T21:10:59.000Z"
+  },
+  "unresolvedHighOrCritical": [],
+  "fullLocalImageEvidence": "reports/image-checks/ (ignored; equivalent uploaded by manual release-preflight workflow)",
+  "restoreEvidence": "reports/restore-test.json",
+  "localDeployment": {
+    "healthyServices": [
+      "agent",
+      "core",
+      "console"
+    ],
+    "healthHTTP": 200,
+    "url": "http://127.0.0.1:8095",
+    "productionSSHDeploymentPerformed": false
+  },
+  "github": {
+    "repository": "https://github.com/konnilabs/cuo",
+    "visibility": "public",
+    "releases": [],
+    "verifiedMainCI": {
+      "revision": "d0398767fdeff381d2fa4495ea0807cc29b628b9",
+      "status": "success",
+      "url": "https://github.com/konnilabs/cuo/actions/runs/41321773403"
+    },
+    "localChangesPushed": false,
+    "newPreflightExecutedOnGitHub": false,
+    "privateVulnerabilityReportingEnabled": false,
+    "secretScanningEnabled": true,
+    "pushProtectionEnabled": true
+  },
+  "openStableArtifactGates": [
+    "Digest-preserving build-once OCI publication with agreed names/version/platform/signing identity",
+    "Signed, reviewed image SBOM coverage and build provenance; verification from destination registry",
+    "Complete scoped WCAG 2.2 AA audit including assistive technology",
+    "Confidential vulnerability reporting channel",
+    "Final-commit CI and final-artifact fresh scans"
+  ],
+  "explicitlyOutsideMVP": [
+    "Private registry credentials (public/anonymous registry images only)",
+    "Multi-host transport",
+    "Automatic application database/volume rollback",
+    "Highly available multi-writer storage and failover"
+  ],
+  "restoreLimits": [
+    "CUO volumes only; not managed application data",
+    "Not atomic across three volume replacements; failed copies leave CUO stopped",
+    "Host-loss restore with separately protected .env, project sources and proxy configuration not yet certified"
+  ],
+  "resolvedHighOrCritical": [
+    {
+      "id": "CVE-2026-78669",
+      "component": "Compose x/net",
+      "oldVersion": "v0.58.0",
+      "fixedVersion": "v0.60.0",
+      "remediation": "Pinned v5.6.1-cuo.1 dependency backport; actual binary verified and image rescanned"
+    }
+  ],
+  "unresolvedUnscoredFindings": [
+    {
+      "VulnerabilityID": "GO-2026-5932",
+      "PkgName": "golang.org/x/crypto",
+      "InstalledVersion": "v0.57.0",
+      "FixedVersion": null,
+      "Severity": "UNKNOWN",
+      "Status": "affected",
+      "binaryAssessment": "Module-only finding; govulncheck finds no affected symbols in this recorded executable"
+    },
+    {
+      "VulnerabilityID": "CVE-2026-78661",
+      "PkgName": "golang.org/x/net",
+      "InstalledVersion": "v0.60.0",
+      "FixedVersion": "0.62.0",
+      "Severity": "UNKNOWN",
+      "Status": "fixed",
+      "binaryAssessment": "Module-only finding; govulncheck finds no affected symbols in this recorded executable"
+    },
+    {
+      "VulnerabilityID": "CVE-2026-97045",
+      "PkgName": "golang.org/x/net",
+      "InstalledVersion": "v0.60.0",
+      "FixedVersion": "0.62.0",
+      "Severity": "UNKNOWN",
+      "Status": "fixed",
+      "binaryAssessment": "Module-only finding; govulncheck finds no affected symbols in this recorded executable"
+    }
+  ],
+  "composeBackport": {
+    "schema": "cuo.compose-backport.v1",
+    "scope": "Actual binary identity, dependency versions, retained symbol information and Go binary vulnerability scan",
+    "verifiedAt": "2026-11-01T21:09:29.547Z",
+    "revision": "eb4b4cd8e5715552cfb018f04cc3d4e69eda77b9",
+    "dirty": true,
+    "imageId": "sha256:c7b43223f3b227e4a8323eef27a0b67d0c80a27476c4779df7bc4f614e93cc13",
+    "version": "5.6.1-cuo.1",
+    "toolchain": "go1.26.10",
+    "binarySha256": "e9408efd561a2b5c7a3951233123698d41d295be1a0198e9c4b41e9dcce04bb6",
+    "lock": {
+      "COMPOSE_VERSION": "v5.6.1-cuo.1",
+      "COMPOSE_UPSTREAM_VERSION": "v5.6.1",
+      "COMPOSE_GO_VERSION": "go1.26.10",
+      "COMPOSE_REVISION": "6cbc19a3fd59e305fb814dca4d854a4fb67d2941",
+      "COMPOSE_SOURCE_SHA256": "2293b570f258dfc6e38e0bfdd3fa0e710324a7cf0449994304b524af8fb4f06c",
+      "COMPOSE_SECURITY_REVISION": "7ad5c58b380038aed842bc1396b091e81a88a0b0",
+      "COMPOSE_PATCH_SHA256": "c9c11ef0705fcfc44813ff9a39ba09a8d787a15b987ff3be851604eccd15720c",
+      "COMPOSE_MOD_SHA256": "4fc4a43a1c6d22f08ceae0ab0cebfb35af6d4c99d1b83a79c749b088b8a7748c",
+      "COMPOSE_SUM_SHA256": "88c9f2d713a391c08baf06c9b329d873821fe2001d827b50e98b0e26571a470d"
+    },
+    "modules": {
+      "golang.org/x/net": "v0.60.0",
+      "golang.org/x/crypto": "v0.57.0",
+      "golang.org/x/text": "v0.42.0"
+    },
+    "passed": true,
+    "binarySCA": {
+      "tool": "govulncheck v1.9.0",
+      "passed": true,
+      "report": "reports/compose-govulncheck.txt"
+    },
+    "checks": [
+      "Actual executable build info",
+      "Custom plugin version",
+      "Embedded dependency lock matches source",
+      "Binary SHA-256 matches shipped record",
+      "Symbol information retained for binary SCA",
+      "govulncheck -mode=binary passes; module-only advisories remain visible"
+    ]
+  },
+  "composeBinarySCA": {
+    "tool": "govulncheck v1.9.0 -mode=binary",
+    "binarySha256": "e9408efd561a2b5c7a3951233123698d41d295be1a0198e9c4b41e9dcce04bb6",
+    "result": "passed; zero affected symbols; 3 module-only advisories remain visible",
+    "report": "reports/compose-govulncheck.txt",
+    "scope": "Upstream Go 1.26.10 and linker flags with retained symbol table; no suppression",
+    "moduleOnlyAdvisories": [
+      "GO-2026-5932",
+      "GO-2026-6860",
+      "GO-2026-6866"
+    ]
+  }
+}

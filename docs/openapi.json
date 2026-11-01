@@ -849,6 +849,134 @@
         }
       }
     },
+    "/api/v1/update-runs": {
+      "post": {
+        "operationId": "createRun",
+        "x-cuo-min-role": "Administrator",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateRun"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRunRequest"
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/update-jobs/{id}/approve": {
       "post": {
         "operationId": "approveJob",
@@ -2092,6 +2220,12 @@
       "Job": {
         "type": "object",
         "properties": {
+          "runId": {
+            "type": "string"
+          },
+          "immediate": {
+            "type": "boolean"
+          },
           "engineId": {
             "type": "string"
           },
@@ -2158,6 +2292,60 @@
           "windowId",
           "createdAt",
           "updatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "RunSkip": {
+        "type": "object",
+        "properties": {
+          "containerId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "containerId",
+          "name",
+          "reason"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateRun": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "requester": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunSkip"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "requester",
+          "createdAt",
+          "jobs",
+          "skipped"
         ],
         "additionalProperties": false
       },
@@ -2255,6 +2443,28 @@
           }
         },
         "required": [
+          "reason",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "UpdateRunRequest": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 500
+          },
+          "confirmed": {
+            "const": true
+          },
+          "all": {
+            "const": true
+          }
+        },
+        "required": [
+          "all",
           "reason",
           "confirmed"
         ],

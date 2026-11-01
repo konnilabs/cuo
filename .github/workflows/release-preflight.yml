@@ -1,0 +1,41 @@
+name: CUO image release preflight (no publication)
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  images:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: {node-version: '24.22.1'}
+      - uses: actions/setup-go@v5
+        with: {go-version: '1.27.3'}
+      - name: Install pinned scanners with verified download hashes
+        shell: bash
+        run: |
+          mkdir -p "$RUNNER_TEMP/cuo-scanners"
+          cd "$RUNNER_TEMP/cuo-scanners"
+          curl --fail --location --silent --show-error https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz -o trivy.tar.gz
+          curl --fail --location --silent --show-error https://github.com/anchore/syft/releases/download/v1.55.0/syft_1.55.0_linux_amd64.tar.gz -o syft.tar.gz
+          echo 'c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0  trivy.tar.gz' | sha256sum -c
+          echo 'bb65249542db5fedeeb4d3f9b018b75e7264dbfbbb10486f044581a92f90490d  syft.tar.gz' | sha256sum -c
+          tar -xzf trivy.tar.gz trivy
+          tar -xzf syft.tar.gz syft
+          echo "$RUNNER_TEMP/cuo-scanners" >> "$GITHUB_PATH"
+      - name: Build local candidates
+        env: {CUO_CORE_TOKEN: 'disposable-preflight-token-not-used', CUO_AGENT_TOKEN: 'disposable-preflight-token-not-used'}
+        run: docker compose build
+      - name: Scan exact image archives and create OS/runtime SBOMs
+        env: {CUO_IMAGE_REPORTS: reports/image-checks}
+        run: |
+          node tools/verify-compose.mjs
+          node tools/check-images.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: CUO image evidence (not a signed release)
+          path: |
+            reports/image-checks/
+            reports/compose-backport.json
+            reports/compose-govulncheck.txt

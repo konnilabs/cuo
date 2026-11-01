@@ -1,0 +1,8 @@
+=== RUN   TestDisposableComposeReconcile
+    compose_e2e_test.go:149: two real Compose reconciliations preserved desired pins, .env, env_file, named volume and relative host bind across engine-ID changes
+--- PASS: TestDisposableComposeReconcile (47.09s)
+=== RUN   TestDisposableDockerUpdate
+    docker_e2e_test.go:113: real Docker update preserved volume, environment, labels and healthcheck; old workload retained stopped
+--- PASS: TestDisposableDockerUpdate (34.94s)
+PASS
+ok  	cuo.local/cuo/internal/agent	82.037s

@@ -64,6 +64,8 @@ type Window struct {
 	Enabled   bool     `json:"enabled"`
 }
 type Job struct {
+	RunID       string `json:"runId,omitempty"`
+	Immediate   bool   `json:"immediate,omitempty"`
 	EngineID    string `json:"engineId"`
 	Approved    bool   `json:"approved"`
 	ID          string `json:"id"`
@@ -80,6 +82,18 @@ type Job struct {
 	WindowID    string `json:"windowId"`
 	Created     string `json:"createdAt"`
 	Updated     string `json:"updatedAt"`
+}
+type RunSkip struct {
+	ContainerID string `json:"containerId"`
+	Name        string `json:"name"`
+	Reason      string `json:"reason"`
+}
+type UpdateRun struct {
+	ID        string    `json:"id"`
+	Requester string    `json:"requester"`
+	Created   string    `json:"createdAt"`
+	Jobs      []Job     `json:"jobs"`
+	Skipped   []RunSkip `json:"skipped"`
 }
 type Event struct {
 	ID        int64  `json:"id"`

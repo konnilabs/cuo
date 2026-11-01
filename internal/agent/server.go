@@ -17,10 +17,12 @@ import (
 )
 
 type Agent struct {
-	Docker *Docker
-	Token  string
-	Mu     sync.Mutex
-	Dir    string
+	Docker   *Docker
+	Token    string
+	Mu       sync.Mutex
+	Dir      string
+	Active   map[string]bool
+	Projects sync.Map
 }
 type Operation struct {
 	JobID       string `json:"jobId"`
@@ -115,11 +117,11 @@ func (a *Agent) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "invalid operation", 400)
 			return
 		}
-		if !a.Mu.TryLock() {
+		if !a.reserve(op) {
 			http.Error(w, "agent busy", 409)
 			return
 		}
-		defer a.Mu.Unlock()
+		defer a.release(op)
 		a.Execute(w, op)
 	default:
 		http.NotFound(w, r)
