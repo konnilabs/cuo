@@ -72,6 +72,8 @@ Für einen manuellen Lauf den Container auswählen, Unterbrechung bestätigen un
 
 CUO aktualisiert Compose-Services durch **Docker Compose**, nicht durch eine verdeckte Neuerstellung außerhalb des Projekts. Nicht registrierte Compose-Projekte werden vor der Veränderung abgewiesen.
 
+Der Agent enthält **Compose v5.6.1-cuo.1**, einen eigenen Build der stabilen Upstream-Version v5.6.1 mit dem gezielt zurückportierten Dependency-Fix für CVE-2026-78669. Dabei werden `x/net` auf v0.60.0 und die zugehörigen `x/crypto`-/`x/text`-Versionen aktualisiert; der Compose-Programmcode bleibt auf v5.6.1. Quellarchiv, Security-Patch und resultierende Moduldateien sind per Commit/SHA-256 festgeschrieben. Der Build wird ausdrücklich als modifiziert gekennzeichnet. Herkunft, Lizenzhinweise und Ablösung durch ein späteres offizielles Release sind in [dependencies/compose](dependencies/compose/README.md) beschrieben. Der auf dem Host installierte Compose-Befehl wird dabei nicht ersetzt.
+
 1. `CUO_PROJECTS_DIR` in `.env` auf das absolute Stammverzeichnis vertrauenswürdiger Compose-Projekte setzen. Es wird im Agent unter `/projects` schreibgeschützt eingebunden.
 2. Dem Service zusätzlich `cuo.compose.file` mit dem relativen Pfad der Compose-Datei in diesem Stammverzeichnis geben, etwa `nextcloud/compose.yaml`.
 3. Projekt mit seinen normalen Quellen erstellen und CUO-Inventar aktualisieren.
@@ -151,7 +153,7 @@ Das erste Release-Ziel ist **eine CUO-Instanz für einen lokalen Linux-Docker-Ho
 | Automatische Daten-Rollbacks | Nicht implementiert. Der aufbewahrte Standalone-Vorgänger ist kein Volume- oder Datenbank-Backup. Spätere, anwendungsspezifische Ausbaustufe. |
 | Hochverfügbare Datenhaltung | Nicht implementiert. Single-Writer-SQLite, kein Core-Cluster und kein Failover. Spätere Ausbaustufe. |
 | OCI-Publish / Signaturen / Provenance | Noch offen. Das bisherige Entwurfsskript veröffentlicht aus Sicherheitsgründen keine Images mehr. |
-| SBOM und Image-CVE-Scan | Lokaler, Image-ID-gebundener Scan mit OS-Paketen und CycloneDX-Inventaren vorhanden; noch keine signierte Release-SBOM. Verbleibende HIGH-/CRITICAL-Befunde blockieren die Artefaktfreigabe. |
+| SBOM und Image-CVE-Scan | Nach Compose-Backport 0 HIGH/CRITICAL in allen drei Images und 0 betroffene Symbole im Go-Binärscan. Drei Modulwarnungen bleiben in den Nachweisen sichtbar; die Bewertung gilt für den geprüften Build. Noch keine signierte Release-SBOM. |
 | Barrierefreiheit | Bisher Bedienungs-Smokes; vollständiges WCAG-2.2-AA-Audit mit assistiven Technologien noch offen. |
 | Restore-Test | Automatischer isolierter Test aller drei CUO-Volumes einschließlich Anmeldung, Einstellungen, Historie und Journale vorhanden; keine Aussage über Workload-Daten oder Wiederherstellung nach Host-Verlust. |
 

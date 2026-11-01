@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { composeLock } from "./compose-dependency.mjs";
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 const read = (file) => fs.readFileSync(file, "utf8");
 const licenseFiles = (directory) =>
@@ -33,7 +34,24 @@ const licenseName = (text) =>
         ? "BSD · siehe Lizenztext"
         : "Siehe Lizenztext";
 const xtend = JSON.parse(read("console/xtend.lock.json"));
+const compose = composeLock();
 const libraries = [
+  {
+    name: "Docker Compose (Agent, Security-Backport)",
+    version: compose.COMPOSE_VERSION,
+    license: "Apache-2.0",
+    source:
+      "https://github.com/docker/compose/tree/" + compose.COMPOSE_REVISION,
+    text:
+      "Modifizierter CUO-Build auf Basis von " +
+      compose.COMPOSE_UPSTREAM_VERSION +
+      "; Dependency-Backport aus " +
+      compose.COMPOSE_SECURITY_REVISION +
+      ". Kein offizielles Docker-Release. Weitere Modul-Lizenzen liegen im Agent unter /usr/share/licenses/cuo/compose/.\n\n" +
+      read("third_party/Compose-NOTICE") +
+      "\n" +
+      read("third_party/Compose-LICENSE"),
+  },
   {
     name: "XTend Maraca / RMT / XIcon",
     version: xtend.version + " · " + xtend.revision.slice(0, 7),

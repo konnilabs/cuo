@@ -42,7 +42,9 @@ jobs:
           npm install --prefix work/browser playwright@1.62.1
           work/browser/node_modules/.bin/playwright install --with-deps chromium
       - name: Disposable Compose reconciliation
-        run: CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile -count=1
+        run: |
+          node tools/verify-compose.mjs
+          CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile -count=1
       - name: Isolated three-volume backup and restore
         run: node tools/test-restore.mjs
       - name: Browser and auth integration

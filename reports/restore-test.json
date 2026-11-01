@@ -1,12 +1,12 @@
 {
   "schema": "cuo.restore-test.v1",
-  "createdAt": "2026-11-01T20:39:20.415Z",
-  "revision": "28618e8d31670e9aaffdd33e9bb41c6a9aea5670",
+  "createdAt": "2026-11-01T21:11:01.432Z",
+  "revision": "eb4b4cd8e5715552cfb018f04cc3d4e69eda77b9",
   "dirty": true,
   "images": {
-    "console": "sha256:c699d8fb3bc20646459f7062d3eb0dade60eb8138a30c8e221803eaf033a5452",
-    "core": "sha256:84ace8e272450dbab087f8f616bf329ac6a27f299463d2d2d42d4160e8bec153",
-    "agent": "sha256:bb83c33766b01f189fd9034fccf4cf4d392de694979b788dca9130ea15135589"
+    "console": "sha256:e0831265c2011caa8b7fb67e2f9f98131df796aa384ae480df76c825b4b149f8",
+    "core": "sha256:8f147f560deb54fc5ed642018852d30f6b1d5423a2682b777f1442cd353cb56e",
+    "agent": "sha256:c7b43223f3b227e4a8323eef27a0b67d0c80a27476c4779df7bc4f614e93cc13"
   },
   "passed": true,
   "isolation": {

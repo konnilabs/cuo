@@ -4,3 +4,5 @@
 LICENSE -whitespace
 third_party/* -whitespace
 console/assets/Roboto-LICENSE.txt -whitespace
+# Unified diff context markers must preserve the following Go indentation tabs.
+dependencies/compose/security.patch whitespace=-space-before-tab
