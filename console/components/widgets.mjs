@@ -12,6 +12,48 @@ import {
   select,
 } from "./base.mjs";
 import "./container-icon.mjs";
+import { tableSort, sortRows, timestamp, duration } from "./table-sorting.mjs";
+function sortHeader(column, state, table) {
+  const active = column.key === state.key;
+  const descendingNext = active
+    ? state.direction === "asc"
+    : table === "history" && column.key === "createdAt";
+  const action = `${column.label}: ${descendingNext ? "absteigend" : "aufsteigend"} sortieren`;
+  return h(
+    "th",
+    {
+      scope: "col",
+      "aria-sort": active
+        ? state.direction === "desc"
+          ? "descending"
+          : "ascending"
+        : null,
+    },
+    h(
+      "button",
+      {
+        class: "sort",
+        type: "button",
+        "aria-label": action,
+        title: action,
+        "data-kind": "sort",
+        "data-value": column.key,
+        "data-id": table,
+      },
+      h("span", {}, column.label),
+      h("x-icon", {
+        name: active
+          ? state.direction === "desc"
+            ? "chevron-down"
+            : "chevron-up"
+          : "sort",
+        pack: active ? "core" : "cuo",
+        size: "12px",
+        decorative: true,
+      }),
+    ),
+  );
+}
 function status(c) {
   return c.candidate?.error
     ? ["Prüfung fehlgeschlagen", "warning"]
@@ -42,6 +84,31 @@ register("x-update-status-badge", XUpdateStatusBadge);
 export class XContainerTable extends Widget {
   render() {
     const vm = this.vm;
+    const sorting = tableSort(vm, "containers");
+    const columns = [
+      { key: "name", label: "Name", value: (c) => c.name },
+      {
+        key: "image",
+        label: "Image",
+        value: (c) => c.image.split("/").pop().split(/[:@]/)[0],
+      },
+      {
+        key: "currentVersion",
+        label: "Aktuelle Version",
+        value: (c) => version(c.image),
+      },
+      {
+        key: "availableVersion",
+        label: "Verfügbare Version",
+        value: (c) => c.candidate?.targetDigest,
+      },
+      { key: "status", label: "Status", value: (c) => status(c)[0] },
+      {
+        key: "mode",
+        label: "Richtlinie",
+        value: (c) => modeLabel[c.mode] || c.mode,
+      },
+    ];
     let rows = (vm.containers || []).filter((c) => {
       const matches = (c.name + " " + c.image)
         .toLowerCase()
@@ -58,9 +125,7 @@ export class XContainerTable extends Widget {
           (vm.filter === "excluded" && c.excluded))
       );
     });
-    rows.sort((a, b) =>
-      String(a[vm.sort] || "").localeCompare(String(b[vm.sort] || "")),
-    );
+    rows = sortRows(rows, sorting, columns);
     const total = rows.length;
     const offset = Math.min(vm.offset || 0, Math.max(0, total - 1));
     rows = rows.slice(offset, offset + 8);
@@ -163,39 +228,17 @@ export class XContainerTable extends Widget {
             h(
               "tr",
               {},
-              [
-                ["name", "Name"],
-                ["image", "Image"],
-                ["", "Aktuelle Version"],
-                ["", "Verfügbare Version"],
-                ["", "Status"],
-                ["", "Richtlinie"],
-                ["", "Aktionen"],
-              ].map(([sort, label]) =>
-                h(
-                  "th",
-                  { scope: "col" },
-                  sort
-                    ? h(
-                        "button",
-                        {
-                          class: "sort",
-                          type: "button",
-                          "data-kind": "sort",
-                          "data-value": sort,
-                        },
-                        label,
-                      )
-                    : label,
-                ),
+              columns.map((column) =>
+                sortHeader(column, sorting, "containers"),
               ),
+              h("th", { scope: "col" }, "Aktionen"),
             ),
           ),
           h(
             "tbody",
             {},
             rows.length
-              ? rows.map((c, i) => {
+              ? rows.map((c) => {
                   const [label, tone] = status(c);
                   const name = c.image.split("/").pop().split(":")[0];
                   return h(
@@ -235,7 +278,9 @@ export class XContainerTable extends Widget {
                       {
                         class: c.candidate?.targetDigest
                           ? "available " +
-                            (i === 0 || i === 4 ? "critical" : "positive")
+                            (c.updateTone === "critical"
+                              ? "critical"
+                              : "positive")
                           : "muted",
                       },
                       c.candidate?.targetDigest
@@ -490,7 +535,31 @@ export class XUpdateRunTimeline extends Widget {
   render() {
     const vm = this.vm;
     const compact = this.getAttribute("compact") !== null;
-    const rows = (vm.jobs || []).slice(0, compact ? 4 : 100);
+    const sorting = tableSort(vm, "history");
+    const columns = [
+      {
+        key: "createdAt",
+        label: "Startzeit",
+        value: (j) => timestamp(j.createdAt),
+        numeric: true,
+      },
+      { key: "duration", label: "Dauer", value: duration, numeric: true },
+      {
+        key: "affected",
+        label: "Betroffene Container",
+        value: (j) => j.count ?? j.name,
+      },
+      {
+        key: "result",
+        label: "Ergebnis",
+        value: (j) =>
+          vm.demo && j.reason ? j.reason : stageLabel[j.state] || j.state,
+      },
+    ];
+    const rows = sortRows(vm.jobs || [], sorting, columns).slice(
+      0,
+      compact ? 4 : 100,
+    );
     return [
       h(
         "div",
@@ -519,13 +588,8 @@ export class XUpdateRunTimeline extends Widget {
             h(
               "tr",
               {},
-              [
-                "Startzeit",
-                "Dauer",
-                "Betroffene Container",
-                "Ergebnis",
-                "",
-              ].map((v) => h("th", { scope: "col" }, v)),
+              columns.map((column) => sortHeader(column, sorting, "history")),
+              h("th", { scope: "col" }, "Aktionen"),
             ),
           ),
           h(
@@ -552,7 +616,7 @@ export class XUpdateRunTimeline extends Widget {
                             ) + " min"
                           : "–"),
                     ),
-                    h("td", {}, j.count || j.name),
+                    h("td", {}, j.count ?? j.name),
                     h(
                       "td",
                       {},
@@ -741,8 +805,8 @@ export class XPolicyEditor extends Widget {
             { class: "policy-card", key: p.id },
             h(
               "div",
-              { class: "inline spread" },
-              h("strong", {}, p.id),
+              { class: "policy-heading" },
+              h("strong", { class: "policy-title", title: p.id }, p.id),
               h(
                 "span",
                 { class: "badge " + (p.excluded ? "muted" : "blue") },
@@ -752,9 +816,17 @@ export class XPolicyEditor extends Widget {
             h(
               "p",
               { class: "muted" },
-              `${p.scope} · ${p.target || "Alle Container"}`,
+              `${p.scope} · ${(p.scope === "container" ? (vm.containers || []).find((c) => c.id === p.target)?.name : p.scope === "host" ? (vm.hosts || []).find((host) => host.id === p.target)?.name : "") || p.target || "Alle Container"}`,
             ),
-            h("p", {}, "Wartungsfenster: " + (p.windowId || "Keines")),
+            h(
+              "p",
+              {},
+              "Wartungsfenster: " +
+                ((vm.windows || []).find((window) => window.id === p.windowId)
+                  ?.name ||
+                  p.windowId ||
+                  "Keines"),
+            ),
             button("Bearbeiten", "policy", "", p.id, "btn"),
           ),
         ),

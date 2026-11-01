@@ -24,6 +24,7 @@ export type Container = {
   excluded: boolean;
   mode: string;
   reason: string;
+  updateTone?: "critical" | "positive";
   candidate?: { targetDigest: string; sourceDigest: string; error?: string };
 };
 export type VM = {
@@ -62,6 +63,9 @@ export type VM = {
   query: string;
   filter: string;
   sort: string;
+  sortDirection: "asc" | "desc";
+  historySort: string;
+  historySortDirection: "asc" | "desc";
   offset: number;
   calendar: string;
   selectedDate: string;

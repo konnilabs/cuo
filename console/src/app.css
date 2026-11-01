@@ -281,16 +281,18 @@ x-icon {
 }
 .notification-count {
   position: absolute;
-  top: -6px;
-  right: -6px;
+  top: -4px;
+  right: -4px;
   display: grid !important;
   place-items: center;
   background: #df3452;
   color: white;
   border-radius: 20px;
-  min-width: 24px;
-  height: 24px;
-  font-size: 12px;
+  min-width: 21px;
+  height: 21px;
+  padding: 0 4px;
+  font-size: 11px;
+  line-height: 1;
   box-shadow: 0 2px 4px #e5345233;
 }
 .user-menu {

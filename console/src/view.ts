@@ -53,6 +53,9 @@ export function initial(): VM {
     query: "",
     filter: "all",
     sort: "name",
+    sortDirection: "asc",
+    historySort: "createdAt",
+    historySortDirection: "desc",
     offset: 0,
     calendar: new Date().toISOString().slice(0, 7),
     selectedDate: new Date().toISOString().slice(0, 10),
@@ -238,6 +241,7 @@ export function demoVM(): VM {
       excluded: false,
       mode,
       reason: "",
+      updateTone: i === 0 || i === 4 ? "critical" : "positive",
       candidate: { targetDigest: target, sourceDigest: version },
     }),
   );
