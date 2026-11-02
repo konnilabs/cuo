@@ -47,6 +47,34 @@ func (s *Store) Put(kind, id string, v any) error {
 	_, e := s.DB.Exec(`INSERT INTO records VALUES(?,?,?) ON CONFLICT(kind,id) DO UPDATE SET data=excluded.data`, kind, id, encode(v))
 	return e
 }
+
+// Permission decisions and their audit records must commit together.
+func (s *Store) SavePolicy(policy Policy, actor string, permissionChanged bool) error {
+	tx, err := s.DB.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+	if _, err = tx.Exec(`INSERT INTO records VALUES('policy',?,?) ON CONFLICT(kind,id) DO UPDATE SET data=excluded.data`, policy.ID, encode(policy)); err != nil {
+		return err
+	}
+	events := []Event{{Actor: actor, Operation: "policy.save", Stage: "saved", Severity: "info", Message: "Richtlinie " + policy.ID + " aktualisiert"}}
+	if permissionChanged {
+		message := "Lesender Host-Monitoring-Zugriff widerrufen"
+		if policy.Permissions.ReadOnlyHostMonitoring {
+			message = "Lesender Host-Monitoring-Zugriff freigegeben: " + policy.PermissionReason
+		}
+		events = append(events, Event{Actor: actor, Operation: "policy.permissions", Stage: "saved", Severity: "warning", Message: "Richtlinie " + policy.ID + ": " + message})
+	}
+	for _, event := range events {
+		event.HostID = "local"
+		event.Time = time.Now().UTC().Format(time.RFC3339Nano)
+		if _, err = tx.Exec(`INSERT INTO events(host,data) VALUES(?,?)`, event.HostID, encode(event)); err != nil {
+			return err
+		}
+	}
+	return tx.Commit()
+}
 func (s *Store) Get(kind, id string, v any) error {
 	var data string
 	e := s.DB.QueryRow(`SELECT data FROM records WHERE kind=? AND id=?`, kind, id).Scan(&data)

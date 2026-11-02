@@ -2,7 +2,8 @@
 export type Host={"id":string;"name":string;"endpoint":string;"connected":boolean;"dockerVersion":string;"apiVersion":string;"capabilities":Array<string>};
 export type Container={"engineId":string;"id":string;"hostId":string;"name":string;"image":string;"imageId":string;"state":string;"platform":string;"group":string;"compose":boolean;"managed":boolean;"excluded":boolean;"mode":string;"reason":string;"candidate"?:Candidate};
 export type Candidate={"containerId":string;"sourceDigest":string;"targetDigest":string;"image":string;"platform":string;"discoveredAt":string;"error"?:string};
-export type Policy={"id":string;"scope":string;"target":string;"mode":string;"excluded":boolean;"windowId":string;"concurrency":number};
+export type ExecutionPermissions={"readOnlyHostMonitoring"?:boolean};
+export type Policy={"id":string;"scope":string;"target":string;"mode":string;"excluded":boolean;"windowId":string;"concurrency":number;"permissions"?:ExecutionPermissions;"permissionReason"?:string;"permissionsConfirmed"?:boolean};
 export type Window={"nextStart"?:string;"id":string;"name":string;"timezone":string;"days":Array<number>;"start":string;"durationMinutes":number;"blackouts":Array<string>;"enabled":boolean};
 export type Job={"runId"?:string;"immediate"?:boolean;"engineId":string;"approved":boolean;"id":string;"hostId":string;"containerId":string;"name":string;"state":string;"targetDigest":string;"sourceDigest":string;"image":string;"platform":string;"requester":string;"reason":string;"windowId":string;"createdAt":string;"updatedAt":string};
 export type RunSkip={"containerId":string;"name":string;"reason":string};
@@ -12,7 +13,7 @@ export type Error={"code":string;"message":string};
 export type JobRequest={"containerId":string;"reason":string;"confirmed":true};
 export type Approval={"reason":string;"confirmed":true};
 export type UpdateRunRequest={"reason":string;"confirmed":true;"all":true};
-export type PolicyRequest={"scope":string;"target":string;"mode":string;"excluded":boolean;"windowId":string;"concurrency":number};
+export type PolicyRequest={"scope":string;"target":string;"mode":string;"excluded":boolean;"windowId":string;"concurrency":number;"permissions"?:ExecutionPermissions;"permissionReason"?:string;"permissionsConfirmed"?:boolean};
 export type WindowRequest={"name":string;"timezone":string;"days":Array<number>;"start":string;"durationMinutes":number;"blackouts":Array<string>;"enabled":boolean};
 export interface CUOTransport{request<T>(method:string,path:string,body?:unknown,key?:string):Promise<T>}
 export function createCUOClient(transport:CUOTransport){return {

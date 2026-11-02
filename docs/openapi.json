@@ -2132,6 +2132,16 @@
         ],
         "additionalProperties": false
       },
+      "ExecutionPermissions": {
+        "type": "object",
+        "properties": {
+          "readOnlyHostMonitoring": {
+            "type": "boolean"
+          }
+        },
+        "required": [],
+        "additionalProperties": false
+      },
       "Policy": {
         "type": "object",
         "properties": {
@@ -2155,6 +2165,15 @@
           },
           "concurrency": {
             "type": "integer"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/ExecutionPermissions"
+          },
+          "permissionReason": {
+            "type": "string"
+          },
+          "permissionsConfirmed": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -2490,6 +2509,15 @@
           },
           "concurrency": {
             "type": "integer"
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/ExecutionPermissions"
+          },
+          "permissionReason": {
+            "type": "string"
+          },
+          "permissionsConfirmed": {
+            "type": "boolean"
           }
         },
         "required": [

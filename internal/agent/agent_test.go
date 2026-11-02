@@ -72,13 +72,45 @@ func TestOperationJournalSurvivesRestart(t *testing.T) {
 func mustURL(value string) *url.URL { u, _ := url.Parse(value); return u }
 func TestHostControlMountBoundaryPreservesOrdinaryDockerVolumes(t *testing.T) {
 	for _, m := range []map[string]any{{"Type": "volume", "Source": "/var/lib/docker/volumes/data/_data", "Destination": "/data"}, {"Type": "bind", "Source": "/srv/app/data", "Destination": "/data"}} {
-		if controlMount(m) {
+		if controlMount(m, false) {
 			t.Fatal("ordinary data mount rejected", m)
 		}
 	}
 	for _, m := range []map[string]any{{"Type": "bind", "Source": "/var/run/docker.sock", "Destination": "/control"}, {"Type": "bind", "Source": "/", "Destination": "/host"}, {"Type": "bind", "Source": "/proc/sys", "Destination": "/settings"}} {
-		if !controlMount(m) {
+		if !controlMount(m, false) {
 			t.Fatal("host control mount accepted", m)
+		}
+	}
+}
+
+func TestReadOnlyHostMonitoringMountBoundary(t *testing.T) {
+	for _, source := range []string{"/proc", "/proc/stat", "/proc/sys", "/sys", "/sys/fs/cgroup"} {
+		for _, rw := range []any{false, true, nil, "false"} {
+			mount := map[string]any{"Type": "bind", "Source": source, "Destination": "/host/metrics", "RW": rw}
+			if blocked := controlMount(mount, true); blocked != (rw != false) {
+				t.Errorf("monitoring mount source=%s RW=%v: blocked=%v", source, rw, blocked)
+			}
+			if !controlMount(mount, false) {
+				t.Errorf("host monitoring accepted without permission: %v", mount)
+			}
+		}
+	}
+	// Read-only monitoring is not a grant to replace container system trees,
+	// expose the host's root/device/Docker state, or access a control socket.
+	for _, mount := range []map[string]any{
+		{"Type": "bind", "Source": "/proc", "Destination": "/proc", "RW": false},
+		{"Type": "bind", "Source": "/proc", "Destination": "/sys/kernel", "RW": false},
+		{"Type": "bind", "Source": "/sys", "Destination": "/dev/metrics", "RW": false},
+		{"Type": "bind", "Source": "/proc/../dev", "Destination": "/host/metrics", "RW": false},
+		{"Type": "bind", "Source": "/srv/data", "Destination": "/host/../proc/sys", "RW": false},
+		{"Type": "bind", "Source": "/", "Destination": "/host", "RW": false},
+		{"Type": "bind", "Source": "/dev", "Destination": "/host/dev", "RW": false},
+		{"Type": "bind", "Source": "/var/lib/docker", "Destination": "/host/docker", "RW": false},
+		{"Type": "bind", "Source": "/var/run/docker.sock", "Destination": "/control", "RW": false},
+		{"Type": "bind", "Source": "/sys", "Destination": "/host/docker.sock", "RW": false},
+	} {
+		if !controlMount(mount, true) {
+			t.Errorf("sensitive mount accepted: %v", mount)
 		}
 	}
 }

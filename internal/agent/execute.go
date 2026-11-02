@@ -98,8 +98,8 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 	mounts, _ := current["Mounts"].([]any)
 	for _, m := range mounts {
 		mm, _ := m.(map[string]any)
-		if controlMount(mm) {
-			fail(errors.New("Host control mounts require manual updates"), false)
+		if controlMount(mm, op.Permissions.ReadOnlyHostMonitoring) {
+			fail(errors.New("Host control mounts require a matching execution permission or manual updates"), false)
 			return
 		}
 	}
@@ -423,14 +423,25 @@ func (a *Agent) reconcileCompose(ctx context.Context, current map[string]any, pi
 	return id, nil
 }
 
-func controlMount(m map[string]any) bool {
-	destination := str(m, "Destination")
-	if strings.Contains(destination, "docker.sock") || destination == "/" || destination == "/proc" || destination == "/sys" {
+func controlMount(m map[string]any, allowReadOnlyMonitoring bool) bool {
+	destination := filepath.Clean(str(m, "Destination"))
+	within := func(path, root string) bool { return path == root || strings.HasPrefix(path, root+"/") }
+	if strings.Contains(destination, "docker.sock") || destination == "/" || within(destination, "/proc") || within(destination, "/sys") || within(destination, "/dev") {
 		return true
 	}
 	if str(m, "Type") != "bind" {
 		return false
 	}
-	source := str(m, "Source")
-	return strings.Contains(source, "docker.sock") || source == "/" || source == "/proc" || strings.HasPrefix(source, "/proc/") || source == "/sys" || strings.HasPrefix(source, "/sys/") || source == "/dev" || strings.HasPrefix(source, "/dev/") || strings.HasPrefix(source, "/var/lib/docker")
+	source := filepath.Clean(str(m, "Source"))
+	if strings.Contains(source, "docker.sock") || source == "/" || within(source, "/dev") || strings.HasPrefix(source, "/var/lib/docker") {
+		return true
+	}
+	if within(source, "/proc") || within(source, "/sys") {
+		// Existing read-only monitoring mounts can be reconciled without granting
+		// additional host access. Require Docker's explicit inspection result;
+		// absent or malformed RW metadata must never turn into a read-only grant.
+		rw, known := m["RW"].(bool)
+		return !allowReadOnlyMonitoring || !known || rw
+	}
+	return false
 }

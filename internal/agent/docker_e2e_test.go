@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"cuo.local/cuo/internal/core"
 	"encoding/json"
 	"fmt"
 	"net/http/httptest"
@@ -32,7 +33,7 @@ func TestDisposableDockerUpdate(t *testing.T) {
 	volume := name + "-data"
 	run("pull", "busybox:1.36.0")
 	run("volume", "create", volume)
-	id := run("run", "-d", "--name", name, "--label", "cuo.managed=true", "--label", "cuo.test="+suffix, "--env", "CUSTOM=preserved", "--publish", "127.0.0.1::8080", "--mount", "type=volume,source="+volume+",target=/data", "--health-cmd", "test -f /data/sentinel", "--health-interval", "1s", "--health-timeout", "1s", "--health-retries", "3", "busybox:1.36.0", "sh", "-c", "test -f /data/sentinel || echo stable > /data/sentinel; exec sleep 3600")
+	id := run("run", "-d", "--name", name, "--label", "cuo.managed=true", "--label", "cuo.test="+suffix, "--env", "CUSTOM=preserved", "--publish", "127.0.0.1::8080", "--mount", "type=volume,source="+volume+",target=/data", "--mount", "type=bind,source=/proc,target=/host/proc,readonly", "--mount", "type=bind,source=/sys,target=/host/sys,readonly", "--health-cmd", "test -f /data/sentinel && test -r /host/proc/stat && test -r /host/sys/kernel/uevent_seqnum", "--health-interval", "1s", "--health-timeout", "1s", "--health-retries", "3", "busybox:1.36.0", "sh", "-c", "test -f /data/sentinel || echo stable > /data/sentinel; exec sleep 3600")
 	publishedPort := run("port", id, "8080/tcp")
 	newID := ""
 	defer func() {
@@ -65,6 +66,14 @@ func TestDisposableDockerUpdate(t *testing.T) {
 	}
 	op := Operation{JobID: strings.Repeat("a", 32), ContainerID: id, Source: str(before, "Image"), Target: target, Image: "busybox:1.36.0", Platform: platform}
 	a := &Agent{Docker: d, Dir: t.TempDir()}
+	denied := httptest.NewRecorder()
+	deniedOperation := op
+	deniedOperation.JobID = strings.Repeat("b", 32)
+	a.Execute(denied, deniedOperation)
+	if !strings.Contains(denied.Body.String(), "Host control mounts require") || strings.Contains(denied.Body.String(), `"stage":"pulling"`) {
+		t.Fatal("host monitoring must be blocked before pull without permission", denied.Body.String())
+	}
+	op.Permissions = core.ExecutionPermissions{ReadOnlyHostMonitoring: true}
 	w := httptest.NewRecorder()
 	a.Execute(w, op)
 	decoder := json.NewDecoder(w.Body)
@@ -110,5 +119,21 @@ func TestDisposableDockerUpdate(t *testing.T) {
 	if run("port", newID, "8080/tcp") != publishedPort {
 		t.Fatal("published port changed during update")
 	}
-	t.Log("real Docker update preserved volume, environment, labels and healthcheck; old workload retained stopped")
+	for _, target := range []string{"/host/proc", "/host/sys"} {
+		found := false
+		for _, entry := range asArray(after["Mounts"]) {
+			mount, _ := entry.(map[string]any)
+			if str(mount, "Destination") != target {
+				continue
+			}
+			found = true
+			if str(mount, "Type") != "bind" || str(mount, "Source") != strings.TrimPrefix(target, "/host") || mount["RW"] != false {
+				t.Fatal("read-only monitoring mount changed", mount)
+			}
+		}
+		if !found {
+			t.Fatal("monitoring mount missing", target)
+		}
+	}
+	t.Log("real Docker update preserved read-only host monitoring mounts, volume, environment, labels, port and healthcheck; old workload retained stopped")
 }

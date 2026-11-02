@@ -265,7 +265,7 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 	e.Mu.Unlock()
 	ctx, cancel := context.WithTimeout(parent, 16*time.Minute)
 	defer cancel()
-	r, err := e.agent(ctx, "POST", "/execute", map[string]any{"jobId": j.ID, "containerId": j.EngineID, "sourceDigest": j.Source, "targetDigest": j.Target, "image": j.Image, "platform": j.Platform})
+	r, err := e.agent(ctx, "POST", "/execute", map[string]any{"jobId": j.ID, "containerId": j.EngineID, "sourceDigest": j.Source, "targetDigest": j.Target, "image": j.Image, "platform": j.Platform, "permissions": p.Permissions})
 	if err != nil {
 		e.update(&j, "intervention_required", "Agent-Verbindung unterbrochen; Journal prüfen")
 		return

@@ -385,8 +385,23 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 			return bad("INVALID_INPUT", "Invalid policy")
 		}
 		policy.ID = strings.TrimPrefix(path, "/api/v1/policies/")
+		var previous Policy
+		_ = store.Get("policy", policy.ID, &previous)
+		permissionChanged := policy.Permissions != previous.Permissions || policy.PermissionReason != previous.PermissionReason
+		if previous.Permissions.ReadOnlyHostMonitoring || policy.Permissions.ReadOnlyHostMonitoring {
+			permissionChanged = permissionChanged || previous.Scope != policy.Scope || previous.Target != policy.Target
+		}
+		if permissionChanged && !p.Can("Owner") {
+			return 403, map[string]string{"code": "OWNER_REQUIRED", "message": "Nur ein Owner darf Ausführungsfreigaben ändern"}
+		}
 		if e := ValidatePolicy(policy); e != nil {
 			return bad("INVALID_POLICY", e.Error())
+		}
+		if policy.Permissions.ReadOnlyHostMonitoring {
+			var container Container
+			if store.Get("container", policy.Target, &container) != nil || !p.Host(container.HostID) {
+				return bad("INVALID_CONTAINER", "Die Ausführungsfreigabe benötigt einen vorhandenen, zugänglichen Container")
+			}
 		}
 		if policy.WindowID != "" {
 			var w Window
@@ -399,10 +414,9 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 				return bad("POLICY_CONFLICT", "Für diesen Geltungsbereich existiert bereits eine Richtlinie")
 			}
 		}
-		if e := store.Put("policy", policy.ID, policy); e != nil {
+		if e := store.SavePolicy(policy, p.ID, permissionChanged); e != nil {
 			return bad("STORE_ERROR", e.Error())
 		}
-		_ = store.Event(Event{Actor: p.ID, Operation: "policy.save", Stage: "saved", Severity: "info", Message: "Richtlinie " + policy.ID + " aktualisiert"})
 		var containers []Container
 		_ = store.List("container", &containers)
 		for _, c := range containers {

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -43,14 +44,24 @@ type Candidate struct {
 	Discovered  string `json:"discoveredAt"`
 	Error       string `json:"error,omitempty"`
 }
+
+// ExecutionPermissions are explicit, container-scoped exceptions to the Agent's
+// default execution boundary. New operation types need their own reviewed grant.
+type ExecutionPermissions struct {
+	ReadOnlyHostMonitoring bool `json:"readOnlyHostMonitoring,omitempty"`
+}
+
 type Policy struct {
-	ID          string `json:"id"`
-	Scope       string `json:"scope"`
-	Target      string `json:"target"`
-	Mode        string `json:"mode"`
-	Excluded    bool   `json:"excluded"`
-	WindowID    string `json:"windowId"`
-	Concurrency int    `json:"concurrency"`
+	ID                   string               `json:"id"`
+	Scope                string               `json:"scope"`
+	Target               string               `json:"target"`
+	Mode                 string               `json:"mode"`
+	Excluded             bool                 `json:"excluded"`
+	WindowID             string               `json:"windowId"`
+	Concurrency          int                  `json:"concurrency"`
+	Permissions          ExecutionPermissions `json:"permissions,omitempty"`
+	PermissionReason     string               `json:"permissionReason,omitempty"`
+	PermissionsConfirmed bool                 `json:"permissionsConfirmed,omitempty"`
 }
 type Window struct {
 	NextStart string   `json:"nextStart,omitempty"`
@@ -140,6 +151,9 @@ func ResolvePolicy(c Container, policies []Policy) Policy {
 	if !c.Managed {
 		p.Excluded = true
 	}
+	if p.Scope != "container" || p.Target != c.ID {
+		p.Permissions = ExecutionPermissions{}
+	}
 	if p.Concurrency < 1 {
 		p.Concurrency = 1
 	}
@@ -161,6 +175,14 @@ func ValidatePolicy(p Policy) error {
 	}
 	if p.Concurrency < 1 || p.Concurrency > 4 {
 		return errors.New("concurrency must be 1..4")
+	}
+	if p.Permissions.ReadOnlyHostMonitoring {
+		if p.Scope != "container" || !regexp.MustCompile(`^[a-f0-9]{64}$`).MatchString(p.Target) {
+			return errors.New("execution permissions require a specific container")
+		}
+		if !p.PermissionsConfirmed || len(strings.TrimSpace(p.PermissionReason)) < 3 || len(p.PermissionReason) > 500 {
+			return errors.New("confirm the host-access warning and provide a permission reason (3..500 characters)")
+		}
 	}
 	return nil
 }

@@ -833,6 +833,13 @@ export class XPolicyEditor extends Widget {
               { class: "muted small" },
               `Parallelität: max. ${p.concurrency || 1}`,
             ),
+            p.permissions?.readOnlyHostMonitoring
+              ? h(
+                  "p",
+                  { class: "small" },
+                  "Owner-Freigabe: lesendes Host-Monitoring",
+                )
+              : null,
           ),
         ),
       ),

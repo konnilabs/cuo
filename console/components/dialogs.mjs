@@ -110,6 +110,17 @@ register("x-cuo-auth", XCUOAuth);
 export class XApprovalDialog extends Widget {
   connectedCallback() {
     super.connectedCallback();
+    for (const event of ["input", "change"])
+      this.shadowRoot.addEventListener(
+        event,
+        (e) => {
+          if (
+            ["permissionReason", "permissionsConfirmed"].includes(e.target.name)
+          )
+            e.target.setCustomValidity("");
+        },
+        { signal: this.controller.signal },
+      );
     this.shadowRoot.addEventListener(
       "cancel",
       (e) => {
@@ -410,6 +421,49 @@ export class XApprovalDialog extends Widget {
             "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
           ),
           h(
+            "fieldset",
+            { class: "execution-permissions" },
+            h("legend", {}, "Erweiterte Ausführungsfreigaben"),
+            h(
+              "p",
+              { class: "callout small", role: "note" },
+              "Achtung: Monitoring-Mounts geben dem Container Einblick in Host-Prozesse und Systeminformationen. Die Freigabe gilt dauerhaft für Updates dieses Containers, einschließlich automatischer Läufe. Nur für vertrauenswürdige Images aktivieren. Volumes und Anwendungsdaten werden bei einem Fehler nicht automatisch zurückgesetzt.",
+            ),
+            h(
+              "label",
+              { class: "checkbox" },
+              h("input", {
+                type: "checkbox",
+                name: "readOnlyHostMonitoring",
+                checked: selected.permissions?.readOnlyHostMonitoring,
+                disabled: vm.user?.role !== "Owner",
+              }),
+              "Bestehende lesende Host-Mounts für Monitoring zulassen",
+            ),
+            h(
+              "p",
+              { class: "muted small" },
+              "Nur für eine Container-Richtlinie. Quelle, Ziel und Readonly-Status werden erhalten. Schreibende System-Mounts und Docker-Sockets benötigen einen eigenen, derzeit nicht unterstützten Freigabetyp. Nur Owner können diese Freigabe ändern.",
+            ),
+            field(
+              "Freigabegrund",
+              "permissionReason",
+              selected.permissionReason || "",
+              "text",
+              { maxlength: 500, disabled: vm.user?.role !== "Owner" },
+            ),
+            h(
+              "label",
+              { class: "checkbox" },
+              h("input", {
+                type: "checkbox",
+                name: "permissionsConfirmed",
+                disabled: vm.user?.role !== "Owner",
+              }),
+              "Ich habe die Auswirkungen geprüft und bestätige den Host-Zugriff.",
+            ),
+          ),
+          h(
             "button",
             { class: "btn primary", type: "submit" },
             "Richtlinie speichern",
@@ -567,6 +621,38 @@ export class XApprovalDialog extends Widget {
       delete data.id;
       data.excluded = bool(data.excluded);
       data.concurrency = Number(data.concurrency);
+      const previous = (this.vm.policies || []).find((p) => p.id === id);
+      if (this.vm.user?.role === "Owner") {
+        const enabled = bool(data.readOnlyHostMonitoring);
+        const confirmation = form.elements.namedItem("permissionsConfirmed");
+        const reason = form.elements.namedItem("permissionReason");
+        confirmation.setCustomValidity("");
+        reason.setCustomValidity("");
+        if (enabled && !bool(data.permissionsConfirmed)) {
+          confirmation.setCustomValidity(
+            "Bestätige zuerst den Warnhinweis zum Host-Zugriff.",
+          );
+          confirmation.reportValidity();
+          return;
+        }
+        if (enabled && String(data.permissionReason || "").trim().length < 3) {
+          reason.setCustomValidity(
+            "Bitte gib einen Freigabegrund mit mindestens drei Zeichen an.",
+          );
+          reason.reportValidity();
+          return;
+        }
+        data.permissions = { readOnlyHostMonitoring: enabled };
+        data.permissionsConfirmed = enabled && bool(data.permissionsConfirmed);
+        data.permissionReason = enabled
+          ? String(data.permissionReason).trim()
+          : "";
+      } else {
+        data.permissions = previous?.permissions || {};
+        data.permissionReason = previous?.permissionReason || "";
+        data.permissionsConfirmed = previous?.permissionsConfirmed || false;
+      }
+      delete data.readOnlyHostMonitoring;
     }
     if (["execute", "approveJob", "cancelJob"].includes(kind)) {
       data.confirmed = bool(data.confirmed);

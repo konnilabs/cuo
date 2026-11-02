@@ -25,12 +25,13 @@ type Agent struct {
 	Projects sync.Map
 }
 type Operation struct {
-	JobID       string `json:"jobId"`
-	ContainerID string `json:"containerId"`
-	Source      string `json:"sourceDigest"`
-	Target      string `json:"targetDigest"`
-	Image       string `json:"image"`
-	Platform    string `json:"platform"`
+	JobID       string                    `json:"jobId"`
+	ContainerID string                    `json:"containerId"`
+	Source      string                    `json:"sourceDigest"`
+	Target      string                    `json:"targetDigest"`
+	Image       string                    `json:"image"`
+	Platform    string                    `json:"platform"`
+	Permissions core.ExecutionPermissions `json:"permissions,omitempty"`
 }
 type Frame struct {
 	Stage   string `json:"stage"`
