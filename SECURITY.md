@@ -1,6 +1,6 @@
 # CUO security model
 
-CUO 0.1.0 is a public-source development preview for a local single-host MVP, not a stable security-supported release. Do not expose the internal Core or Agent ports. The repository maintainer is [konnilabs](https://github.com/konnilabs). A confidential reporting channel is not configured yet: GitHub private vulnerability reporting was disabled when checked on 2026-11-01. Enabling it and documenting a tested reporting route is a stable-release prerequisite. Do not post credentials or nonpublic exploit details in public issues.
+CUO 0.2.0 is a public-source development preview for a local single-host MVP, not a stable security-supported release. Do not expose the internal Core or Agent ports. The repository maintainer is [konnilabs](https://github.com/konnilabs). A confidential reporting channel is not configured yet: GitHub private vulnerability reporting was disabled when checked on 2026-11-01. Enabling it and documenting a tested reporting route is a stable-release prerequisite. Do not post credentials or nonpublic exploit details in public issues.
 
 ## Trust boundaries
 

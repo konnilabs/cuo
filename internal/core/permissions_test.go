@@ -17,7 +17,7 @@ import (
 func TestExecutionPermissionRequiresOwnerContainerReasonAndConfirmation(t *testing.T) {
 	store := testStore(t)
 	id := strings.Repeat("a", 64)
-	_ = store.Put("container", id, Container{ID: id, HostID: "local", Managed: true})
+	_ = store.Put("container", id, Container{ID: id, HostID: "local", Managed: true, Image: "alpine:3", State: "running"})
 	server := &Server{Engine: NewEngine(store), Token: "secret"}
 	request := 0
 	call := func(role string, input Policy) *httptest.ResponseRecorder {
@@ -86,7 +86,7 @@ func TestExecutionPermissionRequiresOwnerContainerReasonAndConfirmation(t *testi
 }
 
 func TestExecutionPermissionsCannotBeInheritedFromBroadPolicies(t *testing.T) {
-	c := Container{ID: strings.Repeat("a", 64), HostID: "local", Managed: true}
+	c := Container{ID: strings.Repeat("a", 64), HostID: "local", Managed: true, Image: "alpine:3", State: "running"}
 	global := Policy{Scope: "global", Mode: "automatic", Permissions: ExecutionPermissions{ReadOnlyHostMonitoring: true}}
 	if ResolvePolicy(c, []Policy{global}).Permissions.ReadOnlyHostMonitoring {
 		t.Fatal("broad policy granted host access")
@@ -142,9 +142,9 @@ func TestExecuteRechecksCurrentPermissionsIncludingRevocation(t *testing.T) {
 		t.Run(fmt.Sprint(granted), func(t *testing.T) {
 			store := testStore(t)
 			id := strings.Repeat("a", 64)
-			c := Container{ID: id, EngineID: strings.Repeat("b", 64), HostID: "local", Managed: true}
+			c := Container{ID: id, EngineID: strings.Repeat("b", 64), HostID: "local", Managed: true, Image: "alpine:3", State: "running"}
 			_ = store.Put("container", id, c)
-			j := Job{ID: strings.Repeat("c", 32), State: "queued", ContainerID: id, EngineID: c.EngineID}
+			j := Job{ID: strings.Repeat("c", 32), State: "queued", ContainerID: id, EngineID: c.EngineID, Image: c.Image}
 			_ = store.Put("job", j.ID, j)
 			// A queued job never stores a permission that survives revocation.
 			_ = store.Put("policy", id, Policy{ID: id, Scope: "container", Target: id, Mode: "automatic", Permissions: ExecutionPermissions{ReadOnlyHostMonitoring: granted}})

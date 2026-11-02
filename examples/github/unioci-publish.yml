@@ -1,0 +1,88 @@
+# Copy into .github/workflows, then adapt Dockerfiles/components and image names.
+# Candidate images can exist before the scan finishes. CUO admits only the final
+# successful workflow plus the exact complete unioci-release artifact.
+name: Publish UniOCI release
+on:
+  push:
+    tags: ['v*']
+permissions: {contents: read}
+jobs:
+  image:
+    runs-on: ubuntu-latest
+    permissions: {contents: read, packages: write}
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - {component: api, dockerfile: Dockerfile.api}
+          - {component: web, dockerfile: Dockerfile.web}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Normalize GHCR repository
+        id: naming
+        shell: bash
+        run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}/${{ matrix.component }}" >> "$GITHUB_OUTPUT"
+      - uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8
+        id: build
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: ${{ steps.naming.outputs.image }}:candidate-${{ github.run_id }}-${{ github.run_attempt }}
+          provenance: mode=max
+          sbom: true
+      - name: Scan published digest before producing the release contract
+        shell: bash
+        env:
+          IMAGE: ${{ steps.naming.outputs.image }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          COMPONENT: ${{ matrix.component }}
+          TRIVY_USERNAME: ${{ github.actor }}
+          TRIVY_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl --fail --location --silent --show-error https://github.com/aquasecurity/trivy/releases/download/v0.76.1/trivy_0.76.1_Linux-64bit.tar.gz -o /tmp/trivy.tar.gz
+          echo 'c7cbe3137fb8a48a17574bede3dd6beb16742d1e9772929940fc90082c39d9c0  /tmp/trivy.tar.gz' | sha256sum -c -
+          tar -xzf /tmp/trivy.tar.gz -C /tmp trivy
+          /tmp/trivy image --scanners vuln --severity HIGH,CRITICAL --exit-code 1 "$IMAGE@$DIGEST"
+          mkdir -p release-image
+          node --input-type=module -e 'import fs from "node:fs";fs.writeFileSync("release-image/"+process.env.COMPONENT+".json",JSON.stringify({component:process.env.COMPONENT,reference:process.env.IMAGE,digest:process.env.DIGEST}));'
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unioci-image-${{ matrix.component }}
+          path: release-image/*.json
+          retention-days: 3
+          if-no-files-found: error
+  release:
+    needs: image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: unioci-image-*
+          merge-multiple: true
+          path: images
+      - name: Emit complete immutable release set
+        shell: bash
+        env:
+          REPOSITORY_ID: ${{ github.repository_id }}
+          VERSION: ${{ github.ref_name }}
+        run: |
+          node --input-type=module <<'JS'
+          import fs from 'node:fs';
+          const images=fs.readdirSync('images').sort().map(name=>JSON.parse(fs.readFileSync('images/'+name)));
+          if(images.length!==2||new Set(images.map(v=>v.component)).size!==2)throw Error('Incomplete image set');
+          const data={schema:'unioci.release.v1',source:{repositoryId:process.env.REPOSITORY_ID,revision:process.env.GITHUB_SHA,workflowRunId:process.env.GITHUB_RUN_ID,runAttempt:Number(process.env.GITHUB_RUN_ATTEMPT)},version:process.env.VERSION,channel:'stable',images};
+          fs.writeFileSync('unioci-release.json',JSON.stringify(data,null,2)+'\n');
+          JS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: unioci-release
+          path: unioci-release.json
+          if-no-files-found: error
+          retention-days: 30

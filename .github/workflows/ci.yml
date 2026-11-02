@@ -38,15 +38,21 @@ jobs:
           umask 077
           node -e "const c=require('node:crypto');require('node:fs').writeFileSync('work/ci.env','CUO_CORE_TOKEN='+c.randomBytes(32).toString('hex')+'\nCUO_AGENT_TOKEN='+c.randomBytes(32).toString('hex')+'\nCUO_ORIGIN=http://127.0.0.1:8096\nCUO_PORT=8096\n')"
           docker run -d --name cuo-ci-fixture busybox:1.37.0 sleep 3600
-          docker compose --env-file work/ci.env -p cuo-ci up -d --build --wait
+          docker compose --env-file work/ci.env -p cuo-ci build
+          ./tools/prepare-secrets.sh
+          docker compose --env-file work/ci.env -p cuo-ci up -d --no-build --wait
           npm install --prefix work/browser playwright@1.62.1
           work/browser/node_modules/.bin/playwright install --with-deps chromium
       - name: Disposable Compose reconciliation
         run: |
           node tools/verify-compose.mjs
           CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestDisposableComposeReconcile -count=1
-      - name: Isolated three-volume backup and restore
-        run: node tools/test-restore.mjs
+      - name: Private registry and optional Zot restore
+        run: |
+          docker pull "$(node -p 'JSON.parse(require("node:fs").readFileSync("dependencies/zot/zot.lock.json")).image')"
+          CUO_DOCKER_E2E=1 go test -v ./internal/agent -run TestPrivateZotScanCopyAndDockerUpdate -count=1
+          node tools/test-restore.mjs
+          CUO_RESTORE_REGISTRY=1 CUO_RESTORE_REPORT=reports/restore-zot-test.json node tools/test-restore.mjs
       - name: Browser and auth integration
         env:
           CUO_TEST_ORIGIN: http://127.0.0.1:8096
@@ -54,6 +60,8 @@ jobs:
         run: |
           CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" node console/test/browser.mjs
           CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_EXTENSIONS_OUTPUT=reports/extensions-browser node console/test/extensions-browser.mjs
+          go build -o "$RUNNER_TEMP/cuo-core-test" ./cmd/cuo
+          CUO_CORE_BINARY="$RUNNER_TEMP/cuo-core-test" CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_INTEGRATIONS_OUTPUT=reports/integrations-browser node console/test/integrations-browser.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

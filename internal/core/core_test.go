@@ -134,7 +134,7 @@ func TestIdempotencyConflictRBACAndHostScope(t *testing.T) {
 func TestCandidateCannotBypassScanOnlyOrDuplicateActiveJob(t *testing.T) {
 	store := testStore(t)
 	e := NewEngine(store)
-	c := Container{ID: "c", HostID: "local", Name: "test", Managed: true, ImageID: "sha256:a", Candidate: &Candidate{Source: "sha256:a", Target: "sha256:b"}}
+	c := Container{ID: "c", HostID: "local", Name: "test", State: "running", Image: "alpine:3", Managed: true, ImageID: "sha256:a", Candidate: &Candidate{Source: "sha256:a", Target: "sha256:b"}}
 	p := Principal{ID: "owner", Role: "Owner", Hosts: []string{"local"}}
 	if _, err := e.CreateJob(c, p, "test", false); err == nil {
 		t.Fatal("scan-only must reject execution")
@@ -212,7 +212,7 @@ func TestNewerSchemaCannotBeSilentlyDowngraded(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = s.DB.Exec("PRAGMA user_version=2")
+	_, err = s.DB.Exec("PRAGMA user_version=3")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -17,7 +17,7 @@ if (!secure && !/^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?$/.test(origin))
 const oidc = new OIDC(auth, origin);
 const host = createNodeAppServiceHost({
   services,
-  historyLimit: 50,
+  historyLimit: 0,
   manifest: JSON.parse(
     fs.readFileSync(path.join(root, "xtend.maraca.services.json"), "utf8"),
   ),
@@ -71,11 +71,31 @@ function limited(key, max = 60) {
 function audit(user, operation) {
   auth.audit(user?.id || "anonymous", operation);
 }
+async function hasCapability(session, capability) {
+  if (session.role === "Owner") return true;
+  const response = await fetch(
+    (process.env.CUO_CORE_URL || "http://core:8091") + "/api/v1/permissions/me",
+    {
+      headers: {
+        Authorization: "Bearer " + process.env.CUO_CORE_TOKEN,
+        "X-CUO-Actor": session.id,
+        "X-CUO-Role": session.role,
+        "X-CUO-Hosts": session.hosts.join(","),
+      },
+      signal: AbortSignal.timeout(5000),
+    },
+  );
+  if (!response.ok) return false;
+  const data = await response.json();
+  return (
+    Array.isArray(data.capabilities) && data.capabilities.includes(capability)
+  );
+}
 const authPending = { enrollment: false };
 const server = http.createServer(async (req, res) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'; require-trusted-types-for 'script'",
+    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://github.com; require-trusted-types-for 'script'",
   );
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
@@ -90,7 +110,7 @@ const server = http.createServer(async (req, res) => {
       session = auth.session(req);
     const modifying = !["GET", "HEAD"].includes(req.method);
     if (url.pathname === "/health") {
-      json(res, 200, { ok: true, version: "0.1.0" });
+      json(res, 200, { ok: true, version: "0.2.0" });
       return;
     }
     if (url.pathname === "/auth/oidc/start" && req.method === "GET") {
@@ -130,6 +150,96 @@ const server = http.createServer(async (req, res) => {
         });
         res.end();
       }
+      return;
+    }
+    if (url.pathname.startsWith("/hooks/github/")) {
+      const id = url.pathname.slice("/hooks/github/".length);
+      if (req.method !== "POST" || !/^[a-f0-9]{32}$/.test(id)) {
+        json(res, 404, { message: "Webhook nicht gefunden" });
+        return;
+      }
+      if (limited(req.socket.remoteAddress + ":webhook", 120)) {
+        json(res, 429, { message: "Zu viele Webhooks" });
+        return;
+      }
+      const chunks = [];
+      let bytes = 0;
+      for await (const chunk of req) {
+        bytes += chunk.length;
+        if (bytes > 2 * 1024 * 1024) {
+          json(res, 413, { message: "Webhook zu groß" });
+          return;
+        }
+        chunks.push(chunk);
+      }
+      const response = await fetch(
+        (process.env.CUO_CORE_URL || "http://core:8091") +
+          "/internal/github/webhooks/" +
+          id,
+        {
+          method: "POST",
+          headers: {
+            Authorization: "Bearer " + process.env.CUO_CORE_TOKEN,
+            "Content-Type": "application/json",
+            "X-Hub-Signature-256": req.headers["x-hub-signature-256"] || "",
+            "X-GitHub-Delivery": req.headers["x-github-delivery"] || "",
+            "X-GitHub-Event": req.headers["x-github-event"] || "",
+          },
+          body: Buffer.concat(chunks),
+          signal: AbortSignal.timeout(8000),
+        },
+      );
+      json(res, response.status, await response.json());
+      return;
+    }
+    if (
+      [
+        "/connect/github/manifest/callback",
+        "/connect/github/install/callback",
+      ].includes(url.pathname) &&
+      req.method === "GET"
+    ) {
+      const match = /(?:^|;\s*)cuo_github_setup=([a-f0-9]{64})(?:;|$)/.exec(
+        req.headers.cookie || "",
+      );
+      res.setHeader(
+        "Set-Cookie",
+        `cuo_github_setup=; Path=/connect/github; HttpOnly; SameSite=Lax; Max-Age=0${secure ? "; Secure" : ""}`,
+      );
+      let success = false;
+      if (match) {
+        const endpoint = url.pathname.includes("/manifest/")
+          ? "manifest-callback"
+          : "install-callback";
+        const response = await fetch(
+          (process.env.CUO_CORE_URL || "http://core:8091") +
+            "/internal/github/" +
+            endpoint,
+          {
+            method: "POST",
+            headers: {
+              Authorization: "Bearer " + process.env.CUO_CORE_TOKEN,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              state: url.searchParams.get("state") || "",
+              code: url.searchParams.get("code") || "",
+              nonce: match[1],
+              installationId: url.searchParams.get("installation_id") || "",
+            }),
+            signal: AbortSignal.timeout(28000),
+          },
+        );
+        success = response.ok;
+      }
+      res.writeHead(303, {
+        Location:
+          "/?github_setup=" +
+          (success ? "success" : "failed") +
+          "#/integrations/github",
+        "Cache-Control": "no-store",
+      });
+      res.end();
       return;
     }
     if (modifying) {
@@ -281,7 +391,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       if (url.pathname === "/auth/users" && req.method === "GET") {
-        if (ranks[session.role] < 2) {
+        if (!(await hasCapability(session, "users.manage"))) {
           json(res, 403, { message: "Administrator erforderlich" });
           return;
         }
@@ -299,7 +409,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       if (url.pathname === "/auth/users" && req.method === "POST") {
-        if (ranks[session.role] < 2) {
+        if (!(await hasCapability(session, "users.manage"))) {
           json(res, 403, { message: "Administrator erforderlich" });
           return;
         }
@@ -316,7 +426,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       if (url.pathname === "/auth/users/revoke" && req.method === "POST") {
-        if (ranks[session.role] < 2) {
+        if (!(await hasCapability(session, "users.manage"))) {
           json(res, 403, { message: "Administrator erforderlich" });
           return;
         }
@@ -387,6 +497,13 @@ const server = http.createServer(async (req, res) => {
           signal: controller.signal,
           concurrencyKey: "bff:" + randomUUID(),
         });
+        if (result.body?._correlation) {
+          res.setHeader(
+            "Set-Cookie",
+            `cuo_github_setup=${result.body._correlation}; Path=/connect/github; HttpOnly; SameSite=Lax; Max-Age=900${secure ? "; Secure" : ""}`,
+          );
+          delete result.body._correlation;
+        }
         json(res, result.status, result.body);
         return;
       }

@@ -1,4 +1,5 @@
 import type { VM } from "./contracts.ts";
+import { integrationInitial, integrationPages } from "./integrations.ts";
 import { notifications } from "./notifications.ts";
 export const pageNames: Record<string, string> = {
   dashboard: "Dashboard",
@@ -12,6 +13,7 @@ export const pageNames: Record<string, string> = {
   hosts: "Hosts",
   users: "Benutzer",
   integrations: "Integrationen",
+  ...integrationPages,
 };
 const descriptions: Record<string, string> = {
   dashboard: "Übersicht über deine Container, Updates und den Systemstatus.",
@@ -28,11 +30,13 @@ const descriptions: Record<string, string> = {
 };
 export function initial(): VM {
   return {
+    ...integrationInitial(),
     auth: "loading",
     theme: "light",
     themeMode: "system",
     notificationsOpen: false,
     profileOpen: false,
+    containerTab: "overview",
     dismissed: [],
     oidc: {},
     oidcConfig: null,
@@ -188,7 +192,7 @@ export function present(vm: VM): VM {
   }
   for (const page of Object.keys(pageNames)) {
     result["nav" + page] =
-      `nav-item cuo-action${vm.page === page ? " active" : ""}`;
+      `nav-item cuo-action${vm.page === page || (["registry", "repositories"].includes(vm.page) && page === "registries") || (["github", "deliveries"].includes(vm.page) && page === "integrations") || (vm.page === "permissions" && page === "users") ? " active" : ""}`;
     result["route" + page] = vm.page === page ? "route-panel" : "is-hidden";
   }
   const { serialized: ignored, ...publicView } = result;

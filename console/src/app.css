@@ -28,11 +28,27 @@
   font-size: 13px;
   background: var(--cuo-canvas);
 }
+/* Top-layer RMT widgets inherit the same palette as the shell. */
+:root[data-theme="dark"] {
+  --cuo-canvas: #10192a;
+  --cuo-surface: #1a263a;
+  --cuo-text: #edf3ff;
+  --cuo-muted: #a7b6d4;
+  --cuo-border: #31415c;
+  --cuo-shadow: 0 3px 12px #0002;
+  color-scheme: dark;
+}
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
+}
+#xtend-maraca-root,
+.cuo-root {
+  width: 100%;
+  min-width: 0;
+  max-width: 100vw;
 }
 button,
 input,
@@ -208,6 +224,7 @@ x-icon {
   background: #ffffff02;
 }
 .main-shell {
+  min-width: 0;
   margin-left: 258px;
   width: calc(100% - 258px);
 }
@@ -1015,4 +1032,17 @@ x-cuo-notifications {
   flex: 1 1 0;
   min-height: 0;
   min-width: 0;
+}
+
+/* iOS focuses controls below 16px by zooming the visual viewport. Keep native
+   editing controls readable on narrow windows and touch devices; pinch zoom
+   and normal keyboard scrolling remain available. */
+@media (max-width: 850px), (pointer: coarse) {
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea,
+    select
+  ) {
+    font-size: max(16px, 1rem);
+  }
 }

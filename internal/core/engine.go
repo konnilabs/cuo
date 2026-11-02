@@ -4,6 +4,8 @@ import (
 	"context"
 	"crypto/rand"
 	"crypto/sha256"
+	gh "cuo.local/cuo/internal/github"
+	"cuo.local/cuo/internal/integrations"
 	"encoding/hex"
 	"encoding/json"
 	"errors"
@@ -17,14 +19,17 @@ import (
 )
 
 type Engine struct {
-	Store      *Store
-	AgentURL   string
-	AgentToken string
-	Client     *http.Client
-	Wake       chan struct{}
-	Mu         sync.Mutex
-	ScanMu     sync.Mutex
-	DiscoverMu sync.Mutex
+	Store           *Store
+	AgentURL        string
+	AgentToken      string
+	Client          *http.Client
+	Wake            chan struct{}
+	Mu              sync.Mutex
+	ScanMu          sync.Mutex
+	DiscoverMu      sync.Mutex
+	Vault           *integrations.Vault
+	IntegrationWake chan struct{}
+	GitHubFactory   func(GitHubConnection) (*gh.Client, error)
 }
 
 func ID() string {
@@ -110,10 +115,32 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		if c.Mode == "disabled" {
 			continue
 		}
+		if c.Candidate != nil && c.Candidate.SubscriptionID != "" {
+			var subscription Subscription
+			if e.Store.Get("subscription", c.Candidate.SubscriptionID, &subscription) == nil && subscription.Enabled {
+				continue
+			}
+		}
+		if c.LocalImage {
+			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: "Lokales Image ohne veröffentlichten Registry-Digest"}
+			_ = e.Store.Put("candidate", c.ID, candidate)
+			continue
+		}
 		if strings.HasPrefix(c.Image, "sha256:") || !strings.Contains(c.Image, ":") && len(c.Image) == 64 {
 			continue
 		}
-		r, err := e.agent(ctx, "POST", "/scan", c)
+		access, accessErr := e.accessForImage(c.Image)
+		if accessErr != nil {
+			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: accessErr.Error()}
+			_ = e.Store.Put("candidate", c.ID, candidate)
+			c.Candidate = &candidate
+			_ = e.Store.Put("container", c.ID, c)
+			continue
+		}
+		r, err := e.agent(ctx, "POST", "/scan", struct {
+			Container
+			Registry any `json:"registry,omitempty"`
+		}{c, access})
 		if err != nil {
 			return err
 		}
@@ -158,14 +185,34 @@ func (e *Engine) CreateJob(c Container, p Principal, reason string, automatic bo
 	if err != nil {
 		return Job{}, err
 	}
-	if err = e.Store.Put("job", j.ID, j); err != nil {
+	tx, err := e.Store.DB.Begin()
+	if err != nil {
 		return j, err
 	}
-	_ = e.Store.Event(Event{JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: j.State, Severity: "info", Message: c.Name + ": Update angelegt"})
+	defer tx.Rollback()
+	if _, err = tx.Exec(`INSERT INTO records VALUES('job',?,?)`, j.ID, encode(j)); err != nil {
+		return j, err
+	}
+	if err = bindReleaseJob(tx, j); err != nil {
+		return j, err
+	}
+	event := Event{HostID: j.HostID, JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: j.State, Severity: "info", Message: c.Name + ": Update angelegt", Time: j.Created}
+	if _, err = tx.Exec(`INSERT INTO events(host,data) VALUES(?,?)`, event.HostID, encode(event)); err != nil {
+		return j, err
+	}
+	if err = tx.Commit(); err != nil {
+		return j, err
+	}
 	e.Notify()
 	return j, nil
 }
 func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, immediate bool) (Job, error) {
+	if !e.Store.Allows(p, "updates.request") {
+		return Job{}, errors.New("update request capability required")
+	}
+	if c.State != "running" {
+		return Job{}, errors.New("only running containers can be updated")
+	}
 	policy := ResolvePolicy(c, e.Store.Policies())
 	if policy.Excluded || policy.Mode == "disabled" || policy.Mode == "scan-only" {
 		return Job{}, errors.New("policy does not permit execution")
@@ -173,7 +220,7 @@ func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, 
 	if !p.Host(c.HostID) {
 		return Job{}, errors.New("host access denied")
 	}
-	if immediate && (!p.Can("Administrator") || c.State != "running") {
+	if immediate && (!e.Store.Allows(p, "updates.approve") || c.State != "running") {
 		return Job{}, errors.New("immediate updates require administrator access and a running container")
 	}
 	if c.Candidate == nil || c.Candidate.Target == "" || c.Candidate.Error != "" {
@@ -199,6 +246,11 @@ func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, 
 	}
 	now := time.Now().UTC().Format(time.RFC3339)
 	j := Job{ID: ID(), EngineID: c.EngineID, HostID: c.HostID, ContainerID: c.ID, Name: c.Name, State: state, Target: c.Candidate.Target, Source: c.Candidate.Source, Image: c.Image, Platform: c.Platform, Requester: p.ID, Reason: reason, WindowID: policy.WindowID, Created: now, Updated: now}
+	j.RequesterRole = p.Role
+	j.TargetImage = c.Candidate.TargetImage
+	j.SubscriptionID = c.Candidate.SubscriptionID
+	j.ReleaseSetID = c.Candidate.ReleaseSetID
+	j.TargetOrder = c.Candidate.TargetOrder
 	if immediate {
 		j.State = "queued"
 		j.WindowID = ""
@@ -241,6 +293,32 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 	var current Container
 	err := e.Store.Get("container", j.ContainerID, &current)
 	p := ResolvePolicy(current, e.Store.Policies())
+	if j.RequesterRole != "" && !e.Store.Allows(Principal{ID: j.Requester, Role: j.RequesterRole, Hosts: []string{j.HostID}}, "updates.request") {
+		e.update(&j, "cancelled", "Rollenberechtigung vor Ausführungsbeginn entzogen")
+		e.Mu.Unlock()
+		return
+	}
+	if j.SubscriptionID != "" {
+		var subscription Subscription
+		if e.Store.Get("subscription", j.SubscriptionID, &subscription) != nil || !subscription.Enabled {
+			e.update(&j, "cancelled", "Subscription ist nicht mehr aktiv")
+			e.Mu.Unlock()
+			return
+		}
+		if j.SubscriptionGenerated {
+			actor := Principal{ID: subscription.Actor, Role: subscription.ActorRole, Hosts: []string{"local"}}
+			if !e.Store.Allows(actor, "subscriptions.manage") || subscription.Mode == "preview" {
+				e.update(&j, "cancelled", "Subscription-Automatisierung wurde widerrufen")
+				e.Mu.Unlock()
+				return
+			}
+			if subscription.Mode == "approval" && !j.Approved {
+				e.update(&j, "pending_approval", "Subscription verlangt Freigabe")
+				e.Mu.Unlock()
+				return
+			}
+		}
+	}
 	if err != nil || current.EngineID != j.EngineID || p.Excluded || p.Mode == "disabled" || p.Mode == "scan-only" {
 		e.update(&j, "cancelled", "Richtlinie blockiert die Ausführung")
 		e.Mu.Unlock()
@@ -265,7 +343,12 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 	e.Mu.Unlock()
 	ctx, cancel := context.WithTimeout(parent, 16*time.Minute)
 	defer cancel()
-	r, err := e.agent(ctx, "POST", "/execute", map[string]any{"jobId": j.ID, "containerId": j.EngineID, "sourceDigest": j.Source, "targetDigest": j.Target, "image": j.Image, "platform": j.Platform, "permissions": p.Permissions})
+	access, accessErr := e.accessForJob(j)
+	if accessErr != nil {
+		e.update(&j, "failed", accessErr.Error())
+		return
+	}
+	r, err := e.agent(ctx, "POST", "/execute", map[string]any{"jobId": j.ID, "containerId": j.EngineID, "sourceDigest": j.Source, "targetDigest": j.Target, "image": j.Image, "targetImage": j.TargetImage, "platform": j.Platform, "permissions": p.Permissions, "registry": access})
 	if err != nil {
 		e.update(&j, "intervention_required", "Agent-Verbindung unterbrochen; Journal prüfen")
 		return
@@ -313,7 +396,12 @@ func (e *Engine) Tick(now time.Time) {
 		}
 		for _, w := range windows {
 			if w.ID == j.WindowID {
-				if active, _ := ActiveWindow(w, now); active {
+				if active, slot := ActiveWindow(w, now); active {
+					// A planned request consumes the same automatic window slot, even
+					// if its execution fails before the next scheduler wakeup.
+					if _, err := e.Store.DB.Exec(`INSERT OR IGNORE INTO schedule_runs VALUES(?,?)`, slot, j.ContainerID); err != nil {
+						continue
+					}
 					e.update(&j, "queued", "Wartungsfenster geöffnet")
 				}
 			}
@@ -323,7 +411,13 @@ func (e *Engine) Tick(now time.Time) {
 	_ = e.Store.List("container", &containers)
 	for _, c := range containers {
 		p := ResolvePolicy(c, e.Store.Policies())
-		if p.Mode != "automatic" || p.Excluded || c.Candidate == nil || c.Candidate.Target == "" || c.Candidate.Error != "" {
+		if c.Candidate != nil && c.Candidate.SubscriptionID != "" {
+			var subscription Subscription
+			if e.Store.Get("subscription", c.Candidate.SubscriptionID, &subscription) != nil || !subscription.Enabled || subscription.Mode != "automatic" {
+				continue
+			}
+		}
+		if c.State != "running" || p.Mode != "automatic" || p.Excluded || c.Candidate == nil || c.Candidate.Target == "" || c.Candidate.Error != "" {
 			continue
 		}
 		slot := "candidate:" + c.Candidate.Target
@@ -371,5 +465,5 @@ func NewEngine(s *Store) *Engine {
 	if endpoint == "" {
 		endpoint = "http://agent:8092"
 	}
-	return &Engine{Store: s, AgentURL: endpoint, AgentToken: os.Getenv("CUO_AGENT_TOKEN"), Client: &http.Client{Timeout: 17 * time.Minute}, Wake: make(chan struct{}, 1)}
+	return &Engine{Store: s, AgentURL: endpoint, AgentToken: os.Getenv("CUO_AGENT_TOKEN"), Client: &http.Client{Timeout: 17 * time.Minute}, Wake: make(chan struct{}, 1), IntegrationWake: make(chan struct{}, 1)}
 }

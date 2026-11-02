@@ -1,11 +1,64 @@
 // CUO shell. Authoring source: tools/author-rmt.mjs. Runtime ownership: RMT only.
 template cuo.app {
  state cuo.vm type object preserve { initial {
+    capabilities [
+
+    ]
+    registries [
+
+    ]
+    githubConnections [
+
+    ]
+    subscriptions [
+
+    ]
+    webhookDeliveries [
+
+    ]
+    releaseSets [
+
+    ]
+    importJobs [
+
+    ]
+    registryRepositories [
+
+    ]
+    registryTags [
+
+    ]
+    githubInstallations [
+
+    ]
+    githubCatalog {
+
+    }
+    permissionMatrix null
+    registryId ""
+    githubId ""
+    routePath "/dashboard"
+    registryEditor ""
+    githubEditorId ""
+    subscriptionEditorId ""
+    subscriptionTargetCount 1
+    repository ""
+    artifactReference "latest"
+    artifact null
+    artifactOpen false
+    integrationBusy false
+    integrationQueryBusy false
+    integrationQueryError ""
+    integrationRequest ""
+    integrationOperation ""
+    registryStorage null
+    retentionPreview null
     auth "loading"
     theme "light"
     themeMode "system"
     notificationsOpen false
     profileOpen false
+    containerTab "overview"
     dismissed [
 
     ]
@@ -113,7 +166,21 @@ template cuo.app {
     routeusers "is-hidden"
     navintegrations "nav-item cuo-action"
     routeintegrations "is-hidden"
-    serialized "{\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"sortDirection\":\"asc\",\"historySort\":\"createdAt\",\"historySortDirection\":\"desc\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-02\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"themeToggleIcon\":\"moon\",\"themeToggleLabel\":\"Farbschema wechseln: Dunklen Modus aktivieren\",\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\"}"
+    navregistries "nav-item cuo-action"
+    routeregistries "is-hidden"
+    navregistry "nav-item cuo-action"
+    routeregistry "is-hidden"
+    navrepositories "nav-item cuo-action"
+    routerepositories "is-hidden"
+    navgithub "nav-item cuo-action"
+    routegithub "is-hidden"
+    navdeliveries "nav-item cuo-action"
+    routedeliveries "is-hidden"
+    navsubscriptions "nav-item cuo-action"
+    routesubscriptions "is-hidden"
+    navpermissions "nav-item cuo-action"
+    routepermissions "is-hidden"
+    serialized "{\"capabilities\":[],\"registries\":[],\"githubConnections\":[],\"subscriptions\":[],\"webhookDeliveries\":[],\"releaseSets\":[],\"importJobs\":[],\"registryRepositories\":[],\"registryTags\":[],\"githubInstallations\":[],\"githubCatalog\":{},\"permissionMatrix\":null,\"registryId\":\"\",\"githubId\":\"\",\"routePath\":\"/dashboard\",\"registryEditor\":\"\",\"githubEditorId\":\"\",\"subscriptionEditorId\":\"\",\"subscriptionTargetCount\":1,\"repository\":\"\",\"artifactReference\":\"latest\",\"artifact\":null,\"artifactOpen\":false,\"integrationBusy\":false,\"integrationQueryBusy\":false,\"integrationQueryError\":\"\",\"integrationRequest\":\"\",\"integrationOperation\":\"\",\"registryStorage\":null,\"retentionPreview\":null,\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"containerTab\":\"overview\",\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"sortDirection\":\"asc\",\"historySort\":\"createdAt\",\"historySortDirection\":\"desc\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-02\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"themeToggleIcon\":\"moon\",\"themeToggleLabel\":\"Farbschema wechseln: Dunklen Modus aktivieren\",\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\",\"navregistries\":\"nav-item cuo-action\",\"routeregistries\":\"is-hidden\",\"navregistry\":\"nav-item cuo-action\",\"routeregistry\":\"is-hidden\",\"navrepositories\":\"nav-item cuo-action\",\"routerepositories\":\"is-hidden\",\"navgithub\":\"nav-item cuo-action\",\"routegithub\":\"is-hidden\",\"navdeliveries\":\"nav-item cuo-action\",\"routedeliveries\":\"is-hidden\",\"navsubscriptions\":\"nav-item cuo-action\",\"routesubscriptions\":\"is-hidden\",\"navpermissions\":\"nav-item cuo-action\",\"routepermissions\":\"is-hidden\"}"
   } }
  state cuo.shell type object preserve { initial {
     id "cuo-shell"
@@ -312,6 +379,90 @@ template cuo.app {
                   type "element"
                   tag "x-route"
                   attributes {
+                    path "/registries"
+                    component "x-cuo-route"
+                    title "UniOCI Registries"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/registries/:id/repositories"
+                    component "x-cuo-route"
+                    title "Repositories"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/registries/:id"
+                    component "x-cuo-route"
+                    title "Registry-Einstellungen"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/integrations/github"
+                    component "x-cuo-route"
+                    title "GitHub"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/integrations/github/:id/deliveries"
+                    component "x-cuo-route"
+                    title "GitHub Inbox"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/subscriptions"
+                    component "x-cuo-route"
+                    title "Release-Subscriptions"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
+                    path "/users/permissions"
+                    component "x-cuo-route"
+                    title "Rollenberechtigungen"
+                  }
+                  children [
+
+                  ]
+                }
+                {
+                  type "element"
+                  tag "x-route"
+                  attributes {
                     path "/"
                     component "x-cuo-route"
                     title "Dashboard"
@@ -400,7 +551,7 @@ template cuo.app {
                               children [
 
                               ]
-                              text "v0.1.0"
+                              text "v0.2.0"
                             }
                           ]
                         }
@@ -695,6 +846,80 @@ template cuo.app {
 
                           ]
                           text "Logs"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navregistries"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "registries"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "cube"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Registries"
+                        }
+                      ]
+                    }
+                    {
+                      type "element"
+                      tag "button"
+                      class "$model.cuo.vm.navsubscriptions"
+                      attributes {
+                        type "button"
+                        data-id ""
+                        data-kind "navigate"
+                        data-value "subscriptions"
+                      }
+                      children [
+                        {
+                          type "element"
+                          tag "x-icon"
+                          attributes {
+                            name "link"
+                            pack "cuo"
+                            size "20px"
+                            decorative true
+                          }
+                          children [
+
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "span"
+                          attributes {
+
+                          }
+                          children [
+
+                          ]
+                          text "Subscriptions"
                         }
                       ]
                     }
@@ -2441,6 +2666,44 @@ template cuo.app {
                           children [
                             {
                               type "element"
+                              tag "button"
+                              class "btn cuo-action"
+                              attributes {
+                                type "button"
+                                data-id ""
+                                aria-label "Rollenberechtigungen"
+                                data-kind "navigate"
+                                data-value "users/permissions"
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "shield"
+                                    pack "core"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "span"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "Rollenberechtigungen"
+                                }
+                              ]
+                            }
+                            {
+                              type "element"
                               tag "x-cuo-workspace"
                               class "cuo-widget"
                               attributes {
@@ -2498,6 +2761,198 @@ template cuo.app {
 
                               ]
                             }
+                            {
+                              type "element"
+                              tag "button"
+                              class "btn primary cuo-action"
+                              attributes {
+                                type "button"
+                                data-id ""
+                                aria-label "GitHub verbinden"
+                                data-kind "navigate"
+                                data-value "integrations/github"
+                              }
+                              children [
+                                {
+                                  type "element"
+                                  tag "x-icon"
+                                  attributes {
+                                    name "link"
+                                    pack "cuo"
+                                    size "20px"
+                                    decorative true
+                                  }
+                                  children [
+
+                                  ]
+                                }
+                                {
+                                  type "element"
+                                  tag "span"
+                                  attributes {
+
+                                  }
+                                  children [
+
+                                  ]
+                                  text "GitHub verbinden"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeregistries"
+                          attributes {
+                            aria-label "registries"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-unioci-registry-list"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routeregistry"
+                          attributes {
+                            aria-label "registry"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-unioci-registry-settings"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routerepositories"
+                          attributes {
+                            aria-label "repositories"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-unioci-repository-browser"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routegithub"
+                          attributes {
+                            aria-label "github"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-github-connection"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routedeliveries"
+                          attributes {
+                            aria-label "deliveries"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-webhook-inbox"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routesubscriptions"
+                          attributes {
+                            aria-label "subscriptions"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-release-subscriptions"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "section"
+                          class "$model.cuo.vm.routepermissions"
+                          attributes {
+                            aria-label "permissions"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-cuo-permission-matrix"
+                              class "cuo-widget"
+                              attributes {
+                                data-cuo-widget "true"
+                                data-view "$model.cuo.vm.serialized"
+                              }
+                              children [
+
+                              ]
+                            }
                           ]
                         }
                       ]
@@ -2530,6 +2985,18 @@ template cuo.app {
 
               ]
             }
+          ]
+        }
+        {
+          type "element"
+          tag "x-unioci-artifact-detail"
+          class "cuo-widget"
+          attributes {
+            data-cuo-widget "true"
+            data-view "$model.cuo.vm.serialized"
+          }
+          children [
+
           ]
         }
         {

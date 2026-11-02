@@ -22,6 +22,16 @@ const core = http.createServer((req, res) => {
     res.write(": fixture\n\n");
     return;
   }
+  if (req.url.startsWith("/api/v1/permissions/me")) {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(
+      JSON.stringify({
+        capabilities: ["inventory.read", "registry.read"],
+        revision: 1,
+      }),
+    );
+    return;
+  }
   let items = [];
   if (req.url.startsWith("/api/v1/containers"))
     items = [
@@ -96,6 +106,9 @@ try {
   const ready = () =>
     wait(() => window.XTendMaraca?.model?.getState("cuo.vm")?.auth === "ready");
   await page.goto(origin);
+  await wait(
+    () => window.XTendMaraca?.model?.getState("cuo.vm")?.auth === "enroll",
+  );
   const auth = page.locator("x-cuo-auth");
   await auth.getByLabel("Benutzername").fill("fixture-owner");
   await auth
@@ -240,6 +253,16 @@ try {
     await toastLayer.evaluate((n) => {
       const r = n.getBoundingClientRect();
       return document.elementFromPoint(r.left + r.width / 2, r.top + 24) === n;
+    }),
+    true,
+  );
+  assert.equal(
+    await toastLayer.evaluate((n) => {
+      const rect = n.getBoundingClientRect();
+      return (
+        Math.abs(innerHeight - rect.bottom - 16) <= 2 &&
+        Math.abs(innerWidth - rect.right - 16) <= 2
+      );
     }),
     true,
   );

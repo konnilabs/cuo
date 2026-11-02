@@ -1,0 +1,23 @@
+services:
+  zot:
+    image: ghcr.io/project-zot/zot-linux-amd64@sha256:b68f727fe35c1eb45b2ae91519dfb0e33192d69b5104882c3e7809b7146c4a02
+    profiles: [registry]
+    user: "10001:10001"
+    command: [serve, /etc/zot/config.json]
+    ports:
+      - "127.0.0.1:${CUO_ZOT_PORT:-5055}:5000"
+    volumes:
+      - zot:/var/lib/registry
+      - ./.secrets/zot:/etc/zot:ro
+    networks: [registry]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    restart: unless-stopped
+    labels: {cuo.system: "true", cuo.registry: integrated}
+    healthcheck:
+      test: [CMD, /usr/local/bin/zot-linux-amd64, healthcheck, /etc/zot/config.json]
+      interval: 30s
+      timeout: 10s
+      retries: 3

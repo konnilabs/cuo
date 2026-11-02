@@ -68,11 +68,16 @@ export function patch(parent, items) {
   items = (items || [])
     .flat(Infinity)
     .filter((v) => v !== null && v !== undefined && v !== false);
-  const old = new Map([...parent.childNodes].map((n, i) => [n._key ?? i, n]));
+  const old = new Map(
+    [...parent.childNodes].map((n, i) => [n._key ?? "position:" + i, n]),
+  );
   let previous = null;
   items.forEach((item, i) => {
     const text = typeof item !== "object",
-      key = text ? i : (item.attrs.key ?? i);
+      key =
+        !text && item.attrs.key !== undefined && item.attrs.key !== null
+          ? "explicit:" + String(item.attrs.key)
+          : "position:" + i;
     let node = old.get(key);
     old.delete(key);
     if (

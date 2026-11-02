@@ -2,7 +2,9 @@
 
 These are point-in-time development records, not a stable-release certificate.
 
-- `release-readiness.json`: current local release assessment, image IDs/source fingerprints and open gates.
+- `local-0.2.0.json`: local 0.2.0 development assessment, exact image IDs, test evidence hashes and open external gates. Raw new scan/SBOM and browser artifacts stay in the protected local evidence directory named in this report.
+- `dependency-inventory.json`: current source dependency inventory; image SBOMs are separate evidence.
+- `release-readiness.json`: historical 0.1 local release assessment, image IDs/source fingerprints and open gates.
 - `restore-test.json`: newest isolated execution of the real three-volume backup/restore tools, including login after restart. The disposable project and test archives are removed afterwards.
 - `compose-backport.json`: actual executable verification of the pinned Compose security backport, including module versions, binary hash and Agent image ID.
 - `compose-govulncheck.txt`: precise Go binary scan with retained symbols; zero affected symbols in the final build. Three module-only advisories remain visible and require revalidation against the final release binary.

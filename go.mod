@@ -1,10 +1,16 @@
 module cuo.local/cuo
 
-go 1.25.0
+go 1.26.0
 
 toolchain go1.27.3
 
-require modernc.org/sqlite v1.39.1
+require (
+	github.com/opencontainers/go-digest v1.0.0
+	github.com/opencontainers/image-spec v1.1.1
+	golang.org/x/crypto v0.58.0
+	modernc.org/sqlite v1.39.1
+	oras.land/oras-go/v2 v2.7.0
+)
 
 require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -13,7 +19,8 @@ require (
 	github.com/ncruces/go-strftime v0.1.9 // indirect
 	github.com/remyoudompheng/bigfft v0.0.0-20230129092748-24d4a6f8daec // indirect
 	golang.org/x/exp v0.0.0-20250620022241-b7579e27df2b // indirect
-	golang.org/x/sys v0.44.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
 	modernc.org/libc v1.66.10 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect

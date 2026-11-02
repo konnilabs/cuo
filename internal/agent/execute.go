@@ -3,7 +3,9 @@ package agent
 import (
 	"bufio"
 	"context"
+	"cuo.local/cuo/internal/unioci"
 	"cuo.local/cuo/internal/watchtower"
+	"encoding/base64"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,6 +23,9 @@ import (
 var nameRE = regexp.MustCompile(`^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,100}$`)
 
 func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
+	a.executeWithRegistry(w, op, nil)
+}
+func (a *Agent) executeWithRegistry(w http.ResponseWriter, op Operation, access *unioci.Access) {
 	w.Header().Set("Content-Type", "application/x-ndjson")
 	flusher, _ := w.(http.Flusher)
 	enc := json.NewEncoder(w)
@@ -91,8 +96,8 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 		fail(errors.New("Container changed since scan; scan again"), false)
 		return
 	}
-	if boolean(host, "Privileged") || len(asArray(host["CapAdd"])) > 0 || len(asArray(host["Devices"])) > 0 || str(host, "PidMode") == "host" || str(host, "IpcMode") == "host" || boolean(host, "AutoRemove") || str(host, "NetworkMode") == "host" || str(host, "NetworkMode") == "container:"+op.ContainerID {
-		fail(errors.New("Privileged, host-network or auto-remove containers require manual updates"), false)
+	if boolean(host, "Privileged") || unsafeCapabilities(asArray(host["CapAdd"])) || len(asArray(host["Devices"])) > 0 || str(host, "PidMode") == "host" || str(host, "IpcMode") == "host" || boolean(host, "AutoRemove") || str(host, "NetworkMode") == "host" || strings.HasPrefix(str(host, "NetworkMode"), "container:") {
+		fail(errors.New("Privileged capabilities, devices, shared host namespaces or auto-remove require manual updates"), false)
 		return
 	}
 	mounts, _ := current["Mounts"].([]any)
@@ -120,7 +125,17 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 		fail(errors.New("Platform changed since scan"), false)
 		return
 	}
-	pin, e := pinned(op.Image, op.Target)
+	targetReference := op.Image
+	if op.TargetImage != "" {
+		targetReference = op.TargetImage
+	}
+	if access == nil {
+		if _, _, _, err := splitRef(targetReference); err != nil {
+			fail(err, false)
+			return
+		}
+	}
+	pin, e := pinned(targetReference, op.Target)
 	if e != nil {
 		fail(e, false)
 		return
@@ -129,7 +144,7 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 		fail(e, false)
 		return
 	}
-	if e = a.pull(ctx, pin, op.Platform); e != nil {
+	if e = a.pull(ctx, pin, op.Platform, access); e != nil {
 		fail(e, false)
 		return
 	}
@@ -180,10 +195,15 @@ func (a *Agent) Execute(w http.ResponseWriter, op Operation) {
 		flusher.Flush()
 	}
 }
-func (a *Agent) pull(ctx context.Context, pin, platform string) error {
+func (a *Agent) pull(ctx context.Context, pin, platform string, accesses ...*unioci.Access) error {
 	req, e := http.NewRequestWithContext(ctx, "POST", "http://docker"+a.Docker.Path("/images/create?fromImage="+url.QueryEscape(pin)+"&platform="+url.QueryEscape(platform)), nil)
 	if e != nil {
 		return e
+	}
+	if len(accesses) > 0 && accesses[0] != nil {
+		access := accesses[0]
+		auth := map[string]string{"username": access.Credentials.Username, "password": access.Credentials.Password, "serveraddress": access.Config.Host}
+		req.Header.Set("X-Registry-Auth", base64.URLEncoding.EncodeToString(marshal(auth)))
 	}
 	r, e := a.Docker.HTTP.Do(req)
 	if e != nil {
@@ -442,6 +462,22 @@ func controlMount(m map[string]any, allowReadOnlyMonitoring bool) bool {
 		// absent or malformed RW metadata must never turn into a read-only grant.
 		rw, known := m["RW"].(bool)
 		return !allowReadOnlyMonitoring || !known || rw
+	}
+	return false
+}
+
+// Explicitly restating Docker's default capabilities adds no new privilege.
+// All other capabilities, including unknown future ones, remain blocked.
+func unsafeCapabilities(values []any) bool {
+	allowed := map[string]bool{}
+	for _, name := range strings.Fields("AUDIT_WRITE CHOWN DAC_OVERRIDE FOWNER FSETID KILL MKNOD NET_BIND_SERVICE NET_RAW SETFCAP SETGID SETPCAP SETUID SYS_CHROOT") {
+		allowed[name] = true
+	}
+	for _, value := range values {
+		name, ok := value.(string)
+		if !ok || !allowed[strings.TrimPrefix(strings.ToUpper(name), "CAP_")] {
+			return true
+		}
 	}
 	return false
 }

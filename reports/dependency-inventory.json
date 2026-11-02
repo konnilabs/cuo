@@ -1,12 +1,12 @@
 {
   "schema": "cuo.source-dependency-inventory.v1",
   "note": "Source inventory; complete OCI/OS SBOM is a separate release gate.",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "goToolchain": "go version go1.27.3 linux/amd64",
   "goModules": [
     {
       "name": "cuo.local/cuo",
-      "version": "0.1.0"
+      "version": "0.2.0"
     },
     {
       "name": "github.com/dustin/go-humanize",
@@ -33,8 +33,28 @@
       "version": "v0.1.9"
     },
     {
+      "name": "github.com/opencontainers/go-digest",
+      "version": "v1.0.0"
+    },
+    {
+      "name": "github.com/opencontainers/image-spec",
+      "version": "v1.1.1"
+    },
+    {
       "name": "github.com/remyoudompheng/bigfft",
       "version": "v0.0.0-20230129092748-24d4a6f8daec"
+    },
+    {
+      "name": "github.com/russross/blackfriday",
+      "version": "v1.6.0"
+    },
+    {
+      "name": "github.com/santhosh-tekuri/jsonschema/v5",
+      "version": "v5.3.1"
+    },
+    {
+      "name": "golang.org/x/crypto",
+      "version": "v0.58.0"
     },
     {
       "name": "golang.org/x/exp",
@@ -45,12 +65,24 @@
       "version": "v0.27.0"
     },
     {
+      "name": "golang.org/x/net",
+      "version": "v0.60.0"
+    },
+    {
       "name": "golang.org/x/sync",
-      "version": "v0.16.0"
+      "version": "v0.24.0"
     },
     {
       "name": "golang.org/x/sys",
-      "version": "v0.44.0"
+      "version": "v0.49.0"
+    },
+    {
+      "name": "golang.org/x/term",
+      "version": "v0.47.0"
+    },
+    {
+      "name": "golang.org/x/text",
+      "version": "v0.43.0"
     },
     {
       "name": "golang.org/x/tools",
@@ -107,20 +139,24 @@
     {
       "name": "modernc.org/token",
       "version": "v1.1.0"
+    },
+    {
+      "name": "oras.land/oras-go/v2",
+      "version": "v2.7.0"
     }
   ],
   "browser": {
     "framework": "XTend 0.9.0",
-    "commit": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
     "dependency": {
       "schema": "cuo.xtend-dependency-lock.v1",
       "name": "@ccslabs/xtend",
       "version": "0.9.0",
       "repository": "https://github.com/konnilabs/xtend",
-      "revision": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+      "revision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
       "source": {
-        "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/49166cbe96d91049634fbe03eb48c04edb6e70cd",
-        "sha256": "5c96147b712180125ff660b0a3a5be4fd87e230816dfffb0cb70111c993074b3"
+        "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+        "sha256": "ee61c3f213d0059d72b1346f07b9310154aceafe771b186dfc0c059e27b9eb6c"
       },
       "workspaces": [
         "@ccslabs/xtend-cli",

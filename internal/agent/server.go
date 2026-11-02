@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/subtle"
 	"cuo.local/cuo/internal/core"
+	"cuo.local/cuo/internal/unioci"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -30,6 +31,7 @@ type Operation struct {
 	Source      string                    `json:"sourceDigest"`
 	Target      string                    `json:"targetDigest"`
 	Image       string                    `json:"image"`
+	TargetImage string                    `json:"targetImage,omitempty"`
 	Platform    string                    `json:"platform"`
 	Permissions core.ExecutionPermissions `json:"permissions,omitempty"`
 }
@@ -76,6 +78,42 @@ func (a *Agent) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	switch {
+	case r.Method == "GET" && r.URL.Path == "/registry-info":
+		var containers []map[string]any
+		if a.Docker.Request(r.Context(), "GET", a.Docker.Path("/containers/json?all=1"), nil, &containers) != nil {
+			http.Error(w, "Docker unavailable", 502)
+			return
+		}
+		volume := ""
+		for _, container := range containers {
+			labels := obj(container, "Labels")
+			if str(labels, "cuo.registry") != "integrated" || str(labels, "cuo.system") != "true" {
+				continue
+			}
+			for _, entry := range asArray(container["Mounts"]) {
+				mount, _ := entry.(map[string]any)
+				if str(mount, "Destination") == "/var/lib/registry" && str(mount, "Type") == "volume" {
+					volume = str(mount, "Name")
+				}
+			}
+		}
+		if volume == "" {
+			http.Error(w, "Integrated registry volume unavailable", 404)
+			return
+		}
+		var usage map[string]any
+		if a.Docker.Request(r.Context(), "GET", a.Docker.Path("/system/df"), nil, &usage) != nil {
+			http.Error(w, "Volume usage unavailable", 502)
+			return
+		}
+		for _, entry := range asArray(usage["Volumes"]) {
+			v, _ := entry.(map[string]any)
+			if str(v, "Name") == volume {
+				json.NewEncoder(w).Encode(map[string]any{"volume": volume, "usage": obj(v, "UsageData"), "automaticDeletion": false})
+				return
+			}
+		}
+		http.Error(w, "Volume usage unavailable", 404)
 	case r.Method == "GET" && r.URL.Path == "/info":
 		info := map[string]any{}
 		if err := a.Docker.Request(r.Context(), "GET", "/version", nil, &info); err != nil {
@@ -91,18 +129,26 @@ func (a *Agent) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(v)
 	case r.Method == "POST" && r.URL.Path == "/scan":
-		var c core.Container
-		if e := json.NewDecoder(http.MaxBytesReader(w, r.Body, 8192)).Decode(&c); e != nil || !idRE.MatchString(c.ID) {
+		var input struct {
+			core.Container
+			Registry *unioci.Access `json:"registry,omitempty"`
+		}
+		if e := json.NewDecoder(http.MaxBytesReader(w, r.Body, 65536)).Decode(&input); e != nil || !idRE.MatchString(input.ID) {
 			http.Error(w, "invalid container", 400)
 			return
 		}
+		c := input.Container
 		inspect, e := a.Docker.Inspect(r.Context(), c.EngineID)
 		if e != nil {
 			http.Error(w, "container unavailable", 404)
 			return
 		}
 		image := str(obj(inspect, "Config"), "Image")
-		dg, config, e := RegistryManifest(r.Context(), image, c.Platform)
+		if !validAccess(input.Registry, image) {
+			http.Error(w, "invalid registry access envelope", 400)
+			return
+		}
+		dg, config, e := registryManifestAccess(r.Context(), image, c.Platform, input.Registry)
 		out := core.Candidate{ContainerID: c.ID, Source: str(inspect, "Image"), Target: dg, Ref: image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339)}
 		if e != nil {
 			out.Error = e.Error()
@@ -111,11 +157,23 @@ func (a *Agent) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 		json.NewEncoder(w).Encode(out)
 	case r.Method == "POST" && r.URL.Path == "/execute":
-		var op Operation
-		decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 8192))
+		var input struct {
+			Operation
+			Registry *unioci.Access `json:"registry,omitempty"`
+		}
+		decoder := json.NewDecoder(http.MaxBytesReader(w, r.Body, 65536))
 		decoder.DisallowUnknownFields()
-		if e := decoder.Decode(&op); e != nil || !jobRE.MatchString(op.JobID) || !idRE.MatchString(op.ContainerID) || !digestRE.MatchString(op.Target) || !digestRE.MatchString(op.Source) {
+		if e := decoder.Decode(&input); e != nil || !jobRE.MatchString(input.JobID) || !idRE.MatchString(input.ContainerID) || !digestRE.MatchString(input.Target) || !digestRE.MatchString(input.Source) {
 			http.Error(w, "invalid operation", 400)
+			return
+		}
+		op := input.Operation
+		targetImage := op.Image
+		if op.TargetImage != "" {
+			targetImage = op.TargetImage
+		}
+		if !validAccess(input.Registry, targetImage) {
+			http.Error(w, "invalid registry access envelope", 400)
 			return
 		}
 		if !a.reserve(op) {
@@ -123,7 +181,7 @@ func (a *Agent) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		defer a.release(op)
-		a.Execute(w, op)
+		a.executeWithRegistry(w, op, input.Registry)
 	default:
 		http.NotFound(w, r)
 	}
@@ -143,6 +201,9 @@ func (a *Agent) Inventory(ctx context.Context) ([]core.Container, error) {
 		c := core.Container{ID: str(v, "Id"), EngineID: str(v, "Id"), HostID: "local", Name: name, Image: str(v, "Image"), ImageID: str(v, "ImageID"), State: str(v, "State"), Group: str(labels, "com.docker.compose.project"), Compose: str(labels, "com.docker.compose.project") != "", Managed: str(labels, "cuo.managed") == "true", Platform: "linux/amd64"}
 		im := map[string]any{}
 		if e := a.Docker.Request(ctx, "GET", a.Docker.Path("/images/"+c.ImageID+"/json"), nil, &im); e == nil {
+			if digests, ok := im["RepoDigests"].([]any); ok && len(digests) == 0 {
+				c.LocalImage = true
+			}
 			c.Platform = str(im, "Os") + "/" + str(im, "Architecture")
 			if variant := str(im, "Variant"); variant != "" {
 				c.Platform += "/" + variant

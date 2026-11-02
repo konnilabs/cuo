@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import { integrationRoutes } from "../src/integrations.ts";
 import { pageNames as initialPages, initial, present } from "../src/view.ts";
 const el = (tag, attrs = {}, children = [], extra = {}) => ({
   type: "element",
@@ -46,6 +47,8 @@ const links = [
   ["policies", "Richtlinien", "shield", "core"],
   ["history", "Historie", "history", "cuo"],
   ["logs", "Logs", "docs", "core"],
+  ["registries", "Registries", "cube", "cuo"],
+  ["subscriptions", "Subscriptions", "link", "cuo"],
   ["settings", "Einstellungen", "settings", "core"],
 ];
 const nav = ([page, label, name, pack]) =>
@@ -85,7 +88,7 @@ const sidebar = el(
         el("div", {}, [
           el("div", { class: "brand-name" }, [
             text("strong", "CUO"),
-            text("small", "v0.1.0"),
+            text("small", "v0.2.0"),
           ]),
           text("p", "Container Update Orchestrator"),
         ]),
@@ -274,9 +277,35 @@ const routed = [
   ["history", [widget("x-update-run-timeline")]],
   ["logs", [widget("x-log-stream", { expanded: true })]],
   ["hosts", [widget("x-host-health")]],
-  ["users", [widget("x-cuo-workspace", { section: "users" })]],
+  [
+    "users",
+    [
+      cmd("Rollenberechtigungen", "navigate", "users/permissions", "shield"),
+      widget("x-cuo-workspace", { section: "users" }),
+    ],
+  ],
   ["settings", [widget("x-cuo-workspace", { section: "settings" })]],
-  ["integrations", [widget("x-cuo-workspace", { section: "integrations" })]],
+  [
+    "integrations",
+    [
+      widget("x-cuo-workspace", { section: "integrations" }),
+      cmd(
+        "GitHub verbinden",
+        "navigate",
+        "integrations/github",
+        "link",
+        "btn primary",
+        "cuo",
+      ),
+    ],
+  ],
+  ["registries", [widget("x-unioci-registry-list")]],
+  ["registry", [widget("x-unioci-registry-settings")]],
+  ["repositories", [widget("x-unioci-repository-browser")]],
+  ["github", [widget("x-cuo-github-connection")]],
+  ["deliveries", [widget("x-cuo-webhook-inbox")]],
+  ["subscriptions", [widget("x-cuo-release-subscriptions")]],
+  ["permissions", [widget("x-cuo-permission-matrix")]],
 ].map(([page, children]) =>
   el(
     "section",
@@ -299,12 +328,19 @@ const shell = el(
         "data-kind": "route",
         "data-id": "",
       },
-      Object.keys(initialPages)
-        .map((page) =>
+      [
+        ...Object.keys(initialPages)
+          .filter(
+            (page) => !integrationRoutes.some((route) => route.page === page),
+          )
+          .map((page) => ({ path: "/" + page, page })),
+        ...integrationRoutes,
+      ]
+        .map(({ path, page }) =>
           el(
             "x-route",
             {
-              path: "/" + page,
+              path,
               component: "x-cuo-route",
               title: initialPages[page],
             },
@@ -383,6 +419,7 @@ const tree = {
       }),
       el("div", { class: "$model.cuo.vm.authClass" }, [widget("x-cuo-auth")]),
       shell,
+      widget("x-unioci-artifact-detail"),
       widget("x-cuo-toasts", {
         id: "cuo-toast-layer",
         popover: "manual",
@@ -484,6 +521,18 @@ fs.writeFileSync(
     {
       "x-icon": "../.framework/components/xicon.js",
       "x-container-icon": "./container-icon.mjs",
+      ...Object.fromEntries(
+        [
+          "x-unioci-registry-list",
+          "x-unioci-registry-settings",
+          "x-unioci-repository-browser",
+          "x-unioci-artifact-detail",
+          "x-cuo-github-connection",
+          "x-cuo-webhook-inbox",
+          "x-cuo-release-subscriptions",
+          "x-cuo-permission-matrix",
+        ].map((tag) => [tag, "./integrations.mjs"]),
+      ),
       "x-router": "../vendor/xrouter.mjs",
       "x-route": "../vendor/xrouter.mjs",
       "x-toggle": "../.framework/components/xtoggle.js",

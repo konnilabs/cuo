@@ -97,7 +97,7 @@ test("login rendering hides local credentials only in OIDC-only mode; tutorial r
     host,
     tutorial({ ...notices, notice: "<img src=x onerror=alert(1)>" }, "ready"),
   );
-  assert.equal(host.querySelectorAll(".tutorial-steps section").length, 6);
+  assert.equal(host.querySelectorAll(".tutorial-steps section").length, 8);
   assert.equal(host.querySelectorAll("img,script").length, 0);
   assert.match(host.textContent, /<img src=x/);
   assert.equal(

@@ -27,9 +27,9 @@ func Open(path string) (*Store, error) {
 		db.Close()
 		return nil, err
 	}
-	if schemaVersion > 1 {
+	if schemaVersion > 2 {
 		db.Close()
-		return nil, fmt.Errorf("database schema %d is newer than supported schema 1", schemaVersion)
+		return nil, fmt.Errorf("database schema %d is newer than supported schema 2", schemaVersion)
 	}
 	s := &Store{DB: db}
 	_, e = db.Exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000;
@@ -37,8 +37,15 @@ CREATE TABLE IF NOT EXISTS records(kind TEXT NOT NULL,id TEXT NOT NULL,data TEXT
 CREATE TABLE IF NOT EXISTS events(id INTEGER PRIMARY KEY AUTOINCREMENT,host TEXT NOT NULL,data TEXT NOT NULL);
 CREATE TABLE IF NOT EXISTS idempotency(actor TEXT NOT NULL,key TEXT NOT NULL,fingerprint TEXT NOT NULL,response TEXT NOT NULL,status INTEGER NOT NULL,PRIMARY KEY(actor,key));
 CREATE TABLE IF NOT EXISTS schedule_runs(slot TEXT NOT NULL,container TEXT NOT NULL,PRIMARY KEY(slot,container));
-PRAGMA user_version=1;`)
+CREATE TABLE IF NOT EXISTS secrets(id TEXT PRIMARY KEY,purpose TEXT NOT NULL,ciphertext BLOB NOT NULL,version INTEGER NOT NULL,updated TEXT NOT NULL);
+CREATE TABLE IF NOT EXISTS webhook_payloads(id TEXT PRIMARY KEY,body BLOB NOT NULL);
+CREATE TABLE IF NOT EXISTS release_targets(subscription TEXT NOT NULL,release TEXT NOT NULL,container TEXT NOT NULL,job TEXT NOT NULL,state TEXT NOT NULL,PRIMARY KEY(subscription,release,container));
+PRAGMA user_version=2;`)
 	if e != nil {
+		return nil, e
+	}
+	if _, e = db.Exec(`INSERT OR IGNORE INTO records(kind,id,data) VALUES('permission-policy','current',?)`, encode(defaultPermissions())); e != nil {
+		db.Close()
 		return nil, e
 	}
 	return s, nil

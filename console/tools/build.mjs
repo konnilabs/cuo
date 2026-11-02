@@ -45,7 +45,7 @@ function publicModes(directory) {
 publicModes("dist/assets");
 fs.writeFileSync(
   "dist/boot.mjs",
-  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),lazyStrategy:'eager'});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
+  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),lazyStrategy:'eager',actionHistoryLimit:10,commandHistoryLimit:10,stateProjectionWriteHistoryLimit:0,stateProjectionReadHistoryLimit:20,diagnosticLimit:100});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
 );
 let html = fs
   .readFileSync("dist/index.html", "utf8")

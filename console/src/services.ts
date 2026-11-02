@@ -1,3 +1,9 @@
+import {
+  integrationIntent,
+  loadIntegrations,
+  routeDetails,
+  cancelIntegrationQueries,
+} from "./integrations.ts";
 import { defineAppServices, service } from "@ccslabs/xtend-maraca/app-services";
 import type { MaracaBrowserFacade } from "@ccslabs/xtend/maraca/browser-composition-runtime";
 import type { Intent, Request, VM } from "./contracts.ts";
@@ -11,7 +17,7 @@ declare global {
 }
 import type { XRouterElement } from "../.framework/components/xrouter.js";
 function routePage(path: string) {
-  const page = path.split("?")[0].replace(/^\//, "") || "dashboard";
+  const page = routeDetails(path).page;
   return Object.hasOwn(pageNames, page) ? page : "dashboard";
 }
 function currentPage() {
@@ -71,7 +77,13 @@ let stream: EventSource | undefined,
 function model() {
   return (window.XTendMaraca.model?.getState("cuo.vm") as VM) || initial();
 }
-async function api(path: string, method = "GET", body?: unknown, key?: string) {
+async function api(
+  path: string,
+  method = "GET",
+  body?: unknown,
+  key?: string,
+  signal?: AbortSignal,
+) {
   const csrf = await fetch("/auth/session", {
     credentials: "same-origin",
   }).then((r) => r.json());
@@ -86,6 +98,7 @@ async function api(path: string, method = "GET", body?: unknown, key?: string) {
     method,
     headers,
     credentials: "same-origin",
+    signal,
     body: body === undefined ? undefined : JSON.stringify(body),
   });
   const data = await r.json();
@@ -116,10 +129,21 @@ async function snapshot(vm: VM, discover = false): Promise<VM> {
     "hosts",
     "activity",
   ];
-  const data = await Promise.all(paths.map((p) => api("/api/v1/" + p)));
+  vm = await loadIntegrations(vm, api);
+  const data = await Promise.all(
+    paths.map((p) =>
+      vm.user.role === "Owner" ||
+      (vm.capabilities as string[]).includes("inventory.read")
+        ? api("/api/v1/" + p)
+        : Promise.resolve({ items: [] }),
+    ),
+  );
   const [containers, jobs, policies, windows, hosts, events] = data;
   let users = vm.users;
-  if (["Owner", "Administrator"].includes(vm.user.role))
+  if (
+    vm.user.role === "Owner" ||
+    (vm.capabilities as string[]).includes("users.manage")
+  )
     users = (await api("/auth/users")).items;
   return present({
     ...vm,
@@ -133,7 +157,13 @@ async function snapshot(vm: VM, discover = false): Promise<VM> {
   });
 }
 function connect() {
-  if (stream || model().demo) return;
+  if (
+    stream ||
+    model().demo ||
+    (model().user.role !== "Owner" &&
+      !(model().capabilities as string[]).includes("inventory.read"))
+  )
+    return;
   const boundary = window.XTendMaraca.getSurfaceBoundary();
   if (boundary.signal.aborted) return;
   stream = new EventSource("/api/v1/events");
@@ -160,11 +190,18 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
   let vm: VM = { ...model(), notice: "", error: false };
   const { kind, value = "", id = "", data = {} } = input || { kind: "" };
   try {
-    if (kind === "boot") {
+    const integration = await integrationIntent(vm, input, {
+      api,
+      refresh: snapshot,
+    });
+    if (integration) vm = integration;
+    else if (kind === "boot") {
       observePreferences();
+      Object.assign(vm, routeDetails(location.hash.replace(/^#/, "")));
       vm.page = currentPage();
       if (new URL(location.href).searchParams.get("demo") === "1") {
         vm = demoVM();
+        Object.assign(vm, routeDetails(location.hash.replace(/^#/, "")));
         vm.page = currentPage();
         try {
           const data = JSON.parse(
@@ -183,6 +220,16 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
             : "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder lokal anmelden.";
         vm.error = true;
       }
+      const githubSetup = new URL(location.href).searchParams.get(
+        "github_setup",
+      );
+      if (githubSetup) {
+        vm.notice =
+          githubSetup === "success"
+            ? "GitHub-Einrichtung abgeschlossen. Installation und Verbindung prüfen."
+            : "GitHub-Einrichtung fehlgeschlagen oder abgelaufen. Bitte erneut starten.";
+        vm.error = githubSetup !== "success";
+      }
       if (vm.auth === "ready") connect();
     } else if (kind === "refresh") {
       if (!vm.demo) {
@@ -190,21 +237,36 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
         if (vm.auth === "ready") connect();
       }
     } else if (kind === "navigate") {
-      if (!Object.hasOwn(pageNames, value)) throw Error("Unbekannte Ansicht");
+      const route = routeDetails("/" + value);
+      if (!Object.hasOwn(pageNames, route.page))
+        throw Error("Unbekannte Ansicht");
+      cancelIntegrationQueries();
       const router = document.getElementById(
         "cuo-router",
       ) as XRouterElement | null;
       if (!router?.navigate("/" + value))
         throw Error("Navigation ist noch nicht bereit");
-      vm.page = value;
+      Object.assign(vm, route);
+      vm.integrationQueryBusy = false;
+      vm.integrationRequest = "";
+      vm.page = route.page;
       vm.mobile = false;
       vm.dialog = "";
       vm.notificationsOpen = false;
+      if (!vm.demo) vm = await loadIntegrations(vm, api);
     } else if (kind === "route") {
+      cancelIntegrationQueries();
+      Object.assign(vm, routeDetails(value));
+      vm.integrationQueryBusy = false;
+      vm.integrationRequest = "";
       vm.page = routePage(value);
       vm.mobile = false;
       vm.dialog = "";
       vm.notificationsOpen = false;
+      if (!vm.demo) vm = await loadIntegrations(vm, api);
+    } else if (kind === "containerTab") {
+      if (["overview", "source", "permissions"].includes(value))
+        vm.containerTab = value;
     } else if (kind === "theme") {
       vm = await preference(vm, {
         theme: vm.theme === "dark" ? "light" : "dark",

@@ -114,3 +114,14 @@ func TestReadOnlyHostMonitoringMountBoundary(t *testing.T) {
 		}
 	}
 }
+
+func TestDefaultVersusPrivilegedCapabilities(t *testing.T) {
+	if unsafeCapabilities([]any{"CHOWN", "CAP_NET_BIND_SERVICE", "SETUID"}) {
+		t.Fatal("Docker default capabilities rejected")
+	}
+	for _, value := range []string{"SYS_ADMIN", "NET_ADMIN", "SYS_PTRACE", "ALL", "CAP_BPF", "unknown"} {
+		if !unsafeCapabilities([]any{value}) {
+			t.Fatal("unsafe capability accepted", value)
+		}
+	}
+}

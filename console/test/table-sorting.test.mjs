@@ -209,7 +209,7 @@ test("real table headers dispatch scoped commands and reflect accessible orderin
     table.shadowRoot.querySelector("tbody tr .available").className,
     "available critical",
   );
-  assert.equal(history.shadowRoot.querySelector("tbody tr")._key, "new");
+  assert.equal(history.shadowRoot.querySelector("tbody tr td").textContent, "01.11.2026 03:00");
   history.shadowRoot
     .querySelector('[data-kind="sort"][data-value="duration"]')
     .click();
@@ -219,7 +219,7 @@ test("real table headers dispatch scoped commands and reflect accessible orderin
   history.shadowRoot
     .querySelector('[data-kind="sort"][data-value="duration"]')
     .click();
-  assert.equal(history.shadowRoot.querySelector("tbody tr")._key, "old");
+  assert.equal(history.shadowRoot.querySelector("tbody tr td").textContent, "31.10.2026 03:00");
   assert.equal(vm.containers[0].name, "web-12");
   table.remove();
   history.remove();

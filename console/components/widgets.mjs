@@ -837,7 +837,7 @@ export class XPolicyEditor extends Widget {
               ? h(
                   "p",
                   { class: "small" },
-                  "Owner-Freigabe: lesendes Host-Monitoring",
+                  "Ausführungsfreigabe: lesendes Host-Monitoring",
                 )
               : null,
           ),
@@ -863,7 +863,7 @@ export class XHostHealth extends Widget {
           { class: "core-heading" },
           h("i", { class: "dot green" }),
           h("strong", {}, "CUO Core"),
-          h("span", {}, "v0.1.0"),
+          h("span", {}, "v0.2.0"),
         ),
         h(
           "div",

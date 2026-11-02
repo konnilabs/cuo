@@ -19,30 +19,35 @@ type Host struct {
 	Capabilities  []string `json:"capabilities"`
 }
 type Container struct {
-	EngineID  string     `json:"engineId"`
-	ID        string     `json:"id"`
-	HostID    string     `json:"hostId"`
-	Name      string     `json:"name"`
-	Image     string     `json:"image"`
-	ImageID   string     `json:"imageId"`
-	State     string     `json:"state"`
-	Platform  string     `json:"platform"`
-	Group     string     `json:"group"`
-	Compose   bool       `json:"compose"`
-	Managed   bool       `json:"managed"`
-	Excluded  bool       `json:"excluded"`
-	Mode      string     `json:"mode"`
-	Reason    string     `json:"reason"`
-	Candidate *Candidate `json:"candidate,omitempty"`
+	EngineID   string     `json:"engineId"`
+	ID         string     `json:"id"`
+	HostID     string     `json:"hostId"`
+	Name       string     `json:"name"`
+	Image      string     `json:"image"`
+	ImageID    string     `json:"imageId"`
+	State      string     `json:"state"`
+	Platform   string     `json:"platform"`
+	Group      string     `json:"group"`
+	Compose    bool       `json:"compose"`
+	Managed    bool       `json:"managed"`
+	Excluded   bool       `json:"excluded"`
+	Mode       string     `json:"mode"`
+	Reason     string     `json:"reason"`
+	Candidate  *Candidate `json:"candidate,omitempty"`
+	LocalImage bool       `json:"localImage,omitempty"`
 }
 type Candidate struct {
-	ContainerID string `json:"containerId"`
-	Source      string `json:"sourceDigest"`
-	Target      string `json:"targetDigest"`
-	Ref         string `json:"image"`
-	Platform    string `json:"platform"`
-	Discovered  string `json:"discoveredAt"`
-	Error       string `json:"error,omitempty"`
+	TargetImage    string `json:"targetImage,omitempty"`
+	SubscriptionID string `json:"subscriptionId,omitempty"`
+	ReleaseSetID   string `json:"releaseSetId,omitempty"`
+	TargetOrder    int    `json:"targetOrder,omitempty"`
+	ContainerID    string `json:"containerId"`
+	Source         string `json:"sourceDigest"`
+	Target         string `json:"targetDigest"`
+	Ref            string `json:"image"`
+	Platform       string `json:"platform"`
+	Discovered     string `json:"discoveredAt"`
+	Error          string `json:"error,omitempty"`
 }
 
 // ExecutionPermissions are explicit, container-scoped exceptions to the Agent's
@@ -75,24 +80,30 @@ type Window struct {
 	Enabled   bool     `json:"enabled"`
 }
 type Job struct {
-	RunID       string `json:"runId,omitempty"`
-	Immediate   bool   `json:"immediate,omitempty"`
-	EngineID    string `json:"engineId"`
-	Approved    bool   `json:"approved"`
-	ID          string `json:"id"`
-	HostID      string `json:"hostId"`
-	ContainerID string `json:"containerId"`
-	Name        string `json:"name"`
-	State       string `json:"state"`
-	Target      string `json:"targetDigest"`
-	Source      string `json:"sourceDigest"`
-	Image       string `json:"image"`
-	Platform    string `json:"platform"`
-	Requester   string `json:"requester"`
-	Reason      string `json:"reason"`
-	WindowID    string `json:"windowId"`
-	Created     string `json:"createdAt"`
-	Updated     string `json:"updatedAt"`
+	SubscriptionGenerated bool   `json:"subscriptionGenerated,omitempty"`
+	TargetImage           string `json:"targetImage,omitempty"`
+	SubscriptionID        string `json:"subscriptionId,omitempty"`
+	ReleaseSetID          string `json:"releaseSetId,omitempty"`
+	TargetOrder           int    `json:"targetOrder,omitempty"`
+	RequesterRole         string `json:"requesterRole,omitempty"`
+	RunID                 string `json:"runId,omitempty"`
+	Immediate             bool   `json:"immediate,omitempty"`
+	EngineID              string `json:"engineId"`
+	Approved              bool   `json:"approved"`
+	ID                    string `json:"id"`
+	HostID                string `json:"hostId"`
+	ContainerID           string `json:"containerId"`
+	Name                  string `json:"name"`
+	State                 string `json:"state"`
+	Target                string `json:"targetDigest"`
+	Source                string `json:"sourceDigest"`
+	Image                 string `json:"image"`
+	Platform              string `json:"platform"`
+	Requester             string `json:"requester"`
+	Reason                string `json:"reason"`
+	WindowID              string `json:"windowId"`
+	Created               string `json:"createdAt"`
+	Updated               string `json:"updatedAt"`
 }
 type RunSkip struct {
 	ContainerID string `json:"containerId"`

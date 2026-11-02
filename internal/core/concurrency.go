@@ -62,6 +62,12 @@ func (e *Engine) dispatch(ctx context.Context, active map[string]Container, comp
 		if j.State != "queued" {
 			continue
 		}
+		if ready, failed := e.releaseCanStart(j); !ready {
+			if failed {
+				e.update(&j, "cancelled", "Vorheriger Release-Schritt fehlgeschlagen oder Subscription geändert")
+			}
+			continue
+		}
 		if _, ok := active[j.ID]; ok {
 			continue
 		}
