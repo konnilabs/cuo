@@ -4,6 +4,8 @@ CUO ist ein lokal installierbarer **Container Update Orchestrator** mit eigenst�
 
 **Status: öffentlicher Entwicklungsstand / Single-Host-MVP (0.1.0), noch kein freigegebenes stabiles Release.** Der Quellcode liegt öffentlich auf [konnilabs/cuo](https://github.com/konnilabs/cuo); die Installation baut die Images lokal. Ein grüner PR-Check bestätigt die dort getesteten Funktionen. Die separaten [Release-Kriterien](docs/RELEASE-GATES.md) einschließlich Image-Sicherheit, signierter Veröffentlichung und vollständiger Barrierefreiheitsprüfung sind noch nicht erfüllt. Es werden keine OCI-Images automatisch veröffentlicht.
 
+Die nächste Minor-Version ist im [Implementierungsplan für CUO 0.2.0](docs/IMPLEMENTATION-PLAN-0.2.0.md) beschrieben: UniOCI, optionaler Zot-Dienst, native GitHub-App/Webhooks und RMT-Surfaces. Die dort geplanten Funktionen gehören noch nicht zum aktuellen 0.1.0-Umfang.
+
 ## Installation
 
 Voraussetzungen: Linux mit Docker Engine **29.x**, Docker Compose **v2 oder v5**, Internetzugang beim ersten Build. Verifiziert mit Docker 29.1.3 / API 1.52. Weitere Versionen und Docker Desktop sind noch nicht zertifiziert.
