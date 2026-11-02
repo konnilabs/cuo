@@ -1,0 +1,14 @@
+# Run Caddy in a network that can reach Zot, or adapt the upstream for a host proxy.
+registry.example.org {
+    reverse_proxy zot:5000 {
+        transport http {
+            response_header_timeout 300s
+            read_timeout 300s
+            write_timeout 300s
+        }
+    }
+}
+# Set CUO_ZOT_HOST=registry.example.org before initial provisioning, configure
+# DNS/TLS, and ensure Docker and external CI trust the public certificate.
+# Keep CUO_ZOT_INTERNAL_URL=http://zot:5000 inside the isolated Compose network.
+# Do not publish the unauthenticated Core or Agent ports.

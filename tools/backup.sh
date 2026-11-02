@@ -16,7 +16,7 @@ cleanup() {
   status=$?
   trap - EXIT HUP INT TERM
   rm -f "$partial"
-  if [ "$restart" = 1 ]; then docker compose start --wait >/dev/null || status=1; fi
+  if [ "$restart" = 1 ]; then docker compose up -d --no-build --pull never --wait >/dev/null || status=1; fi
   exit "$status"
 }
 trap cleanup EXIT

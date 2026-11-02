@@ -70,9 +70,11 @@ async function main() {
       "inspect",
       "--format",
       "{{.Id}}",
-      `cuo-${service}:0.1.0`,
+      `cuo-${service}:0.2.0`,
     ]),
   }));
+  const zot=JSON.parse(fs.readFileSync("dependencies/zot/zot.lock.json","utf8"));
+  images.push({service:"zot",id:run("docker",["image","inspect","--format","{{.Id}}",zot.image])});
   let failed = false;
   for (const { service, id } of images) {
     const archive = path.join(output, `${service}.tar`),

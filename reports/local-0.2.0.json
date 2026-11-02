@@ -1,0 +1,254 @@
+{
+  "schema": "cuo.local-development-assessment.v1",
+  "version": "0.2.0",
+  "createdAt": "2026-11-02T21:14:20.809615+00:00",
+  "status": "development-preview-local-only",
+  "stableReleaseApproved": false,
+  "source": {
+    "baseRevision": "144cd8e2fa5ea626d0ddba2e7f5f6abe166ce043",
+    "branch": "codex/cuo-0.2.0",
+    "dirtyAtBuild": true,
+    "fingerprintSha256": "5b51898a8dd31f1ba7b8aab03a71dc7ddf3fcb1b70ba99e3a162c342582f0a43",
+    "fingerprintScope": "All tracked working-tree files except reports/. Sorted UTF-8 path, NUL, SHA-256 file bytes, NUL. This is local source evidence, not signed OCI provenance.",
+    "files": 186
+  },
+  "installation": {
+    "console": "http://127.0.0.1:8095",
+    "services": [
+      "core",
+      "agent",
+      "console",
+      "zot"
+    ],
+    "allHealthy": true,
+    "coreVersion": "0.2.0",
+    "zotVersion": "2.1.23",
+    "zotLoopbackPort": 5055,
+    "existingIdentityAndDataPreserved": true,
+    "productionChanged": false
+  },
+  "implemented": [
+    "UniOCI OCI Distribution adapter and encrypted private credentials",
+    "Optional pinned Zot with distinct pull/import/CI identities and verified digest copy",
+    "Native GitHub App setup, durable authenticated webhook inbox, retries and polling fallback",
+    "Complete immutable release sets, subscriptions and ordered jobs with effective permission checks",
+    "Owner-governed persisted capability matrix and RMT routes with eight registered Custom-XTend components",
+    "Additive schema migration and optional Zot backup/restore",
+    "Bottom-right top-layer XToasts",
+    "Mobile/touch native text inputs, selects and textareas at least 16px; pinch zoom unrestricted"
+  ],
+  "mobile": {
+    "viewportCssPx": 390,
+    "documentScrollWidthCssPx": 390,
+    "testedBrowser": "Chromium automated mobile viewport",
+    "physicalIOSSafariTested": false
+  },
+  "evidenceDirectory": "/home/konni/Documents/Codex/2026-11-01/kan/work/cuo-020-build",
+  "checks": [
+    {
+      "file": "go-race-final.log",
+      "sha256": "c9f49748b9d3e0dddeee1b69127f46e43148e06d542209c8ae3b2653c2b82876",
+      "passed": true,
+      "scope": "All Go packages: race detector tests passed."
+    },
+    {
+      "file": "go-vet.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "passed": true,
+      "scope": "Go vet passed."
+    },
+    {
+      "file": "govulncheck-final.log",
+      "sha256": "b5ae54ddcfa4cb39e85f84ad2d9e43556bd817c480eaab2a71bab63bfc29353b",
+      "passed": true,
+      "scope": "No affected symbols/imported packages. One module-only advisory remains; this is not a claim of CVE-free dependencies."
+    },
+    {
+      "file": "console-release-build.log",
+      "sha256": "0c26fba8d177475cdd2ffed38137a934db70b7633e8cb95fceea2491c8b4c4f4",
+      "passed": true,
+      "scope": "TypeScript, source gate, RMT lint and strict Maraca build passed after mobile input adjustment."
+    },
+    {
+      "file": "console-unit-release.log",
+      "sha256": "057ef6f423257b55c7d23951e845ab9effe1e1beab8d01ac04ee7e565f665594",
+      "passed": true,
+      "scope": "28 console tests passed."
+    },
+    {
+      "file": "tools-unit-final.log",
+      "sha256": "bd0da8a88dbd4c83a9ecf86a776dc7894eecedb02924454429bc2ad8a410591c",
+      "passed": true,
+      "scope": "5 tooling tests passed."
+    },
+    {
+      "file": "private-registry-e2e.log",
+      "sha256": "c84c3aa817f22d7a241ae2fd0ddcafdc52bab436010b4ccccd564708662cbd58",
+      "passed": true,
+      "scope": "Real isolated private Zot/Docker scan, digest copy, pull/update, denied writes, expired credentials and restart persistence."
+    },
+    {
+      "file": "agent-existing-e2e.log",
+      "sha256": "5851471415d2311ab8140db1c13710d791e39a09bdf87a783b19f142e26b0aca",
+      "passed": true,
+      "scope": "Real disposable Compose and standalone replacements preserve pins, mounts, env, ports and health; only fixture workloads touched."
+    },
+    {
+      "file": "github-fixture.log",
+      "sha256": "5dc99cee09d0aece5960ada309c55655406d439e227ead76cde0e69421a972ed",
+      "passed": true,
+      "scope": "Deterministic GitHub API fixtures: setup correlation/replay and polling recovery for long-running publish."
+    },
+    {
+      "file": "browser-release/report.json",
+      "sha256": "6c918a5efcf50fd62a42c45dfefe90e287c3743635825a0448c2cbd1c9014ab2",
+      "passed": true,
+      "scope": "Real isolated Core/BFF/RMT: enrollment, credentials absent from model, authenticated UniOCI, nested routes, effective matrix; 1000 commands without duplicate forms."
+    },
+    {
+      "file": "extensions-final/verification.json",
+      "sha256": "f857f0e41d38e87614ed378b058b13fa4bda28d81da2d32babb25025eca72991",
+      "passed": true,
+      "scope": "Signed independent OIDC/PKCE, router, profiles, theme, notifications, mobile drawer, filled logs and real bottom-right top-layer XToast above drawer."
+    },
+    {
+      "file": "ios-mobile/report.json",
+      "sha256": "24e04c31c206915ae09d5079b4fe9c8f6a628b256763d37c2543fb8bd5a2c034",
+      "passed": true,
+      "scope": "Final mobile smoke: global and shadow-root inputs computed at least 16px; no uncaught browser errors. Chromium, not physical iOS certification."
+    },
+    {
+      "file": "ios-mobile/a11y-permissions.json",
+      "sha256": "0c4d052ceaea23ff9846a161b325372c0da543c951efb6b6a37b784b1c1d9ef0",
+      "passed": true,
+      "scope": "Axe of the new permission matrix: 0 violations, 14 passes. Limited scope, not full WCAG audit."
+    },
+    {
+      "file": "restore.json",
+      "sha256": "b2b343ee949df0dc2f6c7ea757bdbaf6fca82a10b3029e3f4bf9b0b20475b6f9",
+      "passed": true,
+      "scope": "Actual three-volume backup/restore with identities, login, preferences, policies, jobs, audit, journals and desired state."
+    },
+    {
+      "file": "restore-zot-final.json",
+      "sha256": "a541432049b6cd32235bd0d9b730678fdc6c5b7be1312d2151a0cf138c532483",
+      "passed": true,
+      "scope": "Actual four-volume restore: authenticated OCI manifest/blob pushed before backup and fetched with byte/digest equality afterwards."
+    },
+    {
+      "file": "running-check.json",
+      "sha256": "dd35dcad9e2afc455338f3730f0ee3a67f6f98ea8c5844a5f50f756ddb7d453f",
+      "passed": true,
+      "scope": "Installed Core health 0.2.0; real public GHCR Zot artifact resolves to pinned digest; cryptographic verification explicitly not_verified."
+    },
+    {
+      "file": "final-ready-image-checks/manifest.json",
+      "sha256": "7d1f608f80188b063666fb0db72405ceb71822853278eb4702a8ee0cdc3491b2",
+      "passed": true,
+      "scope": "Exact image archives scanned by Trivy; Syft CycloneDX SBOMs generated; 0 HIGH/CRITICAL for all four images."
+    }
+  ],
+  "imageEvidence": {
+    "schema": "cuo.image-checks.v1",
+    "createdAt": "2026-11-02T21:13:04.348Z",
+    "revision": "144cd8e2fa5ea626d0ddba2e7f5f6abe166ce043",
+    "dirty": true,
+    "platform": "linux/x86_64",
+    "tools": {
+      "trivy": "Version: 0.76.1\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-11-02 19:15:11.074748541 +0000 UTC\n  NextUpdate: 2026-11-03 19:15:11.074748061 +0000 UTC\n  DownloadedAt: 2026-11-02 19:41:24.614756975 +0000 UTC",
+      "syft": "Application:   syft\nVersion:       1.55.0\nBuildDate:     2026-10-19T18:54:46Z\nGitCommit:     f15c3343e29dfb20cf6d82c820e7090b49808c96\nGitDescription: v1.55.0\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11"
+    },
+    "services": [
+      {
+        "service": "core",
+        "imageId": "sha256:7e98d5036292071c5cf1a9cd3581871b7113545f5271e06a345b12d405f72b79",
+        "archiveSha256": "sha256:9dbf0d376d41af27c891b2c5a59286c74edbf807493e8c0a44648c682c56351e",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 1
+        },
+        "sbomComponents": 843,
+        "scanSha256": "sha256:91193a6723f67b45302db0b6b26605159e9fc6d535e93cdb995f367b683bdeec",
+        "sbomSha256": "sha256:6cebacab11edad66d2dc4370636d4f5f9bba7b420bdeea901475c941aa66758f",
+        "archiveRetained": false
+      },
+      {
+        "service": "agent",
+        "imageId": "sha256:c81f6e22b13eaf652a9fcadbaa831bddcfc4318569242fa69963d133bf2184db",
+        "archiveSha256": "sha256:d00d617305d485af23231a51238de89f70b7aed4543b79a0a1a1ae07229faece",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 4
+        },
+        "sbomComponents": 1097,
+        "scanSha256": "sha256:db857c0eb1b40e5eff7b9c31a2f7bff9a8480838ef3c3ac438cc5c0a4ba32c6c",
+        "sbomSha256": "sha256:7199f6f82ed128cae0f34b287b100a699e0a09bf803f6c1aa779c6f420decb85",
+        "archiveRetained": false
+      },
+      {
+        "service": "console",
+        "imageId": "sha256:4184eec12b6a63bb16a722320828efa36ba08dac789dee5276ce4eb00b9246a5",
+        "archiveSha256": "sha256:6c85e47896306adad6dba41dea1c462b64abf2713f11723a159a410f2e07e760",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 114,
+        "scanSha256": "sha256:ba339dd28c8f5186749ff9ce6c658ae5ec3b01e39295101f1ad3cfb992d61e0e",
+        "sbomSha256": "sha256:6d5919fdcecc4c8b6d88a2dff8292ddd927219a261b6954d8a389ba984081a74",
+        "archiveRetained": false
+      },
+      {
+        "service": "zot",
+        "imageId": "sha256:be279845926de82a0e3c1421ae4a032eda4792745327d71de3632fd126662b25",
+        "archiveSha256": "sha256:2ed2a71f960c7df2c6301134b669e73334e343078b4669449f851d430d964edd",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 14,
+          "LOW": 8,
+          "UNKNOWN": 3
+        },
+        "sbomComponents": 1716,
+        "scanSha256": "sha256:3c4491adb7ee8dd8f0249b13433e6d8a2b502c914d5b063c606c98fb7f381e20",
+        "sbomSha256": "sha256:529757ebe2a1b143d1a0bb77c06ceffa6103a5a3d57c41dca58af0d65c3906a5",
+        "archiveRetained": false
+      }
+    ],
+    "passed": true,
+    "completedAt": "2026-11-02T21:13:33.076Z"
+  },
+  "backupHandling": {
+    "beforeMigrationDataBackupMode": "0600",
+    "afterMigrationDataBackupMode": "0600",
+    "separateKeyAndBootstrapArchiveMode": "0600",
+    "contentsCommitted": false,
+    "note": "Archives contain secrets, are not encrypted and must remain protected and stored separately."
+  },
+  "openExternalGates": [
+    "Real GitHub App sandbox enrollment/token/webhook round trip with user installation; API fixtures passed locally.",
+    "Public TLS ingress and CI-to-owned-Zot integration; local polling and registry paths tested.",
+    "Independent cryptographic signature/provenance verification and signed OCI promotion/publication; publication remains disabled.",
+    "Complete manual screenreader/WCAG audit, beyond the automated matrix and keyboard/mobile smokes.",
+    "Final-commit CI and the separate confidential vulnerability-reporting setup."
+  ],
+  "outOfScope": [
+    "Multi-host transport",
+    "Highly available shared data storage",
+    "Automatic rollback of workload data",
+    "Automatic registry deletion; retention is preview only"
+  ]
+}

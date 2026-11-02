@@ -25,7 +25,9 @@ jobs:
           echo "$RUNNER_TEMP/cuo-scanners" >> "$GITHUB_PATH"
       - name: Build local candidates
         env: {CUO_CORE_TOKEN: 'disposable-preflight-token-not-used', CUO_AGENT_TOKEN: 'disposable-preflight-token-not-used'}
-        run: docker compose build
+        run: |
+          docker compose build
+          docker pull "$(node -p 'JSON.parse(require("node:fs").readFileSync("dependencies/zot/zot.lock.json")).image')"
       - name: Scan exact image archives and create OS/runtime SBOMs
         env: {CUO_IMAGE_REPORTS: reports/image-checks}
         run: |

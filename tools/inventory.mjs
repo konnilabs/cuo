@@ -12,7 +12,7 @@ const go = execFileSync(
   .split("\n")
   .map((s) => {
     const [name, version] = s.split("@");
-    return { name, version: version || "0.1.0" };
+    return { name, version: version || "0.2.0" };
   });
 const archives = fs
   .readdirSync("third_party")
@@ -24,16 +24,17 @@ const archives = fs
       .update(fs.readFileSync("third_party/" + name))
       .digest("hex"),
   }));
+const xtend = JSON.parse(fs.readFileSync("console/xtend.lock.json", "utf8"));
 const inventory = {
   schema: "cuo.source-dependency-inventory.v1",
   note: "Source inventory; complete OCI/OS SBOM is a separate release gate.",
-  version: "0.1.0",
+  version: "0.2.0",
   goToolchain: execFileSync("go", ["version"], { encoding: "utf8" }).trim(),
   goModules: go,
   browser: {
-    framework: "XTend 0.9.0",
-    commit: "49166cbe96d91049634fbe03eb48c04edb6e70cd",
-    dependency: JSON.parse(fs.readFileSync("console/xtend.lock.json", "utf8")),
+    framework: `XTend ${xtend.version}`,
+    commit: xtend.revision,
+    dependency: xtend,
     thirdPartyScripts: "bundled local XTend only",
     icons: "XIcon local node-based packs",
     fonts: "Roboto regular and medium",

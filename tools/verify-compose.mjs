@@ -17,7 +17,7 @@ const imageId = run("docker", [
   "inspect",
   "--format",
   "{{.Id}}",
-  "cuo-agent:0.1.0",
+  "cuo-agent:0.2.0",
 ]);
 assert.match(imageId, /^sha256:[a-f0-9]{64}$/);
 const docker = (...args) =>

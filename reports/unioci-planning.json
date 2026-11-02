@@ -1,0 +1,320 @@
+{
+  "schema": "cuo.unioci-planning.v1",
+  "checkedOn": "2026-11-02",
+  "scope": "Planning for CUO 0.2.0; UniOCI, Zot, GitHub integrations and configurable role matrix are not implemented by this document.",
+  "cuoBaseline": "b2c5f65",
+  "mcp": {
+    "transport": "authenticated local HTTP MCP",
+    "endpoint": "http://127.0.0.1:31415/mcp",
+    "container": "xtend-mcp-mcp-1",
+    "health": "ok",
+    "availableTools": [
+      "xtend_knowledge_search",
+      "xtend_knowledge_context"
+    ],
+    "compileToolAvailable": false,
+    "queries": [
+      {
+        "query": "Custom XTend component registration registry properties command events lifecycle shadow DOM",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/components",
+            "sourcePath": "docs/en/components.md",
+            "sourceHash": "b6a4a50c9e034a62e0f7399bb626d4cce22711ca1226bb8f8953e5edbf24b1aa",
+            "heading": "Choose a component"
+          },
+          {
+            "uri": "xtend://docs/en/components-xdialog",
+            "sourcePath": "docs/en/components/xdialog.md",
+            "sourceHash": "a4d809ec0ba3c82c1431dcfb6ec5c63c3b9bd5d69ae1f12000d739fa333a6cf6",
+            "heading": "Integration notes"
+          },
+          {
+            "uri": "xtend://docs/en/components-xdrawer",
+            "sourcePath": "docs/en/components/xdrawer.md",
+            "sourceHash": "41fe6d9148f9e4617167895314f93c99a812df037897de892f9cf96ed4fd7d09",
+            "heading": "Integration notes"
+          },
+          {
+            "uri": "xtend://docs/en/components-xtextarea",
+            "sourcePath": "docs/en/components/xtextarea.md",
+            "sourceHash": "8289f7cfb339c8bdc14c40b2a54edc954ba948ba907db0e9b78b4fe28ed9ad37",
+            "heading": "Integration notes"
+          }
+        ]
+      },
+      {
+        "query": "Component Development register custom component xtendComponentContract xtendRmtMetadata",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/components",
+            "sourcePath": "docs/en/components.md",
+            "sourceHash": "b6a4a50c9e034a62e0f7399bb626d4cce22711ca1226bb8f8953e5edbf24b1aa",
+            "heading": "Component Development"
+          },
+          {
+            "uri": "xtend://docs/en/components-xalert",
+            "sourcePath": "docs/en/components/xalert.md",
+            "sourceHash": "efcf3033cfa56632a9db9853d8c30d4960b2f2eaeba3194e81b5c50dec026ccf",
+            "heading": "Load and register"
+          },
+          {
+            "uri": "xtend://docs/en/components-xbutton",
+            "sourcePath": "docs/en/components/xbutton.md",
+            "sourceHash": "7d0b3dbf4d889423b09f19816ee0cd84f26afe76437d4ef46b1e19abad12d922",
+            "heading": "Load and register"
+          }
+        ]
+      },
+      {
+        "query": "XRouter x-route path navigation public events",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/components-xrouter",
+            "sourcePath": "docs/en/components/xrouter.md",
+            "sourceHash": "32baf36e6edfe4c2b009eef914cb784bbf22a9c0be4b50d9de7b9fdc63fc7989",
+            "heading": "What it solves"
+          },
+          {
+            "uri": "xtend://docs/en/xtendrmt-parsedown-scheduling",
+            "sourcePath": "docs/en/xtendrmt-parsedown-scheduling.md",
+            "sourceHash": "57317b7e0a73944d85b2b40ad3a0e447971b120008e80fb32dad87e283418f01",
+            "heading": "Route data flow"
+          },
+          {
+            "uri": "xtend://docs/en/components-xfooter",
+            "sourcePath": "docs/en/components/xfooter.md",
+            "sourceHash": "ac33457bda565038a83e124262cb72e1a4beca8e7aadaebb15a73d60dbd9a901",
+            "heading": "What it solves"
+          }
+        ]
+      },
+      {
+        "query": "XRouter XDrawer innerHTML DOM construction Trusted DOM security templates",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/trusted-dom-boundary-browser-proof",
+            "sourcePath": "docs/en/trusted-dom-boundary-browser-proof.md",
+            "sourceHash": "30b14255a99a861ffa02067a66c438aa702616d875d9d1fca6c1cf4ff01175ab",
+            "heading": "Trusted DOM Boundary Browser Proof"
+          },
+          {
+            "uri": "xtend://docs/en/trusted-dom-sanitizing",
+            "sourcePath": "docs/en/trusted-dom-sanitizing.md",
+            "sourceHash": "90e62b8f604b4260353d316b76e11121762d6263898504b699dfeb3bb96fe580",
+            "heading": "Trusted DOM and Sanitizing"
+          },
+          {
+            "uri": "xtend://docs/en/rmt-kernel-topography-map",
+            "sourcePath": "docs/en/rmt-kernel-topography-map.md",
+            "sourceHash": "ab6773e1e1d7d6783514de96611d28364dff60c137bc5384f77d57b15ee0bb88",
+            "heading": "Canonical Source Topology"
+          },
+          {
+            "uri": "xtend://docs/en/learn-rmt-security-preview",
+            "sourcePath": "docs/en/learn-rmt-security-preview.md",
+            "sourceHash": "4884fdd73f2dc9055a2aa0bcd269090139b336d20f5c114af4c2a27745f98ddb",
+            "heading": "Related Reference"
+          },
+          {
+            "uri": "xtend://docs/en/manifest-import-policy",
+            "sourcePath": "docs/en/manifest-import-policy.md",
+            "sourceHash": "d0d89f5e3c3730f511fc7dfdee346488484cfda544642b842485ef023a22bd49",
+            "heading": "Next steps"
+          }
+        ]
+      },
+      {
+        "query": "Maraca AppServices server services security input trust validation typed contracts",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/maraca-app-services",
+            "sourcePath": "docs/en/maraca-app-services.md",
+            "sourceHash": "a7cd270815cf5b0fc5304e0055a3ba144b8d4c9644ebb8e386adfe21d4b4b649",
+            "heading": "Implement browser and server services"
+          },
+          {
+            "uri": "xtend://rmt/kit/reference/operator%3Avalidation",
+            "sourcePath": "docs/de/rmt-reference-validation-transitions.md",
+            "sourceHash": "b985591d5be261a0363dbfd9dc089b1af028501d5abbea1f19014147b8d4dd99",
+            "heading": "validation"
+          },
+          {
+            "uri": "xtend://docs/en/xtend-material",
+            "sourcePath": "docs/en/xtend-material.md",
+            "sourceHash": "be461148750502ca7989823a39785d2b5288adfe418db9e9098efae97c97d482",
+            "heading": "Create your first app"
+          },
+          {
+            "uri": "xtend://rmt/kit/reference/cli%3Axt%20maraca%20build%20app.rmt%20--orchestration%20strict%20--kernel%20strict%20--hydration%20strict%20--validation%20strict%20--transitions%20strict%20--css%20external%20--json",
+            "sourcePath": "xtend-builder/lib/cli.js",
+            "sourceHash": "b985591d5be261a0363dbfd9dc089b1af028501d5abbea1f19014147b8d4dd99",
+            "heading": "xt maraca build app.rmt --orchestration strict --kernel strict --hydration strict --validation strict --transitions strict --css external --json"
+          }
+        ]
+      },
+      {
+        "query": "Maraca RMT Surface XRouter route services intent model binding lifecycle",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/maraca-fastpass-abort-boundary",
+            "sourcePath": "docs/en/maraca-fastpass-abort-boundary.md",
+            "sourceHash": "cd1bfc0a3895531e03091697bf95cc2facccaae7001a3fa453b252c0e99fbf54",
+            "heading": "FastPass authoring"
+          },
+          {
+            "uri": "xtend://docs/en/rmt-kernel-topography-map",
+            "sourcePath": "docs/en/rmt-kernel-topography-map.md",
+            "sourceHash": "ab6773e1e1d7d6783514de96611d28364dff60c137bc5384f77d57b15ee0bb88",
+            "heading": "Canonical Source Topology"
+          },
+          {
+            "uri": "xtend://docs/en/xtend-maraca-orchestration",
+            "sourcePath": "docs/en/xtend-maraca-orchestration.md",
+            "sourceHash": "10f0fa29734d6f97868d5e8643316316365132c329d22f57023d97bad6f2e73d",
+            "heading": "Runtime Graph"
+          },
+          {
+            "uri": "xtend://docs/en/rmt-reference-surfaces-lanes-lifecycle",
+            "sourcePath": "docs/en/rmt-reference-surfaces-lanes-lifecycle.md",
+            "sourceHash": "f92625732be38b7927572780799199a9d03139cfc5c77c61f1dfdcb3870b4088",
+            "heading": "Presentation epochs in 0.8.0"
+          }
+        ]
+      },
+      {
+        "query": "XModal XDrawer XTabs XCheckbox XDataTable XIcon keyboard accessibility component catalog",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/components",
+            "sourcePath": "docs/en/components.md",
+            "sourceHash": "b6a4a50c9e034a62e0f7399bb626d4cce22711ca1226bb8f8953e5edbf24b1aa",
+            "heading": "Styling and accessibility"
+          },
+          {
+            "uri": "xtend://docs/en/components-xkeymap",
+            "sourcePath": "docs/en/components/xkeymap.md",
+            "sourceHash": "09132675f1a57ce2e07ffc2e7e57c712be38376ca8f68362f1b4bfdf631ea157",
+            "heading": "Accessibility and keyboard behavior"
+          },
+          {
+            "uri": "xtend://docs/en/a11y-keyboard-smokes",
+            "sourcePath": "docs/en/a11y-keyboard-smokes.md",
+            "sourceHash": "bb8b7286b5926cc9136699ed403167b427f66495f9b9314b3d3546a633410f38",
+            "heading": "Public building blocks"
+          },
+          {
+            "uri": "xtend://docs/en/component-long-tail-migration",
+            "sourcePath": "docs/en/component-long-tail-migration.md",
+            "sourceHash": "cb07aa4b604cafda5b4496c25db8c8708877247b55dac3f5b7bfb71d104f8182",
+            "heading": "Review Flow"
+          }
+        ]
+      },
+      {
+        "query": "Maraca fixes changelog RMT XRouter XDrawer DOM descriptor component binding service compatibility release 0.9.0",
+        "tool": "xtend_knowledge_context",
+        "provenance": {
+          "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+          "repository": "konnilabs/xtend",
+          "ref": "main"
+        },
+        "sources": [
+          {
+            "uri": "xtend://docs/en/rmt-dom-descriptor-renderer",
+            "sourcePath": "docs/en/rmt-dom-descriptor-renderer.md",
+            "sourceHash": "1b0a466dda42d9bfc58408cd3bfd3d5f21275fd85a9176449cbba3485a3d7855",
+            "heading": "RMT DOM Descriptor Renderer"
+          },
+          {
+            "uri": "xtend://docs/en/rmt-kernel-topography-map",
+            "sourcePath": "docs/en/rmt-kernel-topography-map.md",
+            "sourceHash": "ab6773e1e1d7d6783514de96611d28364dff60c137bc5384f77d57b15ee0bb88",
+            "heading": "Current Utilization"
+          },
+          {
+            "uri": "xtend://docs/en/rmt-vnext-component-primitives",
+            "sourcePath": "docs/en/rmt-vnext-component-primitives.md",
+            "sourceHash": "c5ef296bd4a60fe8090e09b57304e0c80fd680b3bd29cba42b4dc69abe1ba4cd",
+            "heading": "RMT Component Primitives and XTend UI"
+          },
+          {
+            "uri": "xtend://docs/en/changelog",
+            "sourcePath": "docs/en/changelog.md",
+            "sourceHash": "8004cd7a265ec5350f438ea120471c0b0c28c53d14f2cfcc72bf327528406993",
+            "heading": "Changes in 0.8.0"
+          },
+          {
+            "uri": "xtend://docs/en/ssr-pages",
+            "sourcePath": "docs/en/ssr-pages.md",
+            "sourceHash": "e25f2cf02774d6a252651e76961c570e691864ff48076084e0d5801027dd5f43",
+            "heading": "Migration to XTend 0.9"
+          }
+        ]
+      }
+    ]
+  },
+  "dependency": {
+    "before": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+    "selected": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "version": "0.9.0",
+    "archiveSha256": "ee61c3f213d0059d72b1346f07b9310154aceafe771b186dfc0c059e27b9eb6c",
+    "reason": "Upstream PR #118 bounds Maraca action/command histories, diagnostics and state projection journals; relevant to long-lived CUO sessions.",
+    "routerAndDrawerUnchanged": true,
+    "sourceReview": "Fetched exact MCP-reported commit and compared runtime changes and component bytes; no moving main/latest pin."
+  },
+  "primarySources": [
+    "https://github.com/opencontainers/distribution-spec/blob/v1.1.1/spec.md",
+    "https://github.com/oras-project/oras-go",
+    "https://zotregistry.dev/v2.1.21/admin-guide/admin-configuration/",
+    "https://zotregistry.dev/v2.1.21/developer-guide/api-user-guide/",
+    "https://docs.github.com/en/apps/sharing-github-apps/registering-a-github-app-from-a-manifest",
+    "https://docs.github.com/en/apps/creating-github-apps/authenticating-with-a-github-app/generating-an-installation-access-token-for-a-github-app",
+    "https://docs.github.com/en/webhooks/webhook-events-and-payloads#workflow_run",
+    "https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries",
+    "https://docs.github.com/en/webhooks/using-webhooks/handling-failed-webhook-deliveries",
+    "https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry"
+  ]
+}

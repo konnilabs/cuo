@@ -15,12 +15,8 @@ safety=$(mktemp "${backup_file}.before-restore.XXXXXX")
 docker compose stop
 data_archive > "$safety"
 printf 'Protected pre-restore snapshot: %s\n' "$safety"
-if ! docker run --rm --pull never --network none -i --user 0 --entrypoint cuo \
-  --mount "type=volume,source=$identity_volume,target=/identity" \
-  --mount "type=volume,source=$core_volume,target=/core" \
-  --mount "type=volume,source=$agent_volume,target=/agent" \
-  "$data_image" backup restore < "$backup_file"; then
+if ! data_run restore < "$backup_file"; then
   echo 'Restore failed. CUO remains stopped. Retain the pre-restore snapshot for manual recovery.' >&2
   exit 1
 fi
-docker compose start --wait
+docker compose up -d --no-build --pull never --wait

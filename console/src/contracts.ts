@@ -37,7 +37,8 @@ export type VM = {
   oidc: Record<string, unknown>;
   oidcConfig: Record<string, unknown> | null;
   page: string;
-  mobile: boolean;
+  sidebarCollapsed: boolean;
+  sidebarNarrow: boolean;
   notice: string;
   toasts: { id: string; message: string; type: string; duration: number }[];
   error: boolean;

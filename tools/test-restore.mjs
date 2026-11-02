@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 fs.mkdirSync("work", { recursive: true });
-const directory = fs.mkdtempSync(path.resolve("work/restore-test-")),
+const directory = fs.mkdtempSync(path.resolve("work/_restore-test-")),
   project = "cuo-restore-test-" + randomBytes(4).toString("hex");
 const composeFile = path.join(directory, "compose.json");
 const env = {
@@ -19,20 +19,24 @@ const env = {
   CUO_CORE_TOKEN: randomBytes(32).toString("hex"),
   CUO_AGENT_TOKEN: randomBytes(32).toString("hex"),
 };
+const withRegistry = process.env.CUO_RESTORE_REGISTRY === "1";
 const services = {
   agent: {
-    image: "cuo-agent:0.1.0",
+    image: "cuo-agent:0.2.0",
     entrypoint: ["sh", "-c", "while :; do sleep 3600; done"],
     stop_grace_period: "1s",
     volumes: ["agent:/data"],
   },
   core: {
-    image: "cuo-core:0.1.0",
+    image: "cuo-core:0.2.0",
     environment: {
       CUO_CORE_TOKEN: env.CUO_CORE_TOKEN,
       CUO_AGENT_URL: "http://127.0.0.1:1",
     },
-    volumes: ["core:/data"],
+    volumes: [
+      "core:/data",
+      `${directory}/secrets/integration.key:/run/secrets/cuo-integration-key:ro`,
+    ],
     healthcheck: {
       test: [
         "CMD",
@@ -47,7 +51,7 @@ const services = {
     },
   },
   console: {
-    image: "cuo-console:0.1.0",
+    image: "cuo-console:0.2.0",
     environment: {
       CUO_CORE_TOKEN: env.CUO_CORE_TOKEN,
       CUO_CORE_URL: "http://core:8091",
@@ -67,11 +71,46 @@ const services = {
     },
   },
 };
+if (withRegistry) {
+  const zot = JSON.parse(
+    fs.readFileSync("dependencies/zot/zot.lock.json", "utf8"),
+  );
+  services.zot = {
+    image: zot.image,
+    user: "10001:10001",
+    command: ["serve", "/etc/zot/config.json"],
+    volumes: ["zot:/var/lib/registry", `${directory}/secrets/zot:/etc/zot:ro`],
+    healthcheck: {
+      test: [
+        "CMD",
+        "/usr/local/bin/zot-linux-amd64",
+        "healthcheck",
+        "/etc/zot/config.json",
+      ],
+      interval: "1s",
+      retries: 30,
+    },
+  };
+  Object.assign(services.core.environment, {
+    CUO_ZOT_ENABLED: "1",
+    CUO_ZOT_HOST: "localhost:5055",
+    CUO_ZOT_INTERNAL_URL: "http://zot:5000",
+    CUO_ZOT_CREDENTIALS_FILE: "/run/secrets/cuo-zot-client",
+  });
+  services.core.volumes.push(
+    `${directory}/secrets/zot-client.json:/run/secrets/cuo-zot-client:ro`,
+  );
+}
 fs.writeFileSync(
   composeFile,
   JSON.stringify({
     services,
-    volumes: { identity: {}, core: {}, agent: {} },
+    volumes: {
+      identity: {},
+      core: {},
+      agent: {},
+      ...(withRegistry ? { zot: {} } : {}),
+    },
     networks: { default: { internal: true } },
   }),
   { mode: 0o600 },
@@ -92,7 +131,7 @@ const helper = (code) =>
     "--pull",
     "never",
     "--network",
-    "none",
+    withRegistry ? `${project}_default` : "none",
     "--user",
     "0",
     "--entrypoint",
@@ -101,17 +140,58 @@ const helper = (code) =>
       identity: "/data",
       core: "/core",
       agent: "/agent",
+      ...(withRegistry ? { zot: "/registry" } : {}),
     }).flatMap(([name, target]) => [
       "--mount",
       `type=volume,source=${project}_${name},target=${target}`,
     ]),
-    "cuo-console:0.1.0",
+    ...(withRegistry
+      ? [
+          "--mount",
+          `type=bind,source=${directory}/secrets/zot-client.json,target=/fixture-credentials.json,readonly`,
+        ]
+      : []),
+    "cuo-console:0.2.0",
     "--input-type=module",
     "-e",
     code,
   ]);
 const output = process.env.CUO_RESTORE_REPORT || "reports/restore-test.json";
 try {
+  fs.mkdirSync(path.join(directory, "secrets"), { mode: 0o700 });
+  run("docker", [
+    "run",
+    "--rm",
+    "--network",
+    "none",
+    "--user",
+    "0",
+    "--mount",
+    `type=bind,source=${directory}/secrets,target=/setup`,
+    "cuo-core:0.2.0",
+    "provision",
+    "--directory",
+    "/setup",
+    ...(withRegistry ? ["--registry"] : []),
+  ]);
+  if (withRegistry) {
+    run("docker", ["volume", "create", `${project}_zot`]);
+    run("docker", [
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--user",
+      "0",
+      "--entrypoint",
+      "chown",
+      "--mount",
+      `type=volume,source=${project}_zot,target=/registry`,
+      "cuo-core:0.2.0",
+      "10001:10001",
+      "/registry",
+    ]);
+  }
   compose("up", "-d", "--no-build", "--pull", "never", "--wait");
   helper(`
     import fs from 'node:fs';import {DatabaseSync} from 'node:sqlite';import {Auth} from './server/auth.mjs';
@@ -127,6 +207,25 @@ try {
     fs.mkdirSync('/agent/compose-locks',{recursive:true});fs.writeFileSync('/agent/compose-locks/fixture.json',JSON.stringify({services:{fixture:{image:'example.invalid/app@sha256:fixture',environment:{FIXTURE:'restored'}}}}));
     fs.writeFileSync('/agent/fixture-job.json',JSON.stringify({frame:{stage:'succeeded'},operation:{jobId:'restore-job'}}));
   `);
+  const registryFixture = `
+   import fs from 'node:fs';import {createHash} from 'node:crypto';import assert from 'node:assert/strict';
+   const credentials=JSON.parse(fs.readFileSync('/fixture-credentials.json'));const base='http://zot:5000';
+   const config=Buffer.from(JSON.stringify({architecture:'amd64',os:'linux',rootfs:{type:'layers',diff_ids:[]},config:{Cmd:['/bin/true']}}));
+   const configDigest='sha256:'+createHash('sha256').update(config).digest('hex');
+   const manifest=Buffer.from(JSON.stringify({schemaVersion:2,mediaType:'application/vnd.oci.image.manifest.v1+json',config:{mediaType:'application/vnd.oci.image.config.v1+json',digest:configDigest,size:config.length},layers:[]}));
+   const manifestDigest='sha256:'+createHash('sha256').update(manifest).digest('hex');
+  `;
+  if (withRegistry)
+    helper(
+      registryFixture +
+        `
+   const headers={Authorization:'Basic '+Buffer.from(credentials.pushUsername+':'+credentials.pushPassword).toString('base64')};
+   const upload=await fetch(base+'/v2/universal/restore/blobs/uploads/',{method:'POST',headers});assert.equal(upload.status,202);
+   const location=new URL(upload.headers.get('location'),base);location.searchParams.set('digest',configDigest);
+   const blob=await fetch(location,{method:'PUT',headers:{...headers,'Content-Type':'application/octet-stream'},body:config});assert.equal(blob.status,201);
+   const result=await fetch(base+'/v2/universal/restore/manifests/stable',{method:'PUT',headers:{...headers,'Content-Type':'application/vnd.oci.image.manifest.v1+json'},body:manifest});assert.equal(result.status,201);
+  `,
+    );
   const backup = path.join(directory, "backup.tar.gz");
   run("sh", ["tools/backup.sh", backup]);
   assert.equal(fs.statSync(backup).mode & 0o777, 0o600);
@@ -134,7 +233,20 @@ try {
   helper(
     `import fs from 'node:fs';import {DatabaseSync} from 'node:sqlite';const db=new DatabaseSync('/data/identity.db');db.exec('DELETE FROM users;DELETE FROM profiles;DELETE FROM settings;DELETE FROM notification_dismissals');db.close();const core=new DatabaseSync('/core/cuo.db');core.exec("DELETE FROM records WHERE id IN ('restore-policy','restore-job');DELETE FROM events");core.close();fs.rmSync('/agent/compose-locks',{recursive:true});fs.rmSync('/agent/fixture-job.json');fs.writeFileSync('/agent/after-backup','must disappear');`,
   );
+  if (withRegistry)
+    helper(
+      `import fs from 'node:fs';fs.rmSync('/registry/universal',{recursive:true});`,
+    );
   run("sh", ["tools/restore.sh", backup], "RESTORE\n");
+  if (withRegistry)
+    helper(
+      registryFixture +
+        `
+   const headers={Authorization:'Basic '+Buffer.from(credentials.pullUsername+':'+credentials.pullPassword).toString('base64')};
+   const result=await fetch(base+'/v2/universal/restore/manifests/stable',{headers});assert.equal(result.status,200);assert.equal(result.headers.get('docker-content-digest'),manifestDigest);assert.equal(Buffer.from(await result.arrayBuffer()).equals(manifest),true);
+   const blob=await fetch(base+'/v2/universal/restore/blobs/'+configDigest,{headers});assert.equal(blob.status,200);assert.equal(Buffer.from(await blob.arrayBuffer()).equals(config),true);
+  `,
+    );
   const safety = fs
     .readdirSync(directory)
     .filter((name) => name.startsWith("backup.tar.gz.before-restore."));
@@ -171,19 +283,24 @@ try {
           "inspect",
           "--format",
           "{{.Id}}",
-          `cuo-${s}:0.1.0`,
+          `cuo-${s}:0.2.0`,
         ]).trim(),
       ]),
     ),
     passed: true,
     isolation: {
-      disposableVolumes: 3,
+      disposableVolumes: withRegistry ? 4 : 3,
       dockerSocket: false,
       publishedPorts: false,
       externalNetwork: false,
     },
     checks: [
       "actual backup.sh/restore.sh",
+      ...(withRegistry
+        ? [
+            "optional Zot configuration and real authenticated OCI manifest/blob fetch after restore",
+          ]
+        : []),
       "backup mode 0600",
       "SQLite identity/Core integrity",
       "password login and Owner role after restart",
@@ -201,6 +318,23 @@ try {
   try {
     compose("down", "-v", "--remove-orphans");
   } finally {
+    // Provisioned files belong to service UID 10001, so remove only this
+    // disposable test directory through a narrowly mounted root helper.
+    run("docker", [
+      "run",
+      "--rm",
+      "--network",
+      "none",
+      "--user",
+      "0",
+      "--entrypoint",
+      "sh",
+      "--mount",
+      `type=bind,source=${directory},target=/fixture`,
+      "cuo-core:0.2.0",
+      "-c",
+      "find /fixture -mindepth 1 -delete",
+    ]);
     fs.rmSync(directory, { recursive: true, force: true });
   }
 }

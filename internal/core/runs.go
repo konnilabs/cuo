@@ -9,7 +9,7 @@ import (
 // Called under Engine.Mu. Selection and the persisted batch share one snapshot;
 // its jobs, run record and audit entries commit together before workers wake.
 func (e *Engine) CreateRun(p Principal, reason string) (UpdateRun, error) {
-	if !p.Can("Administrator") {
+	if !e.Store.Allows(p, "updates.approve") {
 		return UpdateRun{}, errors.New("Administrator role required")
 	}
 	var containers []Container
@@ -53,6 +53,9 @@ func (e *Engine) CreateRun(p Principal, reason string) (UpdateRun, error) {
 		return err
 	}
 	for _, j := range run.Jobs {
+		if err = bindReleaseJob(tx, j); err != nil {
+			return run, err
+		}
 		if err = put("job", j.ID, j); err != nil {
 			return run, err
 		}

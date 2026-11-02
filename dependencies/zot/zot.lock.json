@@ -1,0 +1,8 @@
+{
+  "version": "2.1.23",
+  "revision": "d7915e82e6693255338ef7fa9bb15300c82db020",
+  "image": "ghcr.io/project-zot/zot-linux-amd64@sha256:b68f727fe35c1eb45b2ae91519dfb0e33192d69b5104882c3e7809b7146c4a02",
+  "platform": "linux/amd64",
+  "source": "https://github.com/project-zot/zot",
+  "optional": true
+}

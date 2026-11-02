@@ -13,7 +13,7 @@ import (
 )
 
 func runContainer(id string) Container {
-	return Container{ID: id, EngineID: id, HostID: "local", Name: id, Managed: true, State: "running", ImageID: "sha256:old", Candidate: &Candidate{Source: "sha256:old", Target: "sha256:new"}}
+	return Container{ID: id, EngineID: id, HostID: "local", Name: id, Managed: true, State: "running", Image: "alpine:3", ImageID: "sha256:old", Candidate: &Candidate{Source: "sha256:old", Target: "sha256:new"}}
 }
 func runRequest(server *Server, role, key string, body []byte) *httptest.ResponseRecorder {
 	request := httptest.NewRequest("POST", "/api/v1/update-runs", bytes.NewReader(body))

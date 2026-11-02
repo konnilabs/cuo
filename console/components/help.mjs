@@ -20,6 +20,14 @@ export function loadNotices() {
 export function tutorial(notices, state) {
   const steps = [
     [
+      "Registries & GitHub",
+      "Unter Registries verbindest du universelle OCI-Quellen und optional Zot mit getrennten Pull-/Push-Zugängen. Unter Integrationen → GitHub richtest du deine eigene GitHub-App ein. Subscriptions ordnen vollständige Publish-Releases deinen Containern zu; lokal läuft zusätzlich ein periodischer API-Abgleich.",
+    ],
+    [
+      "Rollenberechtigungen",
+      "Unter Benutzer → Rollenberechtigungen verwaltet der Owner die tatsächlich wirksamen Aktionsrechte. Host-Grenzen und containerbezogene Ausführungsfreigaben gelten zusätzlich. Bereits zugelassene Operationen laufen zu Ende.",
+    ],
+    [
       "1. Container erfassen",
       "Unter Container findest du das Docker-Inventar. Nur ausdrücklich mit cuo.managed=true markierte Container lassen sich aktualisieren; CUO-Systemdienste bleiben geschützt.",
     ],
@@ -59,7 +67,7 @@ export function tutorial(notices, state) {
       h(
         "p",
         {},
-        "CUO 0.1.0 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.",
+        "CUO 0.2.0 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.",
       ),
       h(
         "a",

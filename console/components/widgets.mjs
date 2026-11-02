@@ -833,6 +833,13 @@ export class XPolicyEditor extends Widget {
               { class: "muted small" },
               `Parallelität: max. ${p.concurrency || 1}`,
             ),
+            p.permissions?.readOnlyHostMonitoring
+              ? h(
+                  "p",
+                  { class: "small" },
+                  "Ausführungsfreigabe: lesendes Host-Monitoring",
+                )
+              : null,
           ),
         ),
       ),
@@ -856,7 +863,7 @@ export class XHostHealth extends Widget {
           { class: "core-heading" },
           h("i", { class: "dot green" }),
           h("strong", {}, "CUO Core"),
-          h("span", {}, "v0.1.0"),
+          h("span", {}, "v0.2.0"),
         ),
         h(
           "div",

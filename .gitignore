@@ -20,3 +20,4 @@ console/.cache/
 console/assets/container-brands.json
 
 reports/image-checks/
+.secrets/

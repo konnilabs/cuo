@@ -3,10 +3,10 @@
   "name": "@ccslabs/xtend",
   "version": "0.9.0",
   "repository": "https://github.com/konnilabs/xtend",
-  "revision": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+  "revision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
   "source": {
-    "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/49166cbe96d91049634fbe03eb48c04edb6e70cd",
-    "sha256": "5c96147b712180125ff660b0a3a5be4fd87e230816dfffb0cb70111c993074b3"
+    "url": "https://codeload.github.com/konnilabs/xtend/tar.gz/0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "sha256": "ee61c3f213d0059d72b1346f07b9310154aceafe771b186dfc0c059e27b9eb6c"
   },
   "workspaces": [
     "@ccslabs/xtend-cli",

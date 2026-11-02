@@ -35,7 +35,9 @@ const licenseName = (text) =>
         : "Siehe Lizenztext";
 const xtend = JSON.parse(read("console/xtend.lock.json"));
 const compose = composeLock();
+const zot = JSON.parse(read("dependencies/zot/zot.lock.json"));
 const libraries = [
+ {name:"Zot (optionaler Registry-Dienst)",version:zot.version,license:"Apache-2.0",source:zot.source+"/tree/"+zot.revision,text:read("dependencies/zot/LICENSE")},
   {
     name: "Docker Compose (Agent, Security-Backport)",
     version: compose.COMPOSE_VERSION,

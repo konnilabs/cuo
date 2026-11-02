@@ -13,6 +13,8 @@ import {
   stageLabel,
   formatDate,
 } from "./base.mjs";
+const can = (vm, cap) =>
+  vm.user?.role === "Owner" || (vm.capabilities || []).includes(cap);
 const bool = (data) => data === "on" || data === "true";
 export class XCUOAuth extends Widget {
   render() {
@@ -27,7 +29,7 @@ export class XCUOAuth extends Widget {
           { class: "auth-brand" },
           h("span", { class: "cube-mark" }, icon("cube", "cuo")),
           h("strong", {}, "CUO"),
-          h("span", { class: "muted" }, "v0.1.0"),
+          h("span", { class: "muted" }, "v0.2.0"),
         ),
         h("p", { class: "eyebrow" }, "CONTAINER UPDATE ORCHESTRATOR"),
         h(
@@ -110,6 +112,17 @@ register("x-cuo-auth", XCUOAuth);
 export class XApprovalDialog extends Widget {
   connectedCallback() {
     super.connectedCallback();
+    for (const event of ["input", "change"])
+      this.shadowRoot.addEventListener(
+        event,
+        (e) => {
+          if (
+            ["permissionReason", "permissionsConfirmed"].includes(e.target.name)
+          )
+            e.target.setCustomValidity("");
+        },
+        { signal: this.controller.signal },
+      );
     this.shadowRoot.addEventListener(
       "cancel",
       (e) => {
@@ -166,36 +179,143 @@ export class XApprovalDialog extends Widget {
               h("span", {}, c.name),
             ),
             h(
-              "div",
-              { class: "detail-grid" },
+              "nav",
+              { class: "tabs", "aria-label": "Container-Einstellungen" },
               [
-                ["Image", c.image],
-                ["Plattform", c.platform],
-                ["Status", c.state],
-                ["Gruppe", c.group],
-                ["Richtlinie", modeLabel[c.mode]],
-                [
-                  "Verwaltet",
-                  c.managed ? "Ja" : "Nein – cuo.managed=true benötigt",
-                ],
-                [
-                  "Compose",
-                  c.compose ? "Ja – registriertes Projekt benötigt" : "Nein",
-                ],
-                [
-                  "Update-Digest",
-                  c.candidate?.targetDigest || "Kein Update bekannt",
-                ],
-                ["Hinweis", c.candidate?.error || c.reason || "–"],
-              ].map(([a, b]) =>
-                h(
-                  "div",
-                  {},
-                  h("small", { class: "muted" }, a),
-                  h("p", { class: "break" }, b),
+                ["overview", "Übersicht"],
+                ["source", "Image-Quelle"],
+                ["permissions", "Ausführungsrechte"],
+              ].map(([value, label]) =>
+                button(
+                  label,
+                  "containerTab",
+                  value,
+                  "",
+                  "btn" +
+                    (String(vm.containerTab || "overview") === value
+                      ? " primary"
+                      : ""),
                 ),
               ),
             ),
+            vm.containerTab === "source"
+              ? h(
+                  "section",
+                  {},
+                  h("h3", {}, "Image-Quelle & Release-Zuordnung"),
+                  h("p", { class: "break" }, c.image),
+                  h(
+                    "p",
+                    { class: "break muted" },
+                    c.localImage
+                      ? "Lokal gebautes Image ohne veröffentlichten Digest."
+                      : "OCI-Registry; vorhandene Digest-Pins werden beachtet.",
+                  ),
+                  c.candidate?.subscriptionId
+                    ? h(
+                        "div",
+                        {},
+                        h(
+                          "p",
+                          { class: "break" },
+                          "Subscription: " + c.candidate.subscriptionId,
+                        ),
+                        h(
+                          "p",
+                          { class: "break" },
+                          "Release-Set: " + c.candidate.releaseSetId,
+                        ),
+                        h(
+                          "p",
+                          { class: "break" },
+                          "Ziel: " + (c.candidate.targetImage || c.image),
+                        ),
+                        button(
+                          "Subscriptions öffnen",
+                          "navigate",
+                          "subscriptions",
+                          "",
+                          "btn",
+                          "link",
+                        ),
+                      )
+                    : h(
+                        "p",
+                        {},
+                        "Keine Release-Subscription zugeordnet. Die Registry-Verbindung wird anhand von Host und Repository ausgewählt.",
+                      ),
+                  button(
+                    "Registries öffnen",
+                    "navigate",
+                    "registries",
+                    "",
+                    "btn",
+                    "cube",
+                  ),
+                )
+              : vm.containerTab === "permissions"
+                ? h(
+                    "section",
+                    {},
+                    h("h3", {}, "Wirksame Ausführungsrechte"),
+                    h(
+                      "p",
+                      {},
+                      "Verwaltungslabel: " +
+                        (c.managed ? "cuo.managed=true" : "fehlt"),
+                    ),
+                    h(
+                      "p",
+                      {},
+                      "Update-Modus: " + (modeLabel[c.mode] || c.mode),
+                    ),
+                    h(
+                      "p",
+                      { class: "callout small" },
+                      "Zusätzlicher Host-Monitoring-Zugriff benötigt eine ausdrückliche containerbezogene Richtlinie. Privilegierte Host-Aktionen und schreibende System-Mounts bleiben gesperrt.",
+                    ),
+                    button(
+                      "Richtlinie & Freigabe bearbeiten",
+                      "policy",
+                      "",
+                      c.id,
+                      "btn",
+                      "shield",
+                    ),
+                  )
+                : h(
+                    "div",
+                    { class: "detail-grid" },
+                    [
+                      ["Image", c.image],
+                      ["Plattform", c.platform],
+                      ["Status", c.state],
+                      ["Gruppe", c.group],
+                      ["Richtlinie", modeLabel[c.mode]],
+                      [
+                        "Verwaltet",
+                        c.managed ? "Ja" : "Nein – cuo.managed=true benötigt",
+                      ],
+                      [
+                        "Compose",
+                        c.compose
+                          ? "Ja – registriertes Projekt benötigt"
+                          : "Nein",
+                      ],
+                      [
+                        "Update-Digest",
+                        c.candidate?.targetDigest || "Kein Update bekannt",
+                      ],
+                      ["Hinweis", c.candidate?.error || c.reason || "–"],
+                    ].map(([a, b]) =>
+                      h(
+                        "div",
+                        {},
+                        h("small", { class: "muted" }, a),
+                        h("p", { class: "break" }, b),
+                      ),
+                    ),
+                  ),
             h(
               "div",
               { class: "dialog-actions" },
@@ -410,6 +530,52 @@ export class XApprovalDialog extends Widget {
             "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
           ),
           h(
+            "fieldset",
+            { class: "execution-permissions" },
+            h("legend", {}, "Erweiterte Ausführungsfreigaben"),
+            h(
+              "p",
+              { class: "callout small", role: "note" },
+              "Achtung: Monitoring-Mounts geben dem Container Einblick in Host-Prozesse und Systeminformationen. Die Freigabe gilt dauerhaft für Updates dieses Containers, einschließlich automatischer Läufe. Nur für vertrauenswürdige Images aktivieren. Volumes und Anwendungsdaten werden bei einem Fehler nicht automatisch zurückgesetzt.",
+            ),
+            h(
+              "label",
+              { class: "checkbox" },
+              h("input", {
+                type: "checkbox",
+                name: "readOnlyHostMonitoring",
+                checked: selected.permissions?.readOnlyHostMonitoring,
+                disabled: !can(vm, "execution.monitoring.grant"),
+              }),
+              "Bestehende lesende Host-Mounts für Monitoring zulassen",
+            ),
+            h(
+              "p",
+              { class: "muted small" },
+              "Nur für eine Container-Richtlinie. Quelle, Ziel und Readonly-Status werden erhalten. Schreibende System-Mounts und Docker-Sockets benötigen einen eigenen, derzeit nicht unterstützten Freigabetyp. Die Änderung benötigt die Fähigkeit „Lesenden Host-Monitoring-Zugriff freigeben“.",
+            ),
+            field(
+              "Freigabegrund",
+              "permissionReason",
+              selected.permissionReason || "",
+              "text",
+              {
+                maxlength: 500,
+                disabled: !can(vm, "execution.monitoring.grant"),
+              },
+            ),
+            h(
+              "label",
+              { class: "checkbox" },
+              h("input", {
+                type: "checkbox",
+                name: "permissionsConfirmed",
+                disabled: !can(vm, "execution.monitoring.grant"),
+              }),
+              "Ich habe die Auswirkungen geprüft und bestätige den Host-Zugriff.",
+            ),
+          ),
+          h(
             "button",
             { class: "btn primary", type: "submit" },
             "Richtlinie speichern",
@@ -419,7 +585,7 @@ export class XApprovalDialog extends Widget {
     } else if (kind === "run") {
       title = "Update-Lauf starten";
       const candidates = executableCandidates(vm);
-      const canRunAll = ["Owner", "Administrator"].includes(vm.user?.role);
+      const canRunAll = can(vm, "updates.approve");
       body = [
         h(
           "form",
@@ -567,6 +733,38 @@ export class XApprovalDialog extends Widget {
       delete data.id;
       data.excluded = bool(data.excluded);
       data.concurrency = Number(data.concurrency);
+      const previous = (this.vm.policies || []).find((p) => p.id === id);
+      if (can(this.vm, "execution.monitoring.grant")) {
+        const enabled = bool(data.readOnlyHostMonitoring);
+        const confirmation = form.elements.namedItem("permissionsConfirmed");
+        const reason = form.elements.namedItem("permissionReason");
+        confirmation.setCustomValidity("");
+        reason.setCustomValidity("");
+        if (enabled && !bool(data.permissionsConfirmed)) {
+          confirmation.setCustomValidity(
+            "Bestätige zuerst den Warnhinweis zum Host-Zugriff.",
+          );
+          confirmation.reportValidity();
+          return;
+        }
+        if (enabled && String(data.permissionReason || "").trim().length < 3) {
+          reason.setCustomValidity(
+            "Bitte gib einen Freigabegrund mit mindestens drei Zeichen an.",
+          );
+          reason.reportValidity();
+          return;
+        }
+        data.permissions = { readOnlyHostMonitoring: enabled };
+        data.permissionsConfirmed = enabled && bool(data.permissionsConfirmed);
+        data.permissionReason = enabled
+          ? String(data.permissionReason).trim()
+          : "";
+      } else {
+        data.permissions = previous?.permissions || {};
+        data.permissionReason = previous?.permissionReason || "";
+        data.permissionsConfirmed = previous?.permissionsConfirmed || false;
+      }
+      delete data.readOnlyHostMonitoring;
     }
     if (["execute", "approveJob", "cancelJob"].includes(kind)) {
       data.confirmed = bool(data.confirmed);
@@ -677,7 +875,7 @@ export class XCUOWorkspace extends Widget {
               "article",
               {},
               h("h3", {}, "Lokale Installation"),
-              h("p", {}, "CUO 0.1.0 · Go Core · XTend Maraca / RMT"),
+              h("p", {}, "CUO 0.2.0 · Go Core · XTend Maraca / RMT"),
               h(
                 "p",
                 { class: "muted" },

@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"crypto/subtle"
+	"cuo.local/cuo/internal/integrations"
 	"database/sql"
 	"encoding/hex"
 	"encoding/json"
@@ -52,9 +53,24 @@ func Run() error {
 		return errors.New("CUO_CORE_TOKEN must have at least 32 characters")
 	}
 	engine := NewEngine(s)
+	keyFile := os.Getenv("CUO_INTEGRATION_KEY_FILE")
+	if keyFile == "" {
+		keyFile = "/run/secrets/cuo-integration-key"
+	}
+	engine.Vault, e = integrations.OpenVault(s.DB, keyFile)
+	if e != nil {
+		return e
+	}
+	if e = engine.migrateRegistries(); e != nil {
+		return e
+	}
+	if e = engine.provisionZotConnection(); e != nil {
+		return e
+	}
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go engine.Worker(ctx)
+	go engine.IntegrationWorker(ctx)
 	go func() {
 		_, _ = engine.Discover(ctx)
 		interval, err := time.ParseDuration(os.Getenv("CUO_SCAN_INTERVAL"))
@@ -91,11 +107,15 @@ func fail(w http.ResponseWriter, status int, code, msg string) {
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/health" {
-		respond(w, 200, map[string]any{"ok": true, "version": "0.1.0"})
+		respond(w, 200, map[string]any{"ok": true, "version": "0.2.0"})
 		return
 	}
 	if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+s.Token)) != 1 {
 		fail(w, 401, "UNAUTHENTICATED", "Internal authentication required")
+		return
+	}
+	if strings.HasPrefix(r.URL.Path, "/internal/github/") {
+		s.githubInternal(w, r)
 		return
 	}
 	p := Principal{ID: r.Header.Get("X-CUO-Actor"), Role: r.Header.Get("X-CUO-Role"), Hosts: strings.Split(r.Header.Get("X-CUO-Hosts"), ",")}
@@ -107,20 +127,21 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		fail(w, 403, "HOST_FORBIDDEN", "Host access denied")
 		return
 	}
+	capability := capabilityFor(r.URL.Path, r.Method)
+	if capability != "" && !s.Engine.Store.Allows(p, capability) {
+		fail(w, 403, "CAPABILITY_REQUIRED", "Berechtigung fehlt: "+capability)
+		return
+	}
 	if r.Method == "GET" {
+		if integrationPath(r.URL.Path) {
+			s.integrationGet(w, r, p)
+			return
+		}
 		s.get(w, r, p)
 		return
 	}
 	if r.Method != "POST" && r.Method != "PUT" {
 		fail(w, 405, "METHOD_NOT_ALLOWED", "Method not supported")
-		return
-	}
-	minimum := "Operator"
-	if strings.Contains(r.URL.Path, "/policies/") || strings.Contains(r.URL.Path, "/maintenance-windows") || r.URL.Path == "/api/v1/update-runs" {
-		minimum = "Administrator"
-	}
-	if !p.Can(minimum) {
-		fail(w, 403, "FORBIDDEN", minimum+" role required")
 		return
 	}
 	key := r.Header.Get("Idempotency-Key")
@@ -291,6 +312,9 @@ func decode(body []byte, v any) error {
 	return nil
 }
 func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any) {
+	if integrationPath(path) {
+		return s.integrationMutate(path, method, body, p)
+	}
 	store := s.Engine.Store
 	bad := func(code, msg string) (int, any) { return 422, map[string]any{"code": code, "message": msg} }
 	switch {
@@ -361,7 +385,7 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 		if parts[1] != "approve" || j.State != "pending_approval" {
 			return bad("INVALID_STATE", "Job is not awaiting approval")
 		}
-		if !p.Can("Administrator") {
+		if !store.Allows(p, "updates.approve") {
 			return 403, map[string]string{"code": "FORBIDDEN", "message": "Administrator role required for approval"}
 		}
 		var input struct {
@@ -385,8 +409,23 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 			return bad("INVALID_INPUT", "Invalid policy")
 		}
 		policy.ID = strings.TrimPrefix(path, "/api/v1/policies/")
+		var previous Policy
+		_ = store.Get("policy", policy.ID, &previous)
+		permissionChanged := policy.Permissions != previous.Permissions || policy.PermissionReason != previous.PermissionReason
+		if previous.Permissions.ReadOnlyHostMonitoring || policy.Permissions.ReadOnlyHostMonitoring {
+			permissionChanged = permissionChanged || previous.Scope != policy.Scope || previous.Target != policy.Target
+		}
+		if permissionChanged && !store.Allows(p, "execution.monitoring.grant") {
+			return 403, map[string]string{"code": "CAPABILITY_REQUIRED", "message": "Ausführungsfreigaben benötigen eine gesonderte Rollenberechtigung"}
+		}
 		if e := ValidatePolicy(policy); e != nil {
 			return bad("INVALID_POLICY", e.Error())
+		}
+		if policy.Permissions.ReadOnlyHostMonitoring {
+			var container Container
+			if store.Get("container", policy.Target, &container) != nil || !p.Host(container.HostID) {
+				return bad("INVALID_CONTAINER", "Die Ausführungsfreigabe benötigt einen vorhandenen, zugänglichen Container")
+			}
 		}
 		if policy.WindowID != "" {
 			var w Window
@@ -399,10 +438,9 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 				return bad("POLICY_CONFLICT", "Für diesen Geltungsbereich existiert bereits eine Richtlinie")
 			}
 		}
-		if e := store.Put("policy", policy.ID, policy); e != nil {
+		if e := store.SavePolicy(policy, p.ID, permissionChanged); e != nil {
 			return bad("STORE_ERROR", e.Error())
 		}
-		_ = store.Event(Event{Actor: p.ID, Operation: "policy.save", Stage: "saved", Severity: "info", Message: "Richtlinie " + policy.ID + " aktualisiert"})
 		var containers []Container
 		_ = store.List("container", &containers)
 		for _, c := range containers {
@@ -460,6 +498,9 @@ func (s *Server) events(w http.ResponseWriter, r *http.Request, p Principal) {
 	io.WriteString(w, ": connected\n\n")
 	flusher.Flush()
 	for {
+		if !s.Engine.Store.Allows(p, "inventory.read") {
+			return
+		}
 		items, e := s.Engine.Store.Events(after, p)
 		if e != nil {
 			return

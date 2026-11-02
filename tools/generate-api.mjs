@@ -2,7 +2,9 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 // The Go domain structs are the schema source; no registry or network needed.
-const source = fs.readFileSync("internal/core/model.go", "utf8"),
+const source = ["internal/core/model.go", "internal/core/integration_models.go"]
+    .map((file) => fs.readFileSync(file, "utf8"))
+    .join("\n"),
   schemas = {};
 function schema(type) {
   if (type.startsWith("*")) return schema(type.slice(1));
@@ -73,6 +75,35 @@ for (const name of ["Policy", "Window"]) {
     ),
   };
 }
+schemas.RegistryImportRequest = {
+  ...schemas.Approval,
+  properties: {
+    ...schemas.Approval.properties,
+    ...Object.fromEntries(
+      [
+        "sourceRegistryId",
+        "repository",
+        "digest",
+        "destinationRegistryId",
+        "destinationRepository",
+      ].map((k) => [k, { type: "string" }]),
+    ),
+  },
+  required: [
+    "sourceRegistryId",
+    "repository",
+    "digest",
+    "destinationRegistryId",
+    "destinationRepository",
+    "reason",
+    "confirmed",
+  ],
+};
+schemas.GitHubSetupRequest = {
+  type: "object",
+  properties: { organization: { type: "string" } },
+  additionalProperties: false,
+};
 const paths = {};
 function endpoint(
   path,
@@ -86,11 +117,15 @@ function endpoint(
   const responses = {};
   const status =
     method === "post"
-      ? path.endsWith("scans")
+      ? path.endsWith("scans") || path.endsWith("/sync")
         ? "202"
         : path.endsWith("approve") || path.endsWith("cancel")
           ? "200"
-          : "201"
+          : path === "/api/v1/update-jobs" || path === "/api/v1/update-runs"
+            ? "201"
+            : path === "/api/v1/import-jobs"
+              ? "202"
+              : "200"
       : "200";
   const result = collection
     ? {
@@ -278,6 +313,196 @@ endpoint(
   "Viewer",
   true,
 );
+endpoint(
+  "/api/v1/registries",
+  "get",
+  "registries",
+  "RegistryConnection",
+  undefined,
+  "Viewer",
+  true,
+);
+endpoint(
+  "/api/v1/registries",
+  "post",
+  "createRegistry",
+  "RegistryConnection",
+  "RegistryRequest",
+  "Owner",
+);
+endpoint("/api/v1/registries/{id}", "get", "registry", "RegistryConnection");
+endpoint(
+  "/api/v1/registries/{id}",
+  "put",
+  "saveRegistry",
+  "RegistryConnection",
+  "RegistryRequest",
+  "Owner",
+);
+endpoint(
+  "/api/v1/registries/{id}/probe",
+  "post",
+  "probeRegistry",
+  "RegistryConnection",
+  undefined,
+  "Operator",
+);
+for (const name of [
+  "repositories",
+  "tags",
+  "artifact",
+  "storage",
+  "retention-preview",
+])
+  endpoint(
+    `/api/v1/registries/{id}/${name}`,
+    "get",
+    "registry" + name.replace(/-([a-z])/g, (_, c) => c.toUpperCase()),
+    undefined,
+  );
+endpoint(
+  "/api/v1/integrations/github",
+  "get",
+  "githubConnections",
+  "GitHubConnection",
+  undefined,
+  "Owner",
+  true,
+);
+endpoint(
+  "/api/v1/integrations/github",
+  "post",
+  "createGitHub",
+  "GitHubConnection",
+  "GitHubRequest",
+  "Owner",
+);
+endpoint(
+  "/api/v1/integrations/github/{id}",
+  "put",
+  "saveGitHub",
+  "GitHubConnection",
+  "GitHubRequest",
+  "Owner",
+);
+for (const name of ["setup", "install", "probe"])
+  endpoint(
+    `/api/v1/integrations/github/{id}/${name}`,
+    "post",
+    "github" + name,
+    undefined,
+    name === "setup" ? "GitHubSetupRequest" : undefined,
+    "Owner",
+  );
+for (const name of ["installations", "repositories", "workflows", "runs"])
+  endpoint(
+    `/api/v1/integrations/github/{id}/${name}`,
+    "get",
+    "github" + name,
+    undefined,
+    undefined,
+    "Owner",
+  );
+endpoint(
+  "/api/v1/subscriptions",
+  "get",
+  "subscriptions",
+  "Subscription",
+  undefined,
+  "Administrator",
+  true,
+);
+endpoint(
+  "/api/v1/subscriptions",
+  "post",
+  "createSubscription",
+  "Subscription",
+  "Subscription",
+  "Administrator",
+);
+endpoint(
+  "/api/v1/subscriptions/{id}",
+  "put",
+  "saveSubscription",
+  "Subscription",
+  "Subscription",
+  "Administrator",
+);
+endpoint(
+  "/api/v1/subscriptions/{id}/sync",
+  "post",
+  "syncSubscription",
+  undefined,
+  undefined,
+  "Administrator",
+);
+endpoint(
+  "/api/v1/webhook-deliveries",
+  "get",
+  "webhookDeliveries",
+  "WebhookDelivery",
+  undefined,
+  "Administrator",
+  true,
+);
+endpoint(
+  "/api/v1/webhook-deliveries/{id}/retry",
+  "post",
+  "retryDelivery",
+  "WebhookDelivery",
+  undefined,
+  "Administrator",
+);
+endpoint(
+  "/api/v1/release-sets",
+  "get",
+  "releaseSets",
+  "ReleaseSet",
+  undefined,
+  "Administrator",
+  true,
+);
+endpoint(
+  "/api/v1/import-jobs",
+  "get",
+  "importJobs",
+  "ImportJob",
+  undefined,
+  "Viewer",
+  true,
+);
+endpoint(
+  "/api/v1/import-jobs",
+  "post",
+  "createImport",
+  "ImportJob",
+  "RegistryImportRequest",
+  "Owner",
+);
+endpoint(
+  "/api/v1/permission-policy",
+  "get",
+  "permissionPolicy",
+  undefined,
+  undefined,
+  "Owner",
+);
+endpoint(
+  "/api/v1/permission-policy",
+  "put",
+  "savePermissionPolicy",
+  "PermissionPolicy",
+  "PermissionPolicy",
+  "Owner",
+);
+endpoint("/api/v1/permissions/me", "get", "myCapabilities", undefined);
+for (const schema of Object.values(schemas))
+  for (const [name, property] of Object.entries(schema.properties || {})) {
+    if (
+      ["password", "pushPassword", "privateKey", "webhookSecret"].includes(name)
+    )
+      property.writeOnly = true;
+  }
 paths["/api/v1/events"] = {
   get: {
     operationId: "events",
@@ -295,11 +520,48 @@ paths["/api/v1/events"] = {
     },
   },
 };
+for (const [path, methods] of Object.entries(paths))
+  for (const [method, op] of Object.entries(methods)) {
+    let cap = "inventory.read";
+    if (path.includes("permissions/me")) cap = "authenticated";
+    else if (path.includes("permission-policy")) cap = "roles.manage";
+    else if (path.includes("registries"))
+      cap =
+        method === "get"
+          ? "registry.read"
+          : path.endsWith("/probe")
+            ? "registry.scan"
+            : "registry.manage";
+    else if (path.includes("import-jobs"))
+      cap = method === "get" ? "registry.read" : "registry.import";
+    else if (path.includes("integrations/github"))
+      cap =
+        method === "get" && !path.endsWith("/installations")
+          ? "webhook.read"
+          : "github.manage";
+    else if (path.includes("webhook-deliveries"))
+      cap = method === "get" ? "webhook.read" : "webhook.retry";
+    else if (path.includes("release-sets")) cap = "webhook.read";
+    else if (path.includes("subscriptions"))
+      cap = method === "get" ? "webhook.read" : "subscriptions.manage";
+    else if (method !== "get")
+      cap =
+        path.includes("policies") || path.includes("maintenance-windows")
+          ? "policies.manage"
+          : path.endsWith("scans")
+            ? "updates.scan"
+            : path.includes("update-runs") || path.endsWith("approve")
+              ? "updates.approve"
+              : "updates.request";
+    op["x-cuo-capability"] = cap;
+    op.description =
+      "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only.";
+  }
 const spec = {
   openapi: "3.1.0",
   info: {
     title: "CUO API",
-    version: "0.1.0",
+    version: "0.2.0",
     description:
       "Same-origin BFF API. Browser authenticates with HttpOnly session cookie and CSRF. Core is internal and requires a service bearer token plus server-supplied principal headers. Only host local is supported.",
   },

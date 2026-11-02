@@ -33,6 +33,29 @@ run(
 );
 run(["tools/harden-runtime.mjs"]);
 fs.cpSync("assets", "dist/assets", { recursive: true });
+// Reuse compiler-validated RMT motion records in the custom shell decoration.
+// The component does not invent a second set of animation timings/keyframes.
+const motion = JSON.parse(fs.readFileSync("reports/maraca-plan.json", "utf8"))
+  .orchestration.artifact.animationEngine;
+const sidebarAnimations = motion.animations.filter((record) =>
+  record.id.startsWith("cuo.sidebar."),
+);
+if (
+  sidebarAnimations.length !== 4 ||
+  sidebarAnimations.some(
+    (record) =>
+      record.reducedMotion !== "instant" || record.keyframes.length !== 2,
+  )
+)
+  throw Error("Missing or unsafe compiled RMT sidebar motion presets");
+fs.writeFileSync(
+  "dist/assets/sidebar-motion.json",
+  JSON.stringify({
+    schema: motion.schema,
+    animations: sidebarAnimations.map(({ sourceRef, ...record }) => record),
+    transitions: [],
+  }) + "\n",
+);
 function publicModes(directory) {
   for (const entry of fs.readdirSync(directory, { withFileTypes: true })) {
     const file = directory + "/" + entry.name;
@@ -45,7 +68,7 @@ function publicModes(directory) {
 publicModes("dist/assets");
 fs.writeFileSync(
   "dist/boot.mjs",
-  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),lazyStrategy:'eager'});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
+  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),lazyStrategy:'eager',actionHistoryLimit:10,commandHistoryLimit:10,stateProjectionWriteHistoryLimit:0,stateProjectionReadHistoryLimit:20,diagnosticLimit:100});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
 );
 let html = fs
   .readFileSync("dist/index.html", "utf8")

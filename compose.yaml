@@ -1,7 +1,7 @@
 name: cuo
 services:
   console:
-    image: cuo-console:0.1.0
+    image: cuo-console:0.2.0
     build:
       context: .
       dockerfile: console/Dockerfile
@@ -28,7 +28,7 @@ services:
       timeout: 5s
       retries: 5
   core:
-    image: cuo-core:0.1.0
+    image: cuo-core:0.2.0
     build:
       context: .
       target: core
@@ -37,8 +37,20 @@ services:
       CUO_AGENT_TOKEN: ${CUO_AGENT_TOKEN:?Run ./tools/install.sh first}
       CUO_AGENT_URL: http://agent:8092
       CUO_SCAN_INTERVAL: ${CUO_SCAN_INTERVAL:-6h}
+      CUO_ORIGIN: ${CUO_ORIGIN:-http://127.0.0.1:8095}
+      CUO_REGISTRIES: ${CUO_REGISTRIES:-}
+      CUO_INTEGRATION_KEY_FILE: /run/secrets/cuo-integration-key
+      CUO_ZOT_ENABLED: ${CUO_ZOT_ENABLED:-0}
+      CUO_ZOT_HOST: ${CUO_ZOT_HOST:-localhost:5055}
+      CUO_ZOT_INTERNAL_URL: http://zot:5000
+      CUO_ZOT_CREDENTIALS_FILE: /run/secrets/cuo-zot-client
     volumes: ["core:/data"]
-    networks: [core, agent]
+    networks: [core, agent, registry]
+    secrets:
+      - source: integration_key
+        target: cuo-integration-key
+      - source: zot_client
+        target: cuo-zot-client
     depends_on:
       agent: {condition: service_healthy}
     restart: unless-stopped
@@ -53,13 +65,15 @@ services:
       timeout: 5s
       retries: 5
   agent:
-    image: cuo-agent:0.1.0
+    image: cuo-agent:0.2.0
     build:
       context: .
       target: agent
     environment:
       CUO_AGENT_TOKEN: ${CUO_AGENT_TOKEN}
       CUO_REGISTRIES: ${CUO_REGISTRIES:-}
+      CUO_ZOT_HOST: ${CUO_ZOT_HOST:-localhost:5055}
+      CUO_ZOT_INTERNAL_URL: http://zot:5000
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - agent:/data
@@ -76,6 +90,10 @@ services:
       interval: 15s
       timeout: 5s
       retries: 5
+  zot:
+    extends:
+      file: compose.registry.yaml
+      service: zot
 networks:
   console: {}
   core: {internal: true}
@@ -85,3 +103,9 @@ volumes:
   identity: {}
   core: {}
   agent: {}
+  zot: {}
+secrets:
+  integration_key:
+    file: ./.secrets/integration.key
+  zot_client:
+    file: ./.secrets/zot-client.json

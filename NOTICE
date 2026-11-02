@@ -8,7 +8,7 @@ The original source archive and license are retained in third_party/.
 CUO is an independent product; no official Watchtower affiliation is implied.
 
 XTend 0.9.0, konnilabs/xtend commit
-49166cbe96d91049634fbe03eb48c04edb6e70cd, Apache License 2.0.
+0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836, Apache License 2.0.
 Original license: third_party/XTend-LICENSE.
 Two unused legacy HTML materialization paths are disabled in the generated
 browser runtime by console/tools/harden-runtime.mjs, with hash evidence.

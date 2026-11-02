@@ -436,12 +436,15 @@ th[aria-sort] .sort x-icon {
 }
 .pagination {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   color: var(--cuo-muted, #5b6c91);
   font-size: 11px;
   padding-top: 5px;
 }
+
 .page-btn {
   height: 28px;
   min-height: 28px;
@@ -1428,7 +1431,7 @@ x-drawer::part(surface) {
 :host([data-toast-layer]) {
   position: fixed;
   inset: auto;
-  top: max(16px, env(safe-area-inset-top));
+  bottom: max(16px, env(safe-area-inset-bottom));
   right: max(16px, env(safe-area-inset-right));
   z-index: 2147483647;
   width: min(390px, calc(100vw - 32px));
@@ -1462,7 +1465,7 @@ x-drawer::part(surface) {
   gap: 10px;
   max-height: calc(100dvh - 32px);
   overflow: auto;
-  padding: 3px 4px 16px;
+  padding: 3px 4px 4px;
 }
 .toast-stack x-toast {
   pointer-events: auto;
@@ -1486,4 +1489,158 @@ x-drawer::part(surface) {
   height: auto;
   min-height: 320px;
   max-height: none;
+}
+.execution-permissions {
+  min-width: 0;
+  margin: 16px 0;
+  padding: 14px;
+  border: 1px solid var(--cuo-border, #e3e9f3);
+  border-radius: 10px;
+}
+.execution-permissions legend {
+  font-weight: 600;
+  padding: 0 6px;
+}
+.execution-permissions .checkbox {
+  align-items: flex-start;
+}
+.integration-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+.integration-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(270px, 100%), 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.integration-card,
+.integration-section {
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid var(--cuo-border, #dfe7f4);
+  border-radius: 12px;
+  overflow-wrap: anywhere;
+}
+.integration-section {
+  margin: 20px 0;
+}
+.integration-card h3,
+.integration-section h3 {
+  margin: 0 0 12px;
+}
+.integration-actions,
+.integration-tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+.integration-actions {
+  margin-top: 10px;
+}
+.integration-code,
+.integration-wrap {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+.integration-code {
+  font-family: ui-monospace, monospace;
+}
+.integration-empty {
+  padding: 22px 0;
+  color: var(--cuo-muted, #71809c);
+}
+.integration-facts {
+  display: grid;
+  grid-template-columns: minmax(90px, auto) minmax(0, 1fr);
+  gap: 8px 16px;
+}
+.integration-facts dt {
+  color: var(--cuo-muted, #71809c);
+}
+.integration-facts dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.integration-json {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  padding: 12px;
+  font-size: 12px;
+}
+.integration-drawer {
+  padding: 22px;
+  max-width: min(580px, 100vw);
+}
+.permission-matrix {
+  min-width: 660px;
+}
+.permission-matrix td {
+  text-align: center;
+}
+.permission-matrix input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #2e59ff;
+  cursor: pointer;
+}
+.permission-matrix input[type="checkbox"]:focus-visible {
+  outline: 3px solid #679aff;
+  outline-offset: 3px;
+}
+.permission-matrix th small,
+.integration-wrap small {
+  display: block;
+  white-space: normal;
+}
+textarea {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 10px;
+  color: inherit;
+  background: transparent;
+  border: 1px solid var(--cuo-border, #dfe7f4);
+  border-radius: 8px;
+  font: inherit;
+}
+details {
+  margin: 16px 0;
+}
+summary {
+  cursor: pointer;
+  padding: 8px 0;
+  font-weight: 600;
+}
+@media (max-width: 650px) {
+  .integration-grid {
+    grid-template-columns: 1fr;
+  }
+  .integration-facts {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* The same focus-zoom protection is needed inside custom-element shadow roots. */
+@media (max-width: 850px), (pointer: coarse) {
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+    textarea,
+    select
+  ) {
+    font-size: max(16px, 1rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-heading,
+  .table-tools,
+  .window-card .flex {
+    flex-wrap: wrap;
+  }
+  .window-card h3 {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
 }
