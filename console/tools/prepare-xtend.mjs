@@ -5,6 +5,7 @@ import crypto from "node:crypto";
 import { parseFragment } from "../.framework/node_modules/parse5/dist/index.js";
 fs.mkdirSync("vendor", { recursive: true });
 const report = [];
+const dependency = JSON.parse(fs.readFileSync("xtend.lock.json", "utf8"));
 const approved = {
   xrouter: "278058d2786497811f1d0ff1fdd0a5959d1b899583e8ff6d9fde88f3c9b298ab",
   xdrawer: "ad04b0095e0aa4e72371666a512c60c3bed269ca0ba1e5f8c53101ccf8cc9bde",
@@ -83,7 +84,7 @@ for (const name of ["xrouter", "xdrawer"]) {
   fs.writeFileSync(`vendor/${name}.mjs`, code);
   report.push({
     component: name,
-    source: `XTend 49166cbe/components/${name}.js`,
+    source: `XTend ${dependency.revision}/components/${name}.js`,
     before: crypto.createHash("sha256").update(original).digest("hex"),
     after: crypto.createHash("sha256").update(code).digest("hex"),
     adaptation: "Static DOM construction and text-only error rendering",

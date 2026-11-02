@@ -1,0 +1,97 @@
+{
+  "schema": "cuo.xtend-upgrade-evidence.v1",
+  "checkedOn": "2026-11-02",
+  "before": "49166cbe96d91049634fbe03eb48c04edb6e70cd",
+  "after": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+  "version": "0.9.0",
+  "archiveSha256": "ee61c3f213d0059d72b1346f07b9310154aceafe771b186dfc0c059e27b9eb6c",
+  "reason": "Bounded action, command, state-projection and diagnostic history from upstream PR #118. Exact commit selected from local authenticated MCP provenance.",
+  "componentReview": {
+    "xrouterSha256": "278058d2786497811f1d0ff1fdd0a5959d1b899583e8ff6d9fde88f3c9b298ab",
+    "xdrawerSha256": "ad04b0095e0aa4e72371666a512c60c3bed269ca0ba1e5f8c53101ccf8cc9bde",
+    "unchanged": true,
+    "existingDOMAdaptationsRetained": true
+  },
+  "checks": {
+    "strictMaracaBuild": "passed",
+    "typeScript": "passed",
+    "sourceAndHTMLSinkGate": "passed",
+    "consoleTests": {
+      "passed": 25,
+      "failed": 0,
+      "includes": "350-command and 350-projection bounded-history regression tests"
+    },
+    "browserIntegration": {
+      "passed": true,
+      "scope": [
+        "enrollment",
+        "XRouter",
+        "appearance",
+        "notifications",
+        "profile",
+        "OIDC fixture"
+      ]
+    },
+    "npmAuditSelectedXTendWorkspaces": {
+      "vulnerabilities": 0
+    },
+    "notices": {
+      "resources": 17,
+      "passed": true
+    }
+  },
+  "images": [
+    {
+      "service": "core",
+      "imageId": "sha256:1ec80e5c171cdd7d1d8abbfaa7fd22cea992d3bd4f2d6cb9917a77e19d81c5da",
+      "counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "passed": true
+    },
+    {
+      "service": "agent",
+      "imageId": "sha256:2b879f177fef905b8abcf5ec6dd2bd6a9eb8c4b8822285422dc93b535da1f294",
+      "counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 3
+      },
+      "passed": true
+    },
+    {
+      "service": "console",
+      "imageId": "sha256:242af95e64584d8abbc093ad6876f140c71f7f326f911158ad884a5f6150b198",
+      "counts": {
+        "CRITICAL": 0,
+        "HIGH": 0,
+        "MEDIUM": 0,
+        "LOW": 0,
+        "UNKNOWN": 0
+      },
+      "passed": true
+    }
+  ],
+  "installedLocally": {
+    "consoleImageId": "sha256:242af95e64584d8abbc093ad6876f140c71f7f326f911158ad884a5f6150b198",
+    "maracaPlanRuntimeSha256": "38d1ccffe5ceca4be74892385adfcaa6c282655a4e73806da5d3c3b1e9c6b02c",
+    "installedRuntimeMatchesDependency": true,
+    "allServicesHealthy": true,
+    "coreAndAgentRecreated": false
+  },
+  "notPerformed": [
+    "production deployment",
+    "GitHub push or PR",
+    "UniOCI/Zot/GitHub feature implementation"
+  ],
+  "limitations": [
+    "These are local working-tree build checks, not a signed release attestation.",
+    "Three pre-existing UNKNOWN Agent module findings remain visible; no HIGH or CRITICAL findings."
+  ]
+}
