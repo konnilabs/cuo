@@ -9,6 +9,14 @@ registerIconPack({
   id: "cuo",
   label: "CUO local interface icons",
   icons: {
+    "sidebar-triangle": {
+      nodes: [
+        {
+          tag: "path",
+          attrs: { d: "M15 5 7 12l8 7Z", fill: "currentColor", stroke: "none" },
+        },
+      ],
+    },
     question: {
       nodes: [c(12, 12, 9), p("M9.1 9a3 3 0 0 1 5.8 1c0 2-3 2-3 4M12 17h.01")],
     },

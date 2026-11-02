@@ -2,7 +2,8 @@
 
 These are point-in-time development records, not a stable-release certificate.
 
-- `local-0.2.0.json`: local 0.2.0 development assessment, exact image IDs, test evidence hashes and open external gates. Raw new scan/SBOM and browser artifacts stay in the protected local evidence directory named in this report.
+- `sidebar-0.2.0.json`: follow-up assessment for the animated RMT sidebar, with updated image IDs and desktop/mobile/reduced-motion browser checks.
+- `local-0.2.0.json`: initial local 0.2.0 development assessment, exact image IDs, test evidence hashes and open external gates. Raw new scan/SBOM and browser artifacts stay in the protected local evidence directory named in this report.
 - `dependency-inventory.json`: current source dependency inventory; image SBOMs are separate evidence.
 - `release-readiness.json`: historical 0.1 local release assessment, image IDs/source fingerprints and open gates.
 - `restore-test.json`: newest isolated execution of the real three-volume backup/restore tools, including login after restart. The disposable project and test archives are removed afterwards.

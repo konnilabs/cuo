@@ -43,6 +43,23 @@ function profile(vm: VM) {
     }
   );
 }
+const sidebarPreferenceKey = "cuo.sidebar.collapsed";
+function sidebarPreference(narrow: boolean) {
+  // A phone starts with its icon rail; opening it is a temporary overlay.
+  if (narrow) return true;
+  try {
+    return localStorage.getItem(sidebarPreferenceKey) === "true";
+  } catch {
+    return false;
+  }
+}
+function rememberSidebar(collapsed: boolean) {
+  try {
+    localStorage.setItem(sidebarPreferenceKey, String(collapsed));
+  } catch {
+    // Navigation remains usable when browser storage is unavailable.
+  }
+}
 async function preference(vm: VM, changes: Record<string, unknown>) {
   const data = { ...profile(vm), ...changes };
   if (vm.demo) {
@@ -66,6 +83,16 @@ function observePreferences() {
     () => {
       void window.XTendMaraca.dispatchCommand("cuo.intent", {
         kind: "systemTheme",
+      }).catch(() => {});
+    },
+    { signal: boundary.signal },
+  );
+  matchMedia("(max-width: 760px)").addEventListener(
+    "change",
+    (event) => {
+      void window.XTendMaraca.dispatchCommand("cuo.intent", {
+        kind: "sidebarViewport",
+        value: String(event.matches),
       }).catch(() => {});
     },
     { signal: boundary.signal },
@@ -197,10 +224,17 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     if (integration) vm = integration;
     else if (kind === "boot") {
       observePreferences();
+      const sidebarNarrow = matchMedia("(max-width: 760px)").matches;
+      const sidebar = {
+        sidebarNarrow,
+        sidebarCollapsed: sidebarPreference(sidebarNarrow),
+      };
+      Object.assign(vm, sidebar);
       Object.assign(vm, routeDetails(location.hash.replace(/^#/, "")));
       vm.page = currentPage();
       if (new URL(location.href).searchParams.get("demo") === "1") {
         vm = demoVM();
+        Object.assign(vm, sidebar);
         Object.assign(vm, routeDetails(location.hash.replace(/^#/, "")));
         vm.page = currentPage();
         try {
@@ -250,7 +284,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       vm.integrationQueryBusy = false;
       vm.integrationRequest = "";
       vm.page = route.page;
-      vm.mobile = false;
+      if (vm.sidebarNarrow) vm.sidebarCollapsed = true;
       vm.dialog = "";
       vm.notificationsOpen = false;
       if (!vm.demo) vm = await loadIntegrations(vm, api);
@@ -260,7 +294,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       vm.integrationQueryBusy = false;
       vm.integrationRequest = "";
       vm.page = routePage(value);
-      vm.mobile = false;
+      if (vm.sidebarNarrow) vm.sidebarCollapsed = true;
       vm.dialog = "";
       vm.notificationsOpen = false;
       if (!vm.demo) vm = await loadIntegrations(vm, api);
@@ -309,8 +343,15 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       vm.notice = "Profil gespeichert.";
     } else if (kind === "oidcLogin") {
       location.assign("/auth/oidc/start");
-    } else if (kind === "menu") vm.mobile = !vm.mobile;
-    else if (kind === "filter") {
+    } else if (kind === "sidebarToggle") {
+      vm.sidebarCollapsed = !vm.sidebarCollapsed;
+      if (!vm.sidebarNarrow) rememberSidebar(vm.sidebarCollapsed);
+    } else if (kind === "sidebarClose") {
+      vm.sidebarCollapsed = true;
+    } else if (kind === "sidebarViewport") {
+      vm.sidebarNarrow = value === "true";
+      vm.sidebarCollapsed = sidebarPreference(vm.sidebarNarrow);
+    } else if (kind === "filter") {
       vm.filter = value;
       vm.offset = 0;
     } else if (kind === "query") {

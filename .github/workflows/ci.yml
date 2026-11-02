@@ -60,6 +60,7 @@ jobs:
         run: |
           CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" node console/test/browser.mjs
           CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_EXTENSIONS_OUTPUT=reports/extensions-browser node console/test/extensions-browser.mjs
+          CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_SIDEBAR_OUTPUT=reports/sidebar-browser node console/test/sidebar-browser.mjs
           go build -o "$RUNNER_TEMP/cuo-core-test" ./cmd/cuo
           CUO_CORE_BINARY="$RUNNER_TEMP/cuo-core-test" CUO_PLAYWRIGHT_MODULE="$PWD/work/browser/node_modules/playwright/index.mjs" CUO_INTEGRATIONS_OUTPUT=reports/integrations-browser node console/test/integrations-browser.mjs
       - uses: actions/upload-artifact@v4

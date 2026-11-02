@@ -15,6 +15,7 @@
   "x-drawer": "../vendor/xdrawer.mjs",
   "x-toast": "../.framework/components/xtoast.js",
   "x-cuo-toasts": "./toasts.mjs",
+  "x-cuo-sidebar-motion": "./sidebar-motion.mjs",
   "x-cuo-notifications": "./account.mjs",
   "x-cuo-profile": "./account.mjs",
   "x-container-table": "./widgets.mjs",

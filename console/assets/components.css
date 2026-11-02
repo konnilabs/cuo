@@ -436,12 +436,15 @@ th[aria-sort] .sort x-icon {
 }
 .pagination {
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
   align-items: center;
   justify-content: space-between;
   color: var(--cuo-muted, #5b6c91);
   font-size: 11px;
   padding-top: 5px;
 }
+
 .page-btn {
   height: 28px;
   min-height: 28px;
@@ -1627,5 +1630,17 @@ summary {
     select
   ) {
     font-size: max(16px, 1rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .panel-heading,
+  .table-tools,
+  .window-card .flex {
+    flex-wrap: wrap;
+  }
+  .window-card h3 {
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 }

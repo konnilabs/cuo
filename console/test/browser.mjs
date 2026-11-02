@@ -98,7 +98,9 @@ try {
       () => document.documentElement.scrollWidth <= innerWidth,
     ),
   );
-  await mobile.getByRole("button", { name: "Menü", exact: true }).click();
+  await mobile
+    .getByRole("button", { name: "Navigation ausklappen", exact: true })
+    .click();
   await mobile
     .getByRole("button", { name: "Richtlinien", exact: true })
     .click();
@@ -107,9 +109,9 @@ try {
   );
   assert.equal(
     await mobile.evaluate(
-      () => window.XTendMaraca.model.getState("cuo.vm").mobile,
+      () => window.XTendMaraca.model.getState("cuo.vm").sidebarCollapsed,
     ),
-    false,
+    true,
   );
   await mobile.screenshot({ path: out + "/mobile.png", fullPage: true });
   await mobile.close();

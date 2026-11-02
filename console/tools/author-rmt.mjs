@@ -60,10 +60,14 @@ const nav = ([page, label, name, pack]) =>
       class: "$model.cuo.vm.nav" + page,
       "data-kind": "navigate",
       "data-value": page,
+      "aria-label": label,
+      title: label,
     },
     [
       ic(name, pack),
-      text("span", label),
+      el("span", { class: "sidebar-copy", "data-sidebar-label": true }, [], {
+        text: label,
+      }),
       ...(page === "updates"
         ? [text("span", "$model.cuo.vm.updateCount", "nav-badge")]
         : []),
@@ -71,7 +75,7 @@ const nav = ([page, label, name, pack]) =>
   );
 const sidebar = el(
   "aside",
-  { class: "sidebar", "aria-label": "Hauptnavigation" },
+  { class: "sidebar", id: "cuo-sidebar", "aria-label": "Hauptnavigation" },
   [
     el(
       "a",
@@ -85,23 +89,58 @@ const sidebar = el(
       },
       [
         el("span", { class: "brand-cube" }, [ic("logo", "cuo", "44")]),
-        el("div", {}, [
-          el("div", { class: "brand-name" }, [
-            text("strong", "CUO"),
-            text("small", "v0.2.0"),
-          ]),
-          text("p", "Container Update Orchestrator"),
+        el(
+          "div",
+          { class: "brand-copy sidebar-copy", "data-sidebar-label": true },
+          [
+            el("div", { class: "brand-name" }, [
+              text("strong", "CUO"),
+              text("small", "v0.2.0"),
+            ]),
+            text("p", "Container Update Orchestrator"),
+          ],
+        ),
+      ],
+    ),
+    el(
+      "button",
+      {
+        type: "button",
+        id: "cuo-sidebar-toggle",
+        class: "sidebar-toggle cuo-action",
+        "data-kind": "sidebarToggle",
+        "data-value": "",
+        "data-id": "",
+        "aria-label": "$model.cuo.vm.sidebarToggleLabel",
+        title: "$model.cuo.vm.sidebarToggleLabel",
+        "aria-expanded": "$model.cuo.vm.sidebarExpanded",
+        "aria-controls": "cuo-sidebar",
+      },
+      [
+        el("span", { class: "sidebar-arrow", "data-sidebar-arrow": true }, [
+          ic("sidebar-triangle", "cuo", "14"),
         ]),
       ],
     ),
-    el("nav", { class: "nav-main" }, links.map(nav)),
-    el("div", { class: "system-nav" }, [
-      text("p", "SYSTEM", "nav-label"),
-      ...[
-        ["hosts", "Hosts", "server", "lucide"],
-        ["users", "Benutzer", "users", "cuo"],
-        ["integrations", "Integrationen", "link", "cuo"],
-      ].map(nav),
+    el("div", { class: "sidebar-nav-scroll" }, [
+      el(
+        "nav",
+        { class: "nav-main", "aria-label": "Workspace" },
+        links.map(nav),
+      ),
+      el("div", { class: "system-nav" }, [
+        el(
+          "p",
+          { class: "nav-label sidebar-copy", "data-sidebar-label": true },
+          [],
+          { text: "SYSTEM" },
+        ),
+        ...[
+          ["hosts", "Hosts", "server", "lucide"],
+          ["users", "Benutzer", "users", "cuo"],
+          ["integrations", "Integrationen", "link", "cuo"],
+        ].map(nav),
+      ]),
     ]),
     el("div", { class: "core-status" }, [
       widget("x-host-health", { compact: true }),
@@ -109,7 +148,6 @@ const sidebar = el(
   ],
 );
 const topbar = el("header", { class: "topbar" }, [
-  cmd("Menü", "menu", "", "menu", "icon-btn mobile-toggle"),
   el("label", { class: "global-search" }, [
     ic("search"),
     el(
@@ -356,6 +394,15 @@ const shell = el(
         ]),
     ),
     sidebar,
+    el("button", {
+      type: "button",
+      class: "sidebar-scrim cuo-action",
+      "data-kind": "sidebarClose",
+      "data-value": "",
+      "data-id": "",
+      "aria-label": "Navigation schließen",
+      tabindex: "-1",
+    }),
     el("div", { class: "main-shell" }, [
       topbar,
       el(
@@ -406,6 +453,7 @@ const shell = el(
     ]),
     widget("x-approval-dialog"),
     widget("x-cuo-profile"),
+    widget("x-cuo-sidebar-motion", { hidden: true, "aria-hidden": true }),
   ],
 );
 const tree = {
@@ -482,6 +530,41 @@ template cuo.app {
   effect fetch datasource cuo.intent
   reduce state.cuo.vm = result.vm
  }
+${[true, false]
+  .map(
+    (collapsed) => `
+ animation cuo.sidebar.${collapsed ? "hide" : "show"} {
+  effect fade
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   opacity ${collapsed ? 1 : 0}
+   transform "translateX(${collapsed ? 0 : -8}px)"
+   offset 0
+  }
+  keyframe enter {
+   opacity ${collapsed ? 0 : 1}
+   transform "translateX(${collapsed ? -8 : 0}px)"
+   offset 1
+  }
+ }
+ animation cuo.sidebar.${collapsed ? "pointRight" : "pointLeft"} {
+  effect rotate
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   transform "rotate(${collapsed ? 0 : 180}deg)"
+   offset 0
+  }
+  keyframe enter {
+   transform "rotate(${collapsed ? 180 : 0}deg)"
+   offset 1
+  }
+ }`,
+  )
+  .join("\n")}
  resource cuo.events kind stream owner surface.cuo.shell { dispose on surface.destroy }
  portal cuo.root root "#xtend-maraca-root" layer surface
  surface cuo.shell kind region component section {
@@ -539,6 +622,7 @@ fs.writeFileSync(
       "x-drawer": "../vendor/xdrawer.mjs",
       "x-toast": "../.framework/components/xtoast.js",
       "x-cuo-toasts": "./toasts.mjs",
+      "x-cuo-sidebar-motion": "./sidebar-motion.mjs",
       "x-cuo-notifications": "./account.mjs",
       "x-cuo-profile": "./account.mjs",
       ...Object.fromEntries(

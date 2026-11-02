@@ -41,7 +41,8 @@ export function initial(): VM {
     oidc: {},
     oidcConfig: null,
     page: "dashboard",
-    mobile: false,
+    sidebarCollapsed: false,
+    sidebarNarrow: false,
     notice: "",
     toasts: [],
     error: false,
@@ -131,7 +132,11 @@ export function present(vm: VM): VM {
         .join("")
         .slice(0, 2)
         .toUpperCase() || "CU",
-    shellClass: `cuo-shell${vm.mobile ? " mobile-open" : ""}${auth ? "" : " is-hidden"}`,
+    shellClass: `cuo-shell${vm.sidebarCollapsed ? " sidebar-collapsed" : ""}${auth ? "" : " is-hidden"}`,
+    sidebarExpanded: String(!vm.sidebarCollapsed),
+    sidebarToggleLabel: vm.sidebarCollapsed
+      ? "Navigation ausklappen"
+      : "Navigation einklappen",
     authClass: auth ? "is-hidden" : "auth-wrap",
     dashboardClass: vm.page === "dashboard" ? "dashboard-grid" : "is-hidden",
     workspaceClass:

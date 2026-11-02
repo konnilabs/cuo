@@ -1,0 +1,202 @@
+{
+  "schema": "cuo.sidebar-development-assessment.v1",
+  "version": "0.2.0",
+  "createdAt": "2026-11-02T21:39:43.049117+00:00",
+  "status": "development-preview-local-only",
+  "source": {
+    "baseRevision": "9111a1c5b038317a7e731bf469355c95ebff6a2c",
+    "dirtyAtBuild": true,
+    "fingerprintSha256": "eb7a491c2acff3c30cead059d64d429730b0455dcf058afaceab8dd02090b4ec",
+    "fingerprintScope": "All tracked working-tree files except reports/. Sorted UTF-8 path, NUL, SHA-256 file bytes, NUL. Local evidence, not signed OCI provenance.",
+    "rmtSourceSha256": "43b3a6142ecee3688b8cb299a825fb2a3b116c6cf7c55286a1b29d63b7fc4064",
+    "compiledMotionSha256": "c47960570df651038a379f98157d5bf59238cbfc9f51e9cc007245b0673e1981"
+  },
+  "xtend": {
+    "mcp": {
+      "endpoint": "http://127.0.0.1:31415/mcp",
+      "tool": "xtend_knowledge_context",
+      "provenance": {
+        "commit": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+        "repository": "konnilabs/xtend",
+        "ref": "main"
+      }
+    },
+    "lockRevision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "runtime": "Native XTend RMT AnimationEngine with XUtils/WAAPI. Compiler-validated animation presets are declared in app.rmt and extracted into a small local build asset.",
+    "ownership": "Mode, responsive state, class/ARIA bindings and events belong to RMT. Registered x-cuo-sidebar-motion owns temporary animation handles only.",
+    "geometry": "CSS width/padding and content margin/width transitions use the same 260ms curve; AnimationEngine supports compositor opacity/transform rather than width keyframes.",
+    "customComponents": [
+      "x-cuo-sidebar-motion"
+    ],
+    "frameworkPatched": false
+  },
+  "behavior": {
+    "compactWidthCssPx": 76,
+    "desktopWidthsCssPx": [
+      224,
+      258
+    ],
+    "mobileExpandedWidthCssPx": 248,
+    "mobileBreakpointCssPx": 760,
+    "durationMs": 260,
+    "easing": "cubic-bezier(.22,.8,.25,1)",
+    "reducedMotion": "instant",
+    "desktopChoicePersisted": "browser localStorage; navigation remains functional if storage is unavailable",
+    "mobile": "Starts compact; expansion overlays content, closes on navigation/Escape/scrim. Navigation remains independently scrollable.",
+    "a11y": "Named toggle, aria-expanded/controls, icon buttons retain accessible names and native title hints, keyboard focus retained. No full WCAG certification."
+  },
+  "checks": [
+    {
+      "file": "cuo-sidebar-build.log",
+      "sha256": "0c26fba8d177475cdd2ffed38137a934db70b7633e8cb95fceea2491c8b4c4f4",
+      "passed": true,
+      "scope": "TypeScript, source gate, RMT lint and strict Maraca build"
+    },
+    {
+      "file": "cuo-sidebar-unit.log",
+      "sha256": "bfac0cb22d8c8dc6f8dc64cec0ec23781569e53a5709803b14c98eb6e9a532ca",
+      "passed": true,
+      "scope": "28 console tests"
+    },
+    {
+      "file": "cuo-sidebar-browser/result.json",
+      "sha256": "32ce61afbd8202876c2204ec4c8d3684c487767727608da7709924d7079aab9d",
+      "passed": true,
+      "scope": "Dedicated RMT/AnimationEngine/browser checks"
+    },
+    {
+      "file": "cuo-sidebar-extensions/verification.json",
+      "sha256": "f857f0e41d38e87614ed378b058b13fa4bda28d81da2d32babb25025eca72991",
+      "passed": true,
+      "scope": "Existing OIDC/router/profile/notifications/theme/toast/log checks"
+    },
+    {
+      "file": "cuo-sidebar-deployed.json",
+      "sha256": "d7c22cc50df627f5c9de9c4eb92cfcd39c2f09f146cd50c079acd2fa64ff52ce",
+      "passed": true,
+      "scope": "Read-only demo smoke against the installed local Docker Console"
+    },
+    {
+      "file": "cuo-sidebar-image-checks/manifest.json",
+      "sha256": "ccee8a3dbb36cb7b4af87acd93acdbd109881a2d6f2ea7c59f6b282612da78c7",
+      "passed": true,
+      "scope": "Trivy/Syft evidence for exact current image bytes"
+    }
+  ],
+  "browserChecks": [
+    "RMT toggle, keyboard/focus, icon-only accessible names, route and reload persistence",
+    "Native XTend AnimationEngine/WAAPI, AOT RMT presets, intermediate widths and synchronized content movement",
+    "Rapid reversal replaces active motion and releases native animation handles; dark mode",
+    "Real prefers-reduced-motion disables movement while preserving both states",
+    "390/320px reflow, mobile icon rail, overlay, Escape, route auto-close and responsive desktop restoration"
+  ],
+  "animationEvidence": {
+    "intermediateFrames": 7,
+    "synchronizedContent": true,
+    "browserErrors": []
+  },
+  "deployed": {
+    "passed": true,
+    "origin": "http://127.0.0.1:8095",
+    "helper": {
+      "display": "none",
+      "width": 0,
+      "height": 0
+    },
+    "mobile": {
+      "width": 320,
+      "scroll": 320,
+      "collapsed": true
+    },
+    "browserErrors": []
+  },
+  "imageEvidence": {
+    "schema": "cuo.image-checks.v1",
+    "createdAt": "2026-11-02T21:38:31.488Z",
+    "revision": "9111a1c5b038317a7e731bf469355c95ebff6a2c",
+    "dirty": true,
+    "platform": "linux/x86_64",
+    "tools": {
+      "trivy": "Version: 0.76.1\nVulnerability DB:\n  Version: 2\n  UpdatedAt: 2026-11-02 19:15:11.074748541 +0000 UTC\n  NextUpdate: 2026-11-03 19:15:11.074748061 +0000 UTC\n  DownloadedAt: 2026-11-02 19:41:24.614756975 +0000 UTC",
+      "syft": "Application:   syft\nVersion:       1.55.0\nBuildDate:     2026-10-19T18:54:46Z\nGitCommit:     f15c3343e29dfb20cf6d82c820e7090b49808c96\nGitDescription: v1.55.0\nPlatform:      linux/amd64\nGoVersion:     go1.26.8\nCompiler:      gc\nSchemaVersion: 16.1.11"
+    },
+    "services": [
+      {
+        "service": "core",
+        "imageId": "sha256:7e98d5036292071c5cf1a9cd3581871b7113545f5271e06a345b12d405f72b79",
+        "archiveSha256": "sha256:9dbf0d376d41af27c891b2c5a59286c74edbf807493e8c0a44648c682c56351e",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 1
+        },
+        "sbomComponents": 843,
+        "scanSha256": "sha256:9d3351d386a7e2ee0a5c0326e946d92c698aae6ba3962cc4efa04c659686a3bb",
+        "sbomSha256": "sha256:57587f3a807462d41cc283db661376fd23eb6c820316c7a7bc9fd70928b1d430",
+        "archiveRetained": false
+      },
+      {
+        "service": "agent",
+        "imageId": "sha256:c81f6e22b13eaf652a9fcadbaa831bddcfc4318569242fa69963d133bf2184db",
+        "archiveSha256": "sha256:d00d617305d485af23231a51238de89f70b7aed4543b79a0a1a1ae07229faece",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 4
+        },
+        "sbomComponents": 1097,
+        "scanSha256": "sha256:c3ead30ddeb01dc31f68d4a176292162e80582cc64a36e6ee201548ec8d5dda6",
+        "sbomSha256": "sha256:7f540182ac92bd7b8c0a9023cf043165323bb2ae0503da74db3bc0215720c42b",
+        "archiveRetained": false
+      },
+      {
+        "service": "console",
+        "imageId": "sha256:a547bc557ffeeb141bbc6c10dcaff83f1133e4b33030cbeae998951f82ef3b0c",
+        "archiveSha256": "sha256:fc65bf5dce55b474825e2400566385d26f967d2b27a05403e0f410bbfd727f51",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 0,
+          "LOW": 0,
+          "UNKNOWN": 0
+        },
+        "sbomComponents": 114,
+        "scanSha256": "sha256:d3cd4cec967f2034abfde6d55fa87cc44fb5cae5ef3058802875f8beac967a43",
+        "sbomSha256": "sha256:1f2b545d6b7fa6ae6982d0d6a02c791b26d4c1dbf272404f4720e0f21c40ee97",
+        "archiveRetained": false
+      },
+      {
+        "service": "zot",
+        "imageId": "sha256:be279845926de82a0e3c1421ae4a032eda4792745327d71de3632fd126662b25",
+        "archiveSha256": "sha256:2ed2a71f960c7df2c6301134b669e73334e343078b4669449f851d430d964edd",
+        "passed": true,
+        "counts": {
+          "CRITICAL": 0,
+          "HIGH": 0,
+          "MEDIUM": 14,
+          "LOW": 8,
+          "UNKNOWN": 3
+        },
+        "sbomComponents": 1716,
+        "scanSha256": "sha256:94bc6e9acb9974fd5068dd43780c7b1e5023ac5cf0701f57b6efc57f8ffe0909",
+        "sbomSha256": "sha256:1a68b13bc20491b3b82bf2388448a57ec0fb9eed599853332d56d600b91b6546",
+        "archiveRetained": false
+      }
+    ],
+    "passed": true,
+    "completedAt": "2026-11-02T21:38:58.426Z"
+  },
+  "allServicesHealthy": true,
+  "scopeLimits": [
+    "Local Docker Console updated; no GitHub push or production deployment in this task.",
+    "Physical iOS Safari was not tested.",
+    "The external GitHub/signature/provenance and full A11y gates from local-0.2.0.json remain open."
+  ]
+}

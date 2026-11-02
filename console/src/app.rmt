@@ -67,7 +67,8 @@ template cuo.app {
     }
     oidcConfig null
     page "dashboard"
-    mobile false
+    sidebarCollapsed false
+    sidebarNarrow false
     notice ""
     toasts [
 
@@ -136,6 +137,8 @@ template cuo.app {
     systemDetail "0 Fehler · 0 ausstehende Jobs"
     userInitials "CU"
     shellClass "cuo-shell is-hidden"
+    sidebarExpanded "true"
+    sidebarToggleLabel "Navigation einklappen"
     authClass "auth-wrap"
     dashboardClass "dashboard-grid"
     workspaceClass "is-hidden"
@@ -180,7 +183,7 @@ template cuo.app {
     routesubscriptions "is-hidden"
     navpermissions "nav-item cuo-action"
     routepermissions "is-hidden"
-    serialized "{\"capabilities\":[],\"registries\":[],\"githubConnections\":[],\"subscriptions\":[],\"webhookDeliveries\":[],\"releaseSets\":[],\"importJobs\":[],\"registryRepositories\":[],\"registryTags\":[],\"githubInstallations\":[],\"githubCatalog\":{},\"permissionMatrix\":null,\"registryId\":\"\",\"githubId\":\"\",\"routePath\":\"/dashboard\",\"registryEditor\":\"\",\"githubEditorId\":\"\",\"subscriptionEditorId\":\"\",\"subscriptionTargetCount\":1,\"repository\":\"\",\"artifactReference\":\"latest\",\"artifact\":null,\"artifactOpen\":false,\"integrationBusy\":false,\"integrationQueryBusy\":false,\"integrationQueryError\":\"\",\"integrationRequest\":\"\",\"integrationOperation\":\"\",\"registryStorage\":null,\"retentionPreview\":null,\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"containerTab\":\"overview\",\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"mobile\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"sortDirection\":\"asc\",\"historySort\":\"createdAt\",\"historySortDirection\":\"desc\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-02\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"themeToggleIcon\":\"moon\",\"themeToggleLabel\":\"Farbschema wechseln: Dunklen Modus aktivieren\",\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\",\"navregistries\":\"nav-item cuo-action\",\"routeregistries\":\"is-hidden\",\"navregistry\":\"nav-item cuo-action\",\"routeregistry\":\"is-hidden\",\"navrepositories\":\"nav-item cuo-action\",\"routerepositories\":\"is-hidden\",\"navgithub\":\"nav-item cuo-action\",\"routegithub\":\"is-hidden\",\"navdeliveries\":\"nav-item cuo-action\",\"routedeliveries\":\"is-hidden\",\"navsubscriptions\":\"nav-item cuo-action\",\"routesubscriptions\":\"is-hidden\",\"navpermissions\":\"nav-item cuo-action\",\"routepermissions\":\"is-hidden\"}"
+    serialized "{\"capabilities\":[],\"registries\":[],\"githubConnections\":[],\"subscriptions\":[],\"webhookDeliveries\":[],\"releaseSets\":[],\"importJobs\":[],\"registryRepositories\":[],\"registryTags\":[],\"githubInstallations\":[],\"githubCatalog\":{},\"permissionMatrix\":null,\"registryId\":\"\",\"githubId\":\"\",\"routePath\":\"/dashboard\",\"registryEditor\":\"\",\"githubEditorId\":\"\",\"subscriptionEditorId\":\"\",\"subscriptionTargetCount\":1,\"repository\":\"\",\"artifactReference\":\"latest\",\"artifact\":null,\"artifactOpen\":false,\"integrationBusy\":false,\"integrationQueryBusy\":false,\"integrationQueryError\":\"\",\"integrationRequest\":\"\",\"integrationOperation\":\"\",\"registryStorage\":null,\"retentionPreview\":null,\"auth\":\"loading\",\"theme\":\"light\",\"themeMode\":\"system\",\"notificationsOpen\":false,\"profileOpen\":false,\"containerTab\":\"overview\",\"dismissed\":[],\"oidc\":{},\"oidcConfig\":null,\"page\":\"dashboard\",\"sidebarCollapsed\":false,\"sidebarNarrow\":false,\"notice\":\"\",\"toasts\":[],\"error\":false,\"demo\":false,\"user\":{\"name\":\"\",\"role\":\"\"},\"containers\":[],\"jobs\":[],\"events\":[],\"policies\":[],\"windows\":[],\"hosts\":[],\"users\":[],\"query\":\"\",\"filter\":\"all\",\"sort\":\"name\",\"sortDirection\":\"asc\",\"historySort\":\"createdAt\",\"historySortDirection\":\"desc\",\"offset\":0,\"calendar\":\"2026-11\",\"selectedDate\":\"2026-11-02\",\"dialog\":\"\",\"selected\":\"\",\"live\":true,\"themeToggleIcon\":\"moon\",\"themeToggleLabel\":\"Farbschema wechseln: Dunklen Modus aktivieren\",\"notifications\":[],\"notificationCount\":\"0\",\"notificationClass\":\"is-hidden\",\"notificationsExpanded\":\"false\",\"profileExpanded\":\"false\",\"avatarTextClass\":\"\",\"avatarIconClass\":\"is-hidden\",\"avatarName\":\"user\",\"avatarPack\":\"cuo\",\"title\":\"Dashboard\",\"description\":\"Übersicht über deine Container, Updates und den Systemstatus.\",\"total\":\"0\",\"monitored\":\"0\",\"excludedCount\":\"0\",\"updateCount\":\"0\",\"updateHint\":\"0 Image-Änderungen verfügbar\",\"currentCount\":\"0\",\"systemTitle\":\"Alles in Ordnung\",\"systemDetail\":\"0 Fehler · 0 ausstehende Jobs\",\"userInitials\":\"CU\",\"shellClass\":\"cuo-shell is-hidden\",\"sidebarExpanded\":\"true\",\"sidebarToggleLabel\":\"Navigation einklappen\",\"authClass\":\"auth-wrap\",\"dashboardClass\":\"dashboard-grid\",\"workspaceClass\":\"is-hidden\",\"mainContentClass\":\"main-content\",\"demoClass\":\"is-hidden\",\"pageTitle\":\"Dashboard\",\"nextDate\":\"Kein Fenster geplant\",\"nextTime\":\"Wartungsfenster erstellen\",\"navdashboard\":\"nav-item cuo-action active\",\"routedashboard\":\"route-panel\",\"navcontainers\":\"nav-item cuo-action\",\"routecontainers\":\"is-hidden\",\"navupdates\":\"nav-item cuo-action\",\"routeupdates\":\"is-hidden\",\"navschedule\":\"nav-item cuo-action\",\"routeschedule\":\"is-hidden\",\"navpolicies\":\"nav-item cuo-action\",\"routepolicies\":\"is-hidden\",\"navhistory\":\"nav-item cuo-action\",\"routehistory\":\"is-hidden\",\"navlogs\":\"nav-item cuo-action\",\"routelogs\":\"is-hidden\",\"navsettings\":\"nav-item cuo-action\",\"routesettings\":\"is-hidden\",\"navhosts\":\"nav-item cuo-action\",\"routehosts\":\"is-hidden\",\"navusers\":\"nav-item cuo-action\",\"routeusers\":\"is-hidden\",\"navintegrations\":\"nav-item cuo-action\",\"routeintegrations\":\"is-hidden\",\"navregistries\":\"nav-item cuo-action\",\"routeregistries\":\"is-hidden\",\"navregistry\":\"nav-item cuo-action\",\"routeregistry\":\"is-hidden\",\"navrepositories\":\"nav-item cuo-action\",\"routerepositories\":\"is-hidden\",\"navgithub\":\"nav-item cuo-action\",\"routegithub\":\"is-hidden\",\"navdeliveries\":\"nav-item cuo-action\",\"routedeliveries\":\"is-hidden\",\"navsubscriptions\":\"nav-item cuo-action\",\"routesubscriptions\":\"is-hidden\",\"navpermissions\":\"nav-item cuo-action\",\"routepermissions\":\"is-hidden\"}"
   } }
  state cuo.shell type object preserve { initial {
     id "cuo-shell"
@@ -478,6 +481,7 @@ template cuo.app {
               tag "aside"
               class "sidebar"
               attributes {
+                id "cuo-sidebar"
                 aria-label "Hauptnavigation"
               }
               children [
@@ -519,8 +523,9 @@ template cuo.app {
                     {
                       type "element"
                       tag "div"
+                      class "brand-copy sidebar-copy"
                       attributes {
-
+                        data-sidebar-label true
                       }
                       children [
                         {
@@ -572,391 +577,40 @@ template cuo.app {
                 }
                 {
                   type "element"
-                  tag "nav"
-                  class "nav-main"
+                  tag "button"
+                  class "sidebar-toggle cuo-action"
                   attributes {
-
+                    type "button"
+                    id "cuo-sidebar-toggle"
+                    data-kind "sidebarToggle"
+                    data-value ""
+                    data-id ""
+                    aria-label "$model.cuo.vm.sidebarToggleLabel"
+                    title "$model.cuo.vm.sidebarToggleLabel"
+                    aria-expanded "$model.cuo.vm.sidebarExpanded"
+                    aria-controls "cuo-sidebar"
                   }
                   children [
                     {
                       type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navdashboard"
+                      tag "span"
+                      class "sidebar-arrow"
                       attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "dashboard"
+                        data-sidebar-arrow true
                       }
                       children [
                         {
                           type "element"
                           tag "x-icon"
                           attributes {
-                            name "home"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Dashboard"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navcontainers"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "containers"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "cube"
+                            name "sidebar-triangle"
                             pack "cuo"
-                            size "20px"
+                            size "14px"
                             decorative true
                           }
                           children [
 
                           ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Container"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navupdates"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "updates"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "refresh"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Updates"
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          class "nav-badge"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "$model.cuo.vm.updateCount"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navschedule"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "schedule"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "calendar"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Zeitplanung"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navpolicies"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "policies"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "shield"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Richtlinien"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navhistory"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "history"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "history"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Historie"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navlogs"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "logs"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "docs"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Logs"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navregistries"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "registries"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "cube"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Registries"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navsubscriptions"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "subscriptions"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "link"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Subscriptions"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navsettings"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "settings"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "settings"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Einstellungen"
                         }
                       ]
                     }
@@ -965,131 +619,572 @@ template cuo.app {
                 {
                   type "element"
                   tag "div"
-                  class "system-nav"
+                  class "sidebar-nav-scroll"
                   attributes {
 
                   }
                   children [
                     {
                       type "element"
-                      tag "p"
-                      class "nav-label"
+                      tag "nav"
+                      class "nav-main"
                       attributes {
-
+                        aria-label "Workspace"
                       }
                       children [
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navdashboard"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "dashboard"
+                            aria-label "Dashboard"
+                            title "Dashboard"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "home"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
 
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Dashboard"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navcontainers"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "containers"
+                            aria-label "Container"
+                            title "Container"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "cube"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Container"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navupdates"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "updates"
+                            aria-label "Updates"
+                            title "Updates"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "refresh"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Updates"
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "nav-badge"
+                              attributes {
+
+                              }
+                              children [
+
+                              ]
+                              text "$model.cuo.vm.updateCount"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navschedule"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "schedule"
+                            aria-label "Zeitplanung"
+                            title "Zeitplanung"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "calendar"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Zeitplanung"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navpolicies"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "policies"
+                            aria-label "Richtlinien"
+                            title "Richtlinien"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "shield"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Richtlinien"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navhistory"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "history"
+                            aria-label "Historie"
+                            title "Historie"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "history"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Historie"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navlogs"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "logs"
+                            aria-label "Logs"
+                            title "Logs"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "docs"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Logs"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navregistries"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "registries"
+                            aria-label "Registries"
+                            title "Registries"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "cube"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Registries"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navsubscriptions"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "subscriptions"
+                            aria-label "Subscriptions"
+                            title "Subscriptions"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "link"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Subscriptions"
+                            }
+                          ]
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navsettings"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "settings"
+                            aria-label "Einstellungen"
+                            title "Einstellungen"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "settings"
+                                pack "core"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Einstellungen"
+                            }
+                          ]
+                        }
                       ]
-                      text "SYSTEM"
                     }
                     {
                       type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navhosts"
+                      tag "div"
+                      class "system-nav"
                       attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "hosts"
+
                       }
                       children [
                         {
                           type "element"
-                          tag "x-icon"
+                          tag "p"
+                          class "nav-label sidebar-copy"
                           attributes {
-                            name "server"
-                            pack "lucide"
-                            size "20px"
-                            decorative true
+                            data-sidebar-label true
                           }
                           children [
 
+                          ]
+                          text "SYSTEM"
+                        }
+                        {
+                          type "element"
+                          tag "button"
+                          class "$model.cuo.vm.navhosts"
+                          attributes {
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "hosts"
+                            aria-label "Hosts"
+                            title "Hosts"
+                          }
+                          children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "server"
+                                pack "lucide"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
+
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Hosts"
+                            }
                           ]
                         }
                         {
                           type "element"
-                          tag "span"
+                          tag "button"
+                          class "$model.cuo.vm.navusers"
                           attributes {
-
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "users"
+                            aria-label "Benutzer"
+                            title "Benutzer"
                           }
                           children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "users"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
 
-                          ]
-                          text "Hosts"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navusers"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "users"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "users"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
 
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Benutzer"
-                        }
-                      ]
-                    }
-                    {
-                      type "element"
-                      tag "button"
-                      class "$model.cuo.vm.navintegrations"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        data-kind "navigate"
-                        data-value "integrations"
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "link"
-                            pack "cuo"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
+                              ]
+                              text "Benutzer"
+                            }
                           ]
                         }
                         {
                           type "element"
-                          tag "span"
+                          tag "button"
+                          class "$model.cuo.vm.navintegrations"
                           attributes {
-
+                            type "button"
+                            data-id ""
+                            data-kind "navigate"
+                            data-value "integrations"
+                            aria-label "Integrationen"
+                            title "Integrationen"
                           }
                           children [
+                            {
+                              type "element"
+                              tag "x-icon"
+                              attributes {
+                                name "link"
+                                pack "cuo"
+                                size "20px"
+                                decorative true
+                              }
+                              children [
 
+                              ]
+                            }
+                            {
+                              type "element"
+                              tag "span"
+                              class "sidebar-copy"
+                              attributes {
+                                data-sidebar-label true
+                              }
+                              children [
+
+                              ]
+                              text "Integrationen"
+                            }
                           ]
-                          text "Integrationen"
                         }
                       ]
                     }
@@ -1122,6 +1217,22 @@ template cuo.app {
             }
             {
               type "element"
+              tag "button"
+              class "sidebar-scrim cuo-action"
+              attributes {
+                type "button"
+                data-kind "sidebarClose"
+                data-value ""
+                data-id ""
+                aria-label "Navigation schließen"
+                tabindex "-1"
+              }
+              children [
+
+              ]
+            }
+            {
+              type "element"
               tag "div"
               class "main-shell"
               attributes {
@@ -1136,44 +1247,6 @@ template cuo.app {
 
                   }
                   children [
-                    {
-                      type "element"
-                      tag "button"
-                      class "icon-btn mobile-toggle cuo-action"
-                      attributes {
-                        type "button"
-                        data-id ""
-                        aria-label "Menü"
-                        data-kind "menu"
-                        data-value ""
-                      }
-                      children [
-                        {
-                          type "element"
-                          tag "x-icon"
-                          attributes {
-                            name "menu"
-                            pack "core"
-                            size "20px"
-                            decorative true
-                          }
-                          children [
-
-                          ]
-                        }
-                        {
-                          type "element"
-                          tag "span"
-                          attributes {
-
-                          }
-                          children [
-
-                          ]
-                          text "Menü"
-                        }
-                      ]
-                    }
                     {
                       type "element"
                       tag "label"
@@ -2985,6 +3058,20 @@ template cuo.app {
 
               ]
             }
+            {
+              type "element"
+              tag "x-cuo-sidebar-motion"
+              class "cuo-widget"
+              attributes {
+                data-cuo-widget "true"
+                data-view "$model.cuo.vm.serialized"
+                hidden true
+                aria-hidden true
+              }
+              children [
+
+              ]
+            }
           ]
         }
         {
@@ -3032,6 +3119,68 @@ template cuo.app {
   input data object optional
   effect fetch datasource cuo.intent
   reduce state.cuo.vm = result.vm
+ }
+
+ animation cuo.sidebar.hide {
+  effect fade
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   opacity 1
+   transform "translateX(0px)"
+   offset 0
+  }
+  keyframe enter {
+   opacity 0
+   transform "translateX(-8px)"
+   offset 1
+  }
+ }
+ animation cuo.sidebar.pointRight {
+  effect rotate
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   transform "rotate(0deg)"
+   offset 0
+  }
+  keyframe enter {
+   transform "rotate(180deg)"
+   offset 1
+  }
+ }
+
+ animation cuo.sidebar.show {
+  effect fade
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   opacity 0
+   transform "translateX(-8px)"
+   offset 0
+  }
+  keyframe enter {
+   opacity 1
+   transform "translateX(0px)"
+   offset 1
+  }
+ }
+ animation cuo.sidebar.pointLeft {
+  effect rotate
+  durationMs 260
+  easing "cubic-bezier(.22,.8,.25,1)"
+  reducedMotion instant
+  keyframe enter {
+   transform "rotate(180deg)"
+   offset 0
+  }
+  keyframe enter {
+   transform "rotate(0deg)"
+   offset 1
+  }
  }
  resource cuo.events kind stream owner surface.cuo.shell { dispose on surface.destroy }
  portal cuo.root root "#xtend-maraca-root" layer surface
