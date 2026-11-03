@@ -1,3 +1,10 @@
+import { setLocale, t } from "../i18n/index.mjs";
+import {
+  preferenceDefaults,
+  palettes,
+  preferredLanguage,
+} from "../shared/ui-preferences.mjs";
+import { loadProcesses, processIntent } from "./processes.ts";
 import {
   integrationIntent,
   loadIntegrations,
@@ -34,14 +41,30 @@ function theme(vm: VM, mode = vm.themeMode) {
   return vm;
 }
 function profile(vm: VM) {
-  return (
-    vm.user.profile || {
-      displayName: vm.user.name,
-      avatar: "initials",
-      theme: vm.themeMode,
-      updateNotifications: true,
-    }
-  );
+  return {
+    displayName: vm.user.name,
+    avatar: "initials",
+    theme: vm.themeMode,
+    updateNotifications: true,
+    ...preferenceDefaults,
+    ...vm.user.profile,
+  };
+}
+async function applyPreferences(vm: VM, data = profile(vm)) {
+  theme(vm, String(data.theme || "system"));
+  vm.palette = palettes.includes(data.palette) ? data.palette : "slate";
+  vm.highContrast = data.highContrast === true;
+  vm.language = data.language === "en" ? "en" : "de";
+  vm.languageAutomatic = data.languageAutomatic !== false;
+  vm.locale = vm.languageAutomatic
+    ? preferredLanguage(
+        navigator.languages?.length
+          ? navigator.languages
+          : [navigator.language],
+      )
+    : vm.language;
+  await setLocale(vm.locale);
+  return vm;
 }
 const sidebarPreferenceKey = "cuo.sidebar.collapsed";
 function sidebarPreference(narrow: boolean) {
@@ -73,10 +96,19 @@ async function preference(vm: VM, changes: Record<string, unknown>) {
       profile: result.profile,
     };
   }
-  return theme(vm, String(data.theme));
+  return applyPreferences(vm, profile(vm));
 }
 function observePreferences() {
   const boundary = window.XTendMaraca.getSurfaceBoundary();
+  window.addEventListener(
+    "languagechange",
+    () => {
+      void window.XTendMaraca.dispatchCommand("cuo.intent", {
+        kind: "systemLanguage",
+      }).catch(() => {});
+    },
+    { signal: boundary.signal },
+  );
   const media = matchMedia("(prefers-color-scheme: dark)");
   media.addEventListener(
     "change",
@@ -130,7 +162,7 @@ async function api(
   });
   const data = await r.json();
   if (!r.ok)
-    throw Error(data.message || data.error || "Anfrage fehlgeschlagen");
+    throw Error(data.message || data.error || t("Anfrage fehlgeschlagen"));
   return data;
 }
 const coreClient = createCUOClient({
@@ -144,7 +176,7 @@ async function snapshot(vm: VM, discover = false): Promise<VM> {
   vm.user = session.user || { name: "", role: "" };
   vm.oidc = session.oidc || {};
   vm.dismissed = session.dismissed || [];
-  if (session.user) theme(vm, session.user.profile?.theme || "system");
+  await applyPreferences(vm, profile(vm));
   if (vm.user.role === "Owner") vm.oidcConfig = await api("/auth/oidc/config");
   else vm.oidcConfig = null;
   if (vm.auth !== "ready") return present(vm);
@@ -172,16 +204,21 @@ async function snapshot(vm: VM, discover = false): Promise<VM> {
     (vm.capabilities as string[]).includes("users.manage")
   )
     users = (await api("/auth/users")).items;
-  return present({
-    ...vm,
-    containers: containers.items || [],
-    jobs: jobs.items || [],
-    policies: policies.items || [],
-    windows: windows.items || [],
-    hosts: hosts.items || [],
-    events: (events.items || []).slice(-200),
-    users,
-  });
+  return present(
+    await loadProcesses(
+      {
+        ...vm,
+        containers: containers.items || [],
+        jobs: jobs.items || [],
+        policies: policies.items || [],
+        windows: windows.items || [],
+        hosts: hosts.items || [],
+        events: (events.items || []).slice(-200),
+        users,
+      },
+      api,
+    ),
+  );
 }
 function connect() {
   if (
@@ -224,6 +261,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     if (integration) vm = integration;
     else if (kind === "boot") {
       observePreferences();
+      await applyPreferences(vm);
       const sidebarNarrow = matchMedia("(max-width: 760px)").matches;
       const sidebar = {
         sidebarNarrow,
@@ -244,14 +282,18 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
           if (data)
             vm.user = { ...vm.user, name: data.displayName, profile: data };
         } catch {}
-        return { vm: present(theme(vm, vm.user.profile?.theme || "light")) };
+        return { vm: present(await applyPreferences(vm)) };
       }
       vm = await snapshot(vm, true);
       if (new URL(location.href).searchParams.get("login_error") === "oidc") {
         vm.notice =
           vm.oidc.localLoginEnabled === false
-            ? "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder den Betreiber kontaktieren."
-            : "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder lokal anmelden.";
+            ? t(
+                "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder den Betreiber kontaktieren.",
+              )
+            : t(
+                "SSO-Anmeldung fehlgeschlagen oder abgelaufen. Bitte erneut versuchen oder lokal anmelden.",
+              );
         vm.error = true;
       }
       const githubSetup = new URL(location.href).searchParams.get(
@@ -260,8 +302,12 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       if (githubSetup) {
         vm.notice =
           githubSetup === "success"
-            ? "GitHub-Einrichtung abgeschlossen. Installation und Verbindung prüfen."
-            : "GitHub-Einrichtung fehlgeschlagen oder abgelaufen. Bitte erneut starten.";
+            ? t(
+                "GitHub-Einrichtung abgeschlossen. Installation und Verbindung prüfen.",
+              )
+            : t(
+                "GitHub-Einrichtung fehlgeschlagen oder abgelaufen. Bitte erneut starten.",
+              );
         vm.error = githubSetup !== "success";
       }
       if (vm.auth === "ready") connect();
@@ -273,13 +319,13 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     } else if (kind === "navigate") {
       const route = routeDetails("/" + value);
       if (!Object.hasOwn(pageNames, route.page))
-        throw Error("Unbekannte Ansicht");
+        throw Error(t("Unbekannte Ansicht"));
       cancelIntegrationQueries();
       const router = document.getElementById(
         "cuo-router",
       ) as XRouterElement | null;
       if (!router?.navigate("/" + value))
-        throw Error("Navigation ist noch nicht bereit");
+        throw Error(t("Navigation ist noch nicht bereit"));
       Object.assign(vm, route);
       vm.integrationQueryBusy = false;
       vm.integrationRequest = "";
@@ -287,7 +333,10 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       if (vm.sidebarNarrow) vm.sidebarCollapsed = true;
       vm.dialog = "";
       vm.notificationsOpen = false;
-      if (!vm.demo) vm = await loadIntegrations(vm, api);
+      if (!vm.demo && vm.auth === "ready") {
+        vm = await loadIntegrations(vm, api);
+        vm = await loadProcesses(vm, api);
+      }
     } else if (kind === "route") {
       cancelIntegrationQueries();
       Object.assign(vm, routeDetails(value));
@@ -297,10 +346,31 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       if (vm.sidebarNarrow) vm.sidebarCollapsed = true;
       vm.dialog = "";
       vm.notificationsOpen = false;
-      if (!vm.demo) vm = await loadIntegrations(vm, api);
+      if (!vm.demo && vm.auth === "ready") {
+        vm = await loadIntegrations(vm, api);
+        vm = await loadProcesses(vm, api);
+      }
     } else if (kind === "containerTab") {
       if (["overview", "source", "permissions"].includes(value))
         vm.containerTab = value;
+    } else if (kind === "settingsTab") {
+      if (["appearance", "accessibility", "language", "data"].includes(value))
+        vm.settingsTab = value;
+    } else if (kind === "palette") {
+      if (!palettes.includes(value)) throw Error(t("Ungültige Farbfamilie"));
+      vm = await preference(vm, { palette: value });
+    } else if (kind === "highContrast") {
+      vm = await preference(vm, { highContrast: value === "true" });
+    } else if (kind === "language") {
+      if (!["de", "en"].includes(value)) throw Error(t("Ungültige Sprache"));
+      vm = await preference(vm, { language: value, languageAutomatic: false });
+    } else if (kind === "languageAuto") {
+      vm = await preference(vm, {
+        languageAutomatic: value === "true",
+        language: vm.locale,
+      });
+    } else if (kind === "systemLanguage") {
+      await applyPreferences(vm);
     } else if (kind === "theme") {
       vm = await preference(vm, {
         theme: vm.theme === "dark" ? "light" : "dark",
@@ -340,7 +410,7 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
       vm.profileOpen = false;
     } else if (kind === "saveProfile") {
       vm = await preference(vm, data);
-      vm.notice = "Profil gespeichert.";
+      vm.notice = t("Profil gespeichert.");
     } else if (kind === "oidcLogin") {
       location.assign("/auth/oidc/start");
     } else if (kind === "sidebarToggle") {
@@ -351,6 +421,16 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     } else if (kind === "sidebarViewport") {
       vm.sidebarNarrow = value === "true";
       vm.sidebarCollapsed = sidebarPreference(vm.sidebarNarrow);
+    } else if (
+      kind.startsWith("process") ||
+      [
+        "downloadData",
+        "exportData",
+        "saveLogRetention",
+        "logMaintenance",
+      ].includes(kind)
+    ) {
+      vm = (await processIntent(vm, input, api)) || vm;
     } else if (kind === "filter") {
       vm.filter = value;
       vm.offset = 0;
@@ -393,7 +473,9 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
     } else {
       if (vm.demo)
         throw Error(
-          "Design-Demo: Änderungen sind deaktiviert. Zur Live-Ansicht wechseln.",
+          t(
+            "Design-Demo: Änderungen sind deaktiviert. Zur Live-Ansicht wechseln.",
+          ),
         );
       if (kind === "login" || kind === "enroll") {
         await api("/auth/" + kind, "POST", data);
@@ -411,24 +493,24 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
           label: vm.oidcConfig!.label,
           localLoginEnabled: vm.oidcConfig!.localLoginEnabled,
         };
-        vm.notice = "OIDC-Konfiguration gespeichert und Discovery geprüft.";
+        vm.notice = t("OIDC-Konfiguration gespeichert und Discovery geprüft.");
       } else if (kind === "scan") {
         await coreClient.scan(crypto.randomUUID());
-        vm.notice = "Update-Prüfung gestartet. Ergebnisse erscheinen live.";
+        vm.notice = t("Update-Prüfung gestartet. Ergebnisse erscheinen live.");
         connect();
       } else if (kind === "saveWindow") {
         await api("/api/v1/maintenance-windows", "POST", data);
         vm.dialog = "";
         vm = await snapshot(vm);
-        vm.notice = "Wartungsfenster angelegt.";
+        vm.notice = t("Wartungsfenster angelegt.");
       } else if (kind === "savePolicy") {
         await api("/api/v1/policies/" + encodeURIComponent(id), "PUT", data);
         vm.dialog = "";
         vm = await snapshot(vm);
-        vm.notice = "Richtlinie gespeichert.";
+        vm.notice = t("Richtlinie gespeichert.");
       } else if (kind === "execute") {
         if (data.confirmed !== true)
-          throw Error("Neustart muss bestätigt werden.");
+          throw Error(t("Neustart muss bestätigt werden."));
         const run =
           id === "__all__"
             ? await coreClient.createRun(
@@ -452,8 +534,13 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
         vm.dialog = "";
         vm = await snapshot(vm);
         vm.notice = run
-          ? `Sofortlauf gestartet: ${run.jobs.length} Updates, ${run.skipped.length} übersprungen. Fortschritt unter Updates.`
-          : "Update-Job angelegt. Freigaben und Fortschritt findest du unter Updates.";
+          ? t(
+              "Sofortlauf gestartet: {v0} Updates, {v1} übersprungen. Fortschritt unter Updates.",
+              { v0: run.jobs.length, v1: run.skipped.length },
+            )
+          : t(
+              "Update-Job angelegt. Freigaben und Fortschritt findest du unter Updates.",
+            );
       } else if (kind === "approveJob" || kind === "cancelJob") {
         await api(
           "/api/v1/update-jobs/" +
@@ -465,27 +552,28 @@ async function intent(input: Intent): Promise<{ vm: VM }> {
         );
         vm.dialog = "";
         vm = await snapshot(vm);
-        vm.notice = "Job aktualisiert.";
+        vm.notice = t("Job aktualisiert.");
       } else if (kind === "saveUser") {
         await api("/auth/users", "POST", data);
         vm.dialog = "";
         vm = await snapshot(vm);
-        vm.notice = "Benutzer angelegt.";
+        vm.notice = t("Benutzer angelegt.");
       } else if (kind === "revokeUser") {
         await api("/auth/users/revoke", "POST", { id });
         vm = await snapshot(vm);
-        vm.notice = "Sitzungen widerrufen.";
+        vm.notice = t("Sitzungen widerrufen.");
       } else if (kind === "discover") {
         vm = await snapshot(vm, true);
         vm.dialog = "";
-        vm.notice = "Docker-Inventar aktualisiert.";
-      } else throw Error("Unbekannte Aktion");
+        vm.notice = t("Docker-Inventar aktualisiert.");
+      } else throw Error(t("Unbekannte Aktion"));
     }
   } catch (e) {
-    vm.notice = e instanceof Error ? e.message : "Aktion fehlgeschlagen";
+    vm.notice = e instanceof Error ? e.message : t("Aktion fehlgeschlagen");
     vm.error = true;
     if (vm.auth === "loading") vm.auth = "login";
   }
+  if (vm.notice) vm.notice = t(vm.notice);
   if (vm.notice)
     vm.toasts = [
       ...vm.toasts,

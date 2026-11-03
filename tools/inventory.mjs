@@ -12,7 +12,7 @@ const go = execFileSync(
   .split("\n")
   .map((s) => {
     const [name, version] = s.split("@");
-    return { name, version: version || "0.2.0" };
+    return { name, version: version || "0.3.0" };
   });
 const archives = fs
   .readdirSync("third_party")
@@ -28,7 +28,7 @@ const xtend = JSON.parse(fs.readFileSync("console/xtend.lock.json", "utf8"));
 const inventory = {
   schema: "cuo.source-dependency-inventory.v1",
   note: "Source inventory; complete OCI/OS SBOM is a separate release gate.",
-  version: "0.2.0",
+  version: "0.3.0",
   goToolchain: execFileSync("go", ["version"], { encoding: "utf8" }).trim(),
   goModules: go,
   browser: {

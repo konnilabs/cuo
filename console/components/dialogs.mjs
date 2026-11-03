@@ -1,3 +1,5 @@
+import { t } from "../i18n/index.mjs";
+import { workspaceSettings, bindSettingsTabs } from "./workspace-settings.mjs";
 import { appearance, bindAppearance, oidcSettings } from "./account.mjs";
 import { executableCandidates } from "./update-candidates.mjs";
 import { loadNotices, tutorial } from "./help.mjs";
@@ -29,24 +31,26 @@ export class XCUOAuth extends Widget {
           { class: "auth-brand" },
           h("span", { class: "cube-mark" }, icon("cube", "cuo")),
           h("strong", {}, "CUO"),
-          h("span", { class: "muted" }, "v0.2.0"),
+          h("span", { class: "muted" }, "v0.3.0"),
         ),
-        h("p", { class: "eyebrow" }, "CONTAINER UPDATE ORCHESTRATOR"),
+        h("p", { class: "eyebrow" }, t("CONTAINER UPDATE ORCHESTRATOR")),
         h(
           "h1",
           {},
           vm.auth === "loading"
-            ? "CUO wird gestartet …"
+            ? t("CUO wird gestartet …")
             : enroll
-              ? "Deinen Workspace einrichten"
-              : "Willkommen zurück",
+              ? t("Deinen Workspace einrichten")
+              : t("Willkommen zurück"),
         ),
         h(
           "p",
           { class: "muted" },
           enroll
-            ? "Lege den ersten lokalen Administrator an. Deine Daten bleiben auf diesem Host."
-            : "Melde dich an, um deine Container zu verwalten.",
+            ? t(
+                "Lege den ersten lokalen Administrator an. Deine Daten bleiben auf diesem Host.",
+              )
+            : t("Melde dich an, um deine Container zu verwalten."),
         ),
         vm.auth === "loading" ||
           (!enroll && vm.oidc?.localLoginEnabled === false)
@@ -54,13 +58,13 @@ export class XCUOAuth extends Widget {
           : h(
               "form",
               { "data-form": enroll ? "enroll" : "login" },
-              field("Benutzername", "name", "", "text", {
+              field(t("Benutzername"), "name", "", "text", {
                 required: true,
                 autocomplete: "username",
                 minlength: 3,
                 maxlength: 80,
               }),
-              field("Passwort", "password", "", "password", {
+              field(t("Passwort"), "password", "", "password", {
                 required: true,
                 autocomplete: enroll ? "new-password" : "current-password",
                 minlength: 12,
@@ -70,18 +74,20 @@ export class XCUOAuth extends Widget {
                 ? h(
                     "p",
                     { class: "muted small" },
-                    "Mindestens 12 Zeichen. Das Konto erhält die Rolle Owner.",
+                    t(
+                      "Mindestens 12 Zeichen. Das Konto erhält die Rolle Owner.",
+                    ),
                   )
                 : null,
               h(
                 "button",
                 { class: "btn primary full", type: "submit" },
-                enroll ? "Administrator anlegen" : "Anmelden",
+                enroll ? t("Administrator anlegen") : t("Anmelden"),
               ),
             ),
         !enroll && vm.oidc?.enabled
           ? button(
-              String(vm.oidc.label || "Mit SSO anmelden"),
+              String(vm.oidc.label || t("Mit SSO anmelden")),
               "oidcLogin",
               "",
               "",
@@ -93,9 +99,9 @@ export class XCUOAuth extends Widget {
           "div",
           { class: "auth-footer" },
           icon("shield"),
-          h("span", {}, "Lokal installiert · sichere Sitzung"),
+          h("span", {}, t("Lokal installiert · sichere Sitzung")),
         ),
-        button("Design-Demo ansehen", "demo", "", "", "text-btn"),
+        button(t("Design-Demo ansehen"), "demo", "", "", "text-btn"),
       ),
     ];
   }
@@ -163,6 +169,7 @@ export class XApprovalDialog extends Widget {
       job = (vm.jobs || []).find((j) => j.id === vm.selected),
       policy = (vm.policies || []).find((p) => p.id === vm.selected);
     const kind = vm.dialog;
+    if (kind === "process") return [];
     let title = "",
       body = [];
     if (kind === "help") {
@@ -180,11 +187,11 @@ export class XApprovalDialog extends Widget {
             ),
             h(
               "nav",
-              { class: "tabs", "aria-label": "Container-Einstellungen" },
+              { class: "tabs", "aria-label": t("Container-Einstellungen") },
               [
-                ["overview", "Übersicht"],
-                ["source", "Image-Quelle"],
-                ["permissions", "Ausführungsrechte"],
+                ["overview", t("Übersicht")],
+                ["source", t("Image-Quelle")],
+                ["permissions", t("Ausführungsrechte")],
               ].map(([value, label]) =>
                 button(
                   label,
@@ -202,14 +209,16 @@ export class XApprovalDialog extends Widget {
               ? h(
                   "section",
                   {},
-                  h("h3", {}, "Image-Quelle & Release-Zuordnung"),
+                  h("h3", {}, t("Image-Quelle & Release-Zuordnung")),
                   h("p", { class: "break" }, c.image),
                   h(
                     "p",
                     { class: "break muted" },
                     c.localImage
-                      ? "Lokal gebautes Image ohne veröffentlichten Digest."
-                      : "OCI-Registry; vorhandene Digest-Pins werden beachtet.",
+                      ? t("Lokal gebautes Image ohne veröffentlichten Digest.")
+                      : t(
+                          "OCI-Registry; vorhandene Digest-Pins werden beachtet.",
+                        ),
                   ),
                   c.candidate?.subscriptionId
                     ? h(
@@ -231,7 +240,7 @@ export class XApprovalDialog extends Widget {
                           "Ziel: " + (c.candidate.targetImage || c.image),
                         ),
                         button(
-                          "Subscriptions öffnen",
+                          t("Subscriptions öffnen"),
                           "navigate",
                           "subscriptions",
                           "",
@@ -242,10 +251,12 @@ export class XApprovalDialog extends Widget {
                     : h(
                         "p",
                         {},
-                        "Keine Release-Subscription zugeordnet. Die Registry-Verbindung wird anhand von Host und Repository ausgewählt.",
+                        t(
+                          "Keine Release-Subscription zugeordnet. Die Registry-Verbindung wird anhand von Host und Repository ausgewählt.",
+                        ),
                       ),
                   button(
-                    "Registries öffnen",
+                    t("Registries öffnen"),
                     "navigate",
                     "registries",
                     "",
@@ -257,7 +268,7 @@ export class XApprovalDialog extends Widget {
                 ? h(
                     "section",
                     {},
-                    h("h3", {}, "Wirksame Ausführungsrechte"),
+                    h("h3", {}, t("Wirksame Ausführungsrechte")),
                     h(
                       "p",
                       {},
@@ -272,10 +283,12 @@ export class XApprovalDialog extends Widget {
                     h(
                       "p",
                       { class: "callout small" },
-                      "Zusätzlicher Host-Monitoring-Zugriff benötigt eine ausdrückliche containerbezogene Richtlinie. Privilegierte Host-Aktionen und schreibende System-Mounts bleiben gesperrt.",
+                      t(
+                        "Zusätzlicher Host-Monitoring-Zugriff benötigt eine ausdrückliche containerbezogene Richtlinie. Privilegierte Host-Aktionen und schreibende System-Mounts bleiben gesperrt.",
+                      ),
                     ),
                     button(
-                      "Richtlinie & Freigabe bearbeiten",
+                      t("Richtlinie & Freigabe bearbeiten"),
                       "policy",
                       "",
                       c.id,
@@ -287,26 +300,28 @@ export class XApprovalDialog extends Widget {
                     "div",
                     { class: "detail-grid" },
                     [
-                      ["Image", c.image],
-                      ["Plattform", c.platform],
-                      ["Status", c.state],
-                      ["Gruppe", c.group],
-                      ["Richtlinie", modeLabel[c.mode]],
+                      [t("Image"), c.image],
+                      [t("Plattform"), c.platform],
+                      [t("Status"), c.state],
+                      [t("Gruppe"), c.group],
+                      [t("Richtlinie"), modeLabel[c.mode]],
                       [
-                        "Verwaltet",
-                        c.managed ? "Ja" : "Nein – cuo.managed=true benötigt",
+                        t("Verwaltet"),
+                        c.managed
+                          ? "Ja"
+                          : t("Nein – cuo.managed=true benötigt"),
                       ],
                       [
-                        "Compose",
+                        t("Compose"),
                         c.compose
-                          ? "Ja – registriertes Projekt benötigt"
-                          : "Nein",
+                          ? t("Ja – registriertes Projekt benötigt")
+                          : t("Nein"),
                       ],
                       [
                         "Update-Digest",
-                        c.candidate?.targetDigest || "Kein Update bekannt",
+                        c.candidate?.targetDigest || t("Kein Update bekannt"),
                       ],
-                      ["Hinweis", c.candidate?.error || c.reason || "–"],
+                      [t("Hinweis"), c.candidate?.error || c.reason || "–"],
                     ].map(([a, b]) =>
                       h(
                         "div",
@@ -319,8 +334,15 @@ export class XApprovalDialog extends Widget {
             h(
               "div",
               { class: "dialog-actions" },
-              button("Richtlinie bearbeiten", "policy", "", c.id, "btn"),
-              button("Update planen", "run", "", c.id, "btn primary", "play"),
+              button(t("Richtlinie bearbeiten"), "policy", "", c.id, "btn"),
+              button(
+                t("Update planen"),
+                "run",
+                "",
+                c.id,
+                "btn primary",
+                "play",
+              ),
             ),
           ]
         : [
@@ -329,36 +351,40 @@ export class XApprovalDialog extends Widget {
               {},
               job
                 ? stageLabel[job.state] || job.state
-                : "Eintrag ist nicht mehr im aktuellen Inventar vorhanden.",
+                : t("Eintrag ist nicht mehr im aktuellen Inventar vorhanden."),
             ),
           ];
     } else if (kind === "add") {
-      title = "Container hinzufügen";
+      title = t("Container hinzufügen");
       body = [
         h(
           "p",
           {},
-          "CUO entdeckt Container auf dem lokalen Docker-Host automatisch. Die App erstellt keine beliebigen neuen Workloads.",
+          t(
+            "CUO entdeckt Container auf dem lokalen Docker-Host automatisch. Die App erstellt keine beliebigen neuen Workloads.",
+          ),
         ),
         h(
           "ol",
           { class: "instructions" },
-          h("li", {}, "Container mit Docker oder Compose anlegen."),
-          h("li", {}, "Für Updates das Label cuo.managed=true setzen."),
+          h("li", {}, t("Container mit Docker oder Compose anlegen.")),
+          h("li", {}, t("Für Updates das Label cuo.managed=true setzen.")),
           h(
             "li",
             {},
-            "Inventar aktualisieren und eine Update-Richtlinie wählen.",
+            t("Inventar aktualisieren und eine Update-Richtlinie wählen."),
           ),
         ),
         h("code", { class: "code-block" }, 'labels:\n  cuo.managed: "true"'),
         h(
           "p",
           { class: "muted" },
-          "Compose: zusätzlich cuo.compose.file relativ zum registrierten Projektverzeichnis setzen.",
+          t(
+            "Compose: zusätzlich cuo.compose.file relativ zum registrierten Projektverzeichnis setzen.",
+          ),
         ),
         button(
-          "Inventar aktualisieren",
+          t("Inventar aktualisieren"),
           "discover",
           "",
           "",
@@ -368,7 +394,7 @@ export class XApprovalDialog extends Widget {
       ];
     } else if (kind === "windowDetails") {
       const window = (vm.windows || []).find((w) => w.id === vm.selected);
-      title = "Wartungsfenster";
+      title = t("Wartungsfenster");
       body = window
         ? [
             h("h3", {}, window.name),
@@ -376,19 +402,28 @@ export class XApprovalDialog extends Widget {
               "div",
               { class: "detail-grid" },
               [
-                ["Start", window.start + " Uhr"],
-                ["Dauer", window.durationMinutes + " Minuten"],
-                ["Zeitzone", window.timezone],
-                ["Status", window.enabled ? "Aktiv" : "Deaktiviert"],
+                [t("Start"), window.start + " Uhr"],
+                [t("Dauer"), window.durationMinutes + " Minuten"],
+                [t("Zeitzone"), window.timezone],
+                [t("Status"), window.enabled ? t("Aktiv") : t("Deaktiviert")],
                 [
-                  "Wochentage",
+                  t("Wochentage"),
                   window.days
                     .map(
-                      (day) => ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"][day],
+                      (day) =>
+                        [
+                          t("So"),
+                          t("Mo"),
+                          t("Di"),
+                          t("Mi"),
+                          t("Do"),
+                          t("Fr"),
+                          t("Sa"),
+                        ][day],
                     )
                     .join(", "),
                 ],
-                ["Ausnahmen", window.blackouts?.join(", ") || "Keine"],
+                [t("Ausnahmen"), window.blackouts?.join(", ") || t("Keine")],
               ].map(([label, value]) =>
                 h(
                   "div",
@@ -401,41 +436,51 @@ export class XApprovalDialog extends Widget {
             h(
               "p",
               { class: "callout" },
-              "Laufende Jobs werden beim Fensterende nicht unterbrochen. Vergangene Fenster werden nicht nachgeholt.",
+              t(
+                "Laufende Jobs werden beim Fensterende nicht unterbrochen. Vergangene Fenster werden nicht nachgeholt.",
+              ),
             ),
           ]
-        : [h("p", {}, "Wartungsfenster nicht mehr vorhanden.")];
+        : [h("p", {}, t("Wartungsfenster nicht mehr vorhanden."))];
     } else if (kind === "window") {
-      title = "Wartungsfenster erstellen";
+      title = t("Wartungsfenster erstellen");
       body = [
         h(
           "form",
           { "data-form": "saveWindow" },
-          field("Name", "name", "Standard", "text", {
+          field(t("Name"), "name", t("Standard"), "text", {
             required: true,
             maxlength: 100,
           }),
           h(
             "div",
             { class: "form-grid" },
-            field("Startzeit", "start", "03:00", "time", { required: true }),
-            field("Dauer in Minuten", "durationMinutes", "60", "number", {
+            field(t("Startzeit"), "start", "03:00", "time", { required: true }),
+            field(t("Dauer in Minuten"), "durationMinutes", "60", "number", {
               min: 1,
               max: 1440,
               required: true,
             }),
           ),
-          field("IANA-Zeitzone", "timezone", "Europe/Berlin", "text", {
+          field(t("IANA-Zeitzone"), "timezone", "Europe/Berlin", "text", {
             required: true,
           }),
           h(
             "fieldset",
             {},
-            h("legend", {}, "Wochentage"),
+            h("legend", {}, t("Wochentage")),
             h(
               "div",
               { class: "weekday-checks" },
-              ["So", "Mo", "Di", "Mi", "Do", "Fr", "Sa"].map((d, i) =>
+              [
+                t("So"),
+                t("Mo"),
+                t("Di"),
+                t("Mi"),
+                t("Do"),
+                t("Fr"),
+                t("Sa"),
+              ].map((d, i) =>
                 h(
                   "label",
                   {},
@@ -451,7 +496,7 @@ export class XApprovalDialog extends Widget {
             ),
           ),
           field(
-            "Ausnahmen als Datum, mit Komma trennen",
+            t("Ausnahmen als Datum, mit Komma trennen"),
             "blackouts",
             "",
             "text",
@@ -460,18 +505,22 @@ export class XApprovalDialog extends Widget {
           h(
             "p",
             { class: "callout small" },
-            "Sommerzeit: übersprungene Uhrzeiten werden auf die nächste gültige Minute verschoben; doppelte Uhrzeiten werden einmal ausgeführt. Vergangene Fenster werden nicht nachgeholt.",
+            t(
+              "Sommerzeit: übersprungene Uhrzeiten werden auf die nächste gültige Minute verschoben; doppelte Uhrzeiten werden einmal ausgeführt. Vergangene Fenster werden nicht nachgeholt.",
+            ),
           ),
           h(
             "button",
             { type: "submit", class: "btn primary" },
-            "Fenster speichern",
+            t("Fenster speichern"),
           ),
         ),
       ];
     } else if (kind === "policy" || kind === "exclude") {
       title =
-        kind === "exclude" ? "Container ausschließen" : "Richtlinie bearbeiten";
+        kind === "exclude"
+          ? t("Container ausschließen")
+          : t("Richtlinie bearbeiten");
       const selected = policy || {
         id: c ? c.id : "global",
         scope: c ? "container" : "global",
@@ -485,30 +534,30 @@ export class XApprovalDialog extends Widget {
         h(
           "form",
           { "data-form": "savePolicy", "data-id": selected.id },
-          field("Kennung", "id", selected.id, "text", {
+          field(t("Kennung"), "id", selected.id, "text", {
             required: true,
             pattern: "[A-Za-z0-9_.-]{1,128}",
             readonly: !!policy || !!c,
           }),
-          select("Geltungsbereich", "scope", selected.scope, [
-            ["global", "Global"],
-            ["host", "Host"],
-            ["group", "Gruppe"],
-            ["container", "Container"],
+          select(t("Geltungsbereich"), "scope", selected.scope, [
+            ["global", t("Global")],
+            ["host", t("Host")],
+            ["group", t("Gruppe")],
+            ["container", t("Container")],
           ]),
-          field("Ziel-ID oder Gruppenname", "target", selected.target),
+          field(t("Ziel-ID oder Gruppenname"), "target", selected.target),
           select(
-            "Update-Modus",
+            t("Update-Modus"),
             "mode",
             selected.mode,
             Object.entries(modeLabel),
           ),
-          select("Wartungsfenster", "windowId", selected.windowId, [
-            ["", "Keines"],
+          select(t("Wartungsfenster"), "windowId", selected.windowId, [
+            ["", t("Keines")],
             ...(vm.windows || []).map((w) => [w.id, w.name]),
           ]),
           field(
-            "Maximale Parallelität",
+            t("Maximale Parallelität"),
             "concurrency",
             String(selected.concurrency),
             "number",
@@ -522,21 +571,25 @@ export class XApprovalDialog extends Widget {
               name: "excluded",
               checked: selected.excluded,
             }),
-            "Explizit ausschließen",
+            t("Explizit ausschließen"),
           ),
           h(
             "p",
             { class: "callout small" },
-            "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
+            t(
+              "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
+            ),
           ),
           h(
             "fieldset",
             { class: "execution-permissions" },
-            h("legend", {}, "Erweiterte Ausführungsfreigaben"),
+            h("legend", {}, t("Erweiterte Ausführungsfreigaben")),
             h(
               "p",
               { class: "callout small", role: "note" },
-              "Achtung: Monitoring-Mounts geben dem Container Einblick in Host-Prozesse und Systeminformationen. Die Freigabe gilt dauerhaft für Updates dieses Containers, einschließlich automatischer Läufe. Nur für vertrauenswürdige Images aktivieren. Volumes und Anwendungsdaten werden bei einem Fehler nicht automatisch zurückgesetzt.",
+              t(
+                "Achtung: Monitoring-Mounts geben dem Container Einblick in Host-Prozesse und Systeminformationen. Die Freigabe gilt dauerhaft für Updates dieses Containers, einschließlich automatischer Läufe. Nur für vertrauenswürdige Images aktivieren. Volumes und Anwendungsdaten werden bei einem Fehler nicht automatisch zurückgesetzt.",
+              ),
             ),
             h(
               "label",
@@ -547,15 +600,17 @@ export class XApprovalDialog extends Widget {
                 checked: selected.permissions?.readOnlyHostMonitoring,
                 disabled: !can(vm, "execution.monitoring.grant"),
               }),
-              "Bestehende lesende Host-Mounts für Monitoring zulassen",
+              t("Bestehende lesende Host-Mounts für Monitoring zulassen"),
             ),
             h(
               "p",
               { class: "muted small" },
-              "Nur für eine Container-Richtlinie. Quelle, Ziel und Readonly-Status werden erhalten. Schreibende System-Mounts und Docker-Sockets benötigen einen eigenen, derzeit nicht unterstützten Freigabetyp. Die Änderung benötigt die Fähigkeit „Lesenden Host-Monitoring-Zugriff freigeben“.",
+              t(
+                "Nur für eine Container-Richtlinie. Quelle, Ziel und Readonly-Status werden erhalten. Schreibende System-Mounts und Docker-Sockets benötigen einen eigenen, derzeit nicht unterstützten Freigabetyp. Die Änderung benötigt die Fähigkeit „Lesenden Host-Monitoring-Zugriff freigeben“.",
+              ),
             ),
             field(
-              "Freigabegrund",
+              t("Freigabegrund"),
               "permissionReason",
               selected.permissionReason || "",
               "text",
@@ -572,42 +627,53 @@ export class XApprovalDialog extends Widget {
                 name: "permissionsConfirmed",
                 disabled: !can(vm, "execution.monitoring.grant"),
               }),
-              "Ich habe die Auswirkungen geprüft und bestätige den Host-Zugriff.",
+              t(
+                "Ich habe die Auswirkungen geprüft und bestätige den Host-Zugriff.",
+              ),
             ),
           ),
           h(
             "button",
             { class: "btn primary", type: "submit" },
-            "Richtlinie speichern",
+            t("Richtlinie speichern"),
           ),
         ),
       ];
     } else if (kind === "run") {
-      title = "Update-Lauf starten";
+      title = t("Update-Lauf starten");
       const candidates = executableCandidates(vm);
       const canRunAll = can(vm, "updates.approve");
       body = [
         h(
           "form",
           { "data-form": "execute" },
-          select("Container", "containerId", c?.id || candidates[0]?.id || "", [
-            ["", "Container auswählen"],
-            ...(canRunAll
-              ? [
-                  [
-                    "__all__",
-                    `Alle auswählen – ${candidates.length} ausführbare Updates`,
-                  ],
-                ]
-              : []),
-            ...candidates.map((c) => [c.id, c.name]),
-          ]),
+          select(
+            t("Container"),
+            "containerId",
+            c?.id || candidates[0]?.id || "",
+            [
+              ["", t("Container auswählen")],
+              ...(canRunAll
+                ? [
+                    [
+                      "__all__",
+                      t("Alle auswählen – {v0} ausführbare Updates", {
+                        v0: candidates.length,
+                      }),
+                    ],
+                  ]
+                : []),
+              ...candidates.map((c) => [c.id, c.name]),
+            ],
+          ),
           h(
             "p",
             { class: "callout" },
-            "Container werden neu erstellt und sind kurzzeitig nicht erreichbar. Datenbanken und Volumes werden nicht zurückgesetzt. Einzeljobs beachten Freigaben und Wartungsfenster. „Alle auswählen“ startet als bestätigter Administrator-Sofortlauf außerhalb der Wartungsfenster und gibt die ausgewählten Updates frei; Ausschlüsse und Parallelitätsgrenzen bleiben wirksam. Ein fehlgeschlagener Healthcheck erfordert einen manuellen Eingriff.",
+            t(
+              "Container werden neu erstellt und sind kurzzeitig nicht erreichbar. Datenbanken und Volumes werden nicht zurückgesetzt. Einzeljobs beachten Freigaben und Wartungsfenster. „Alle auswählen“ startet als bestätigter Administrator-Sofortlauf außerhalb der Wartungsfenster und gibt die ausgewählten Updates frei; Ausschlüsse und Parallelitätsgrenzen bleiben wirksam. Ein fehlgeschlagener Healthcheck erfordert einen manuellen Eingriff.",
+            ),
           ),
-          field("Grund / Ticket", "reason", "", "text", {
+          field(t("Grund / Ticket"), "reason", "", "text", {
             required: true,
             minlength: 3,
             maxlength: 500,
@@ -616,7 +682,7 @@ export class XApprovalDialog extends Widget {
             "label",
             { class: "checkbox" },
             h("input", { name: "confirmed", type: "checkbox", required: true }),
-            "Ich bestätige den Neustart und die mögliche Unterbrechung.",
+            t("Ich bestätige den Neustart und die mögliche Unterbrechung."),
           ),
           h(
             "button",
@@ -625,19 +691,21 @@ export class XApprovalDialog extends Widget {
               class: "btn primary",
               disabled: !candidates.length,
             },
-            "Update-Lauf starten",
+            t("Update-Lauf starten"),
           ),
         ),
         !candidates.length
           ? h(
               "p",
               { class: "muted" },
-              "Keine freigegebenen Kandidaten. Erst Updates prüfen und die Richtlinie konfigurieren.",
+              t(
+                "Keine freigegebenen Kandidaten. Erst Updates prüfen und die Richtlinie konfigurieren.",
+              ),
             )
           : null,
       ];
     } else if (kind === "approve" || kind === "cancel") {
-      title = kind === "approve" ? "Update freigeben" : "Job abbrechen";
+      title = kind === "approve" ? t("Update freigeben") : t("Job abbrechen");
       body = [
         h("p", {}, job?.name || ""),
         h(
@@ -646,7 +714,7 @@ export class XApprovalDialog extends Widget {
             "data-form": kind === "approve" ? "approveJob" : "cancelJob",
             "data-id": job?.id || "",
           },
-          field("Begründung", "reason", "", "text", {
+          field(t("Begründung"), "reason", "", "text", {
             required: true,
             minlength: 3,
             maxlength: 500,
@@ -656,43 +724,48 @@ export class XApprovalDialog extends Widget {
             { class: "checkbox" },
             h("input", { name: "confirmed", type: "checkbox", required: true }),
             kind === "approve"
-              ? "Ich bestätige die Ausführung und mögliche Unterbrechung."
-              : "Ich bestätige den Abbruch.",
+              ? t("Ich bestätige die Ausführung und mögliche Unterbrechung.")
+              : t("Ich bestätige den Abbruch."),
           ),
           h(
             "button",
             { type: "submit", class: "btn primary" },
-            kind === "approve" ? "Freigeben" : "Abbrechen",
+            kind === "approve" ? t("Freigeben") : t("Abbrechen"),
           ),
         ),
       ];
     } else if (kind === "user") {
-      title = "Benutzer anlegen";
+      title = t("Benutzer anlegen");
       body = [
         h(
           "form",
           { "data-form": "saveUser" },
-          field("Name", "name", "", "text", {
+          field(t("Name"), "name", "", "text", {
             required: true,
             minlength: 3,
             maxlength: 80,
           }),
-          field("Initiales Passwort", "password", "", "password", {
+          field(t("Initiales Passwort"), "password", "", "password", {
             required: true,
             minlength: 12,
             autocomplete: "new-password",
           }),
-          select("Rolle", "role", "Viewer", [
-            ["Viewer", "Viewer – nur lesen"],
-            ["Operator", "Operator – prüfen und Jobs anlegen"],
+          select(t("Rolle"), "role", "Viewer", [
+            ["Viewer", t("Viewer – nur lesen")],
+            ["Operator", t("Operator – prüfen und Jobs anlegen")],
             ...(vm.user?.role === "Owner"
-              ? [["Administrator", "Administrator – freigeben und verwalten"]]
+              ? [
+                  [
+                    "Administrator",
+                    t("Administrator – freigeben und verwalten"),
+                  ],
+                ]
               : []),
           ]),
           h(
             "button",
             { type: "submit", class: "btn primary" },
-            "Benutzer speichern",
+            t("Benutzer speichern"),
           ),
         ),
       ];
@@ -742,14 +815,14 @@ export class XApprovalDialog extends Widget {
         reason.setCustomValidity("");
         if (enabled && !bool(data.permissionsConfirmed)) {
           confirmation.setCustomValidity(
-            "Bestätige zuerst den Warnhinweis zum Host-Zugriff.",
+            t("Bestätige zuerst den Warnhinweis zum Host-Zugriff."),
           );
           confirmation.reportValidity();
           return;
         }
         if (enabled && String(data.permissionReason || "").trim().length < 3) {
           reason.setCustomValidity(
-            "Bitte gib einen Freigabegrund mit mindestens drei Zeichen an.",
+            t("Bitte gib einen Freigabegrund mit mindestens drei Zeichen an."),
           );
           reason.reportValidity();
           return;
@@ -781,6 +854,7 @@ export class XCUOWorkspace extends Widget {
   connectedCallback() {
     super.connectedCallback();
     bindAppearance(this);
+    bindSettingsTabs(this);
   }
   submit(form) {
     if (form.dataset.form !== "saveOIDC") return;
@@ -803,8 +877,15 @@ export class XCUOWorkspace extends Widget {
           h(
             "div",
             { class: "panel-heading" },
-            h("h2", {}, "Benutzer & Rollen"),
-            button("Benutzer anlegen", "user", "", "", "btn primary", "plus"),
+            h("h2", {}, t("Benutzer & Rollen")),
+            button(
+              t("Benutzer anlegen"),
+              "user",
+              "",
+              "",
+              "btn primary",
+              "plus",
+            ),
           ),
           h(
             "div",
@@ -813,12 +894,16 @@ export class XCUOWorkspace extends Widget {
               h(
                 "article",
                 { class: "policy-card" },
-                h("h3", {}, user.name),
-                h("span", { class: "badge blue" }, user.role),
+                h(
+                  "div",
+                  { class: "policy-heading" },
+                  h("h3", { class: "policy-title" }, user.name),
+                  h("span", { class: "badge blue" }, user.role),
+                ),
                 h("p", { class: "muted" }, "Hosts: " + user.hosts.join(", ")),
                 user.id !== vm.user?.id
                   ? button(
-                      "Sitzungen widerrufen",
+                      t("Sitzungen widerrufen"),
                       "revokeUser",
                       "",
                       user.id,
@@ -831,72 +916,43 @@ export class XCUOWorkspace extends Widget {
           h(
             "p",
             { class: "callout" },
-            "Rollen und Host-Berechtigungen werden serverseitig geprüft. Sitzungen sind nach zwölf Stunden ungültig.",
+            t(
+              "Rollen und Host-Berechtigungen werden serverseitig geprüft. Sitzungen sind nach zwölf Stunden ungültig.",
+            ),
           ),
         ];
       case "integrations":
         return [
-          h("h2", {}, "Integrationen"),
+          h("h2", {}, t("Integrationen")),
           h(
             "div",
             { class: "integrations-grid" },
             h(
               "article",
               { class: "policy-card" },
-              h("h3", {}, "Docker Engine"),
-              h("span", { class: "badge good" }, "Verbunden"),
+              h(
+                "div",
+                { class: "policy-heading" },
+                h("h3", { class: "policy-title" }, t("Docker Engine")),
+                h("span", { class: "badge good" }, t("Verbunden")),
+              ),
               h(
                 "p",
                 {},
-                "Interner Host-Agent mit expliziter Container-Freigabe.",
+                t("Interner Host-Agent mit expliziter Container-Freigabe."),
               ),
             ),
             oidcSettings(vm),
           ),
         ];
       default:
-        return [
-          h("h2", {}, "Workspace-Einstellungen"),
-          h(
-            "div",
-            { class: "settings-list" },
-            h(
-              "article",
-              {},
-              h("h3", {}, "Darstellung"),
-              h(
-                "p",
-                { class: "muted" },
-                "Wähle dein Farbschema oder übernimm die Systemeinstellung.",
-              ),
-              appearance(vm),
-            ),
-            h(
-              "article",
-              {},
-              h("h3", {}, "Lokale Installation"),
-              h("p", {}, "CUO 0.2.0 · Go Core · XTend Maraca / RMT"),
-              h(
-                "p",
-                { class: "muted" },
-                "SQLite-Speicher und Agent-Journale liegen in persistenten Docker-Volumes.",
-              ),
-            ),
-            h(
-              "article",
-              {},
-              h("h3", {}, "Sitzung"),
-              h("p", {}, vm.user?.name + " · " + vm.user?.role),
-              button("Abmelden", "logout", "", "", "btn"),
-            ),
-          ),
-        ];
+        return workspaceSettings(vm);
     }
   }
   update() {
     super.update();
     for (const widget of this.content.querySelectorAll(
-      "x-container-table,x-maintenance-planner,x-policy-editor,x-update-run-timeline,x-host-health,x-log-stream",
+      "x-container-table,x-maintenance-planner,x-policy-editor,x-update-run-timeline,x-host-health,x-log-stream,x-cuo-log-retention",
     ))
       widget.vm = this.vm;
   }

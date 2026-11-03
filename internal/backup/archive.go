@@ -222,20 +222,20 @@ func check(root string) error {
 			return fmt.Errorf("invalid integrity or unsupported schema in %s", file)
 		}
 		if file == "core/cuo.db" {
-			rows, queryErr := db.Query("SELECT data FROM records WHERE kind='job'")
+			rows, queryErr := db.Query("SELECT kind,data FROM records WHERE kind IN ('job','scan-run')")
 			if queryErr != nil {
 				db.Close()
 				return errors.New("invalid Core records")
 			}
 			for rows.Next() {
-				var raw string
+				var kind, raw string
 				var job struct {
 					State string `json:"state"`
 				}
-				if err = rows.Scan(&raw); err == nil {
+				if err = rows.Scan(&kind, &raw); err == nil {
 					err = json.Unmarshal([]byte(raw), &job)
 				}
-				if err != nil || !quiescent(job.State) {
+				if err != nil || (!quiescent(job.State) && !(kind == "scan-run" && job.State == "partial")) {
 					rows.Close()
 					db.Close()
 					return errors.New("backup contains unfinished jobs; finish or cancel them before backup")

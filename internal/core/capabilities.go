@@ -6,6 +6,7 @@ import (
 )
 
 var Capabilities = []Capability{
+	{ID: "logs.manage", Label: "Protokoll-Aufbewahrung und Log-Reset verwalten", OwnerOnly: true},
 	{ID: "inventory.read", Label: "Bestände und Protokolle lesen"},
 	{ID: "updates.scan", Label: "Update-Prüfung starten"},
 	{ID: "updates.request", Label: "Update-Jobs anfordern"},
@@ -48,6 +49,14 @@ func (s *Store) PermissionPolicy() PermissionPolicy {
 	var p PermissionPolicy
 	if s.Get("permission-policy", "current", &p) != nil {
 		return defaultPermissions()
+	}
+	for i := range p.Roles {
+		if p.Roles[i].Role == "Owner" {
+			p.Roles[i].Capabilities = []string{}
+			for _, c := range Capabilities {
+				p.Roles[i].Capabilities = append(p.Roles[i].Capabilities, c.ID)
+			}
+		}
 	}
 	return p
 }
@@ -113,6 +122,9 @@ func validatePermissions(p PermissionPolicy) error {
 	return nil
 }
 func capabilityFor(path, method string) string {
+	if strings.HasPrefix(path, "/api/v1/log-retention") && method != "GET" {
+		return "logs.manage"
+	}
 	if path == "/api/v1/permission-policy" {
 		if method == "GET" {
 			return "roles.manage"

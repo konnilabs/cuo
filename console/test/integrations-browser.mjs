@@ -107,6 +107,7 @@ try {
       : {}),
   });
   const context = await browser.newContext({
+    locale: "de-DE",
     viewport: { width: 1440, height: 1000 },
     reducedMotion: "reduce",
   });

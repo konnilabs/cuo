@@ -1,8 +1,8 @@
 # Release-Reife des Single-Host-MVP
 
-Stand: **2026-11-02 / 0.2.0**. Vereinbart ist zunächst eine lokal installierbare CUO-Instanz auf einem Linux-Docker-Host, keine verteilte Plattform. Das Repository ist bereits öffentlich. Öffentlicher Quellcode, grüne PR-Prüfungen und ein stabiles, signiertes OCI-Release sind getrennte Zustände. Aktuell ist CUO eine **Entwicklungsvorschau**, die stabile Artefaktfreigabe bleibt offen.
+Stand: **2026-11-03 / 0.3.0**. Vereinbart ist zunächst eine lokal installierbare CUO-Instanz auf einem Linux-Docker-Host, keine verteilte Plattform. Das Repository ist bereits öffentlich. Öffentlicher Quellcode, grüne PR-Prüfungen und ein stabiles, signiertes OCI-Release sind getrennte Zustände. Aktuell ist CUO eine **Entwicklungsvorschau**, die stabile Artefaktfreigabe bleibt offen.
 
-Die aktuellen lokalen 0.2.0-Nachweise stehen in [`reports/local-0.2.0.json`](../reports/local-0.2.0.json). Die älteren [`reports/release-readiness.json`](../reports/release-readiness.json) und [`reports/restore-test.json`](../reports/restore-test.json) gehören zum dokumentierten 0.1-Stand. Sie nennen Zeit, Quellstand und Image-IDs; ein Nachweis aus einem veränderten Arbeitsverzeichnis ist kein signierter Nachweis eines sauberen Release-Tags. Ältere Berichte sind historische Ergebnisse, insbesondere kein aktueller OIDC-, Registry- oder CVE-Status.
+Die lokalen 0.3.0-Nachweise stehen in [`reports/local-0.3.0.json`](../reports/local-0.3.0.json). [`reports/local-0.2.0.json`](../reports/local-0.2.0.json) dokumentiert den historischen 0.2.0-Grundstand. Die älteren [`reports/release-readiness.json`](../reports/release-readiness.json) und [`reports/restore-test.json`](../reports/restore-test.json) gehören zum dokumentierten 0.1-Stand. Sie nennen Zeit, Quellstand und Image-IDs; ein Nachweis aus einem veränderten Arbeitsverzeichnis ist kein signierter Nachweis eines sauberen Release-Tags. Ältere Berichte sind historische Ergebnisse, insbesondere kein aktueller OIDC-, Registry- oder CVE-Status.
 
 ## Produktumfang und spätere Ausbaustufen
 
@@ -14,6 +14,10 @@ Die aktuellen lokalen 0.2.0-Nachweise stehen in [`reports/local-0.2.0.json`](../
 | Hochverfügbare Datenhaltung | Außerhalb des ersten MVP. Ein Core, ein Agent und eine Identity-Instanz mit lokalen Volumes; kein Failover. SQLite nicht von mehreren Core-Replikaten gemeinsam beschreiben. | Eigener ADR für Datenbank/Transaktionen, Leader-/Worker-Koordination, Fencing des Agents, Sessions/Secrets, Event-Zustellung und getesteten Failover. |
 
 Diese Grenzen sind keine Blocker für einen ehrlich so benannten Single-Host-MVP. Sie müssen in README, UI und Release-Text sichtbar bleiben. Sie dürfen erst nach eigener Implementierung und Abnahme als unterstützt gelten.
+
+## Einordnung von 0.3.0
+
+0.3.0 bündelt Prozessmanager, Datenexporte, Log-Aufbewahrung sowie die lokalisierte und anpassbare App Shell. Der Versionswechsel ändert keine Datenbankschemata und erfüllt keine zuvor offenen externen Release-Gates. Die öffentlichen 0.2.0-Berichte bleiben historische Nachweise; die folgenden Betriebsgrenzen gelten weiterhin.
 
 ## Einordnung von 0.2.0
 

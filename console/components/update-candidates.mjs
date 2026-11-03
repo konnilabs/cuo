@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.mjs";
 const terminal = new Set([
   "succeeded",
   "failed",
@@ -55,27 +56,28 @@ export function isCurrent(container) {
 }
 export function containerStatus(container) {
   if (
-    container.reason === "Aufbewahrter Vorgänger für manuelle Wiederherstellung"
+    container.reason ===
+    t("Aufbewahrter Vorgänger für manuelle Wiederherstellung")
   )
-    return ["Aufbewahrter Vorgänger", "muted"];
+    return [t("Aufbewahrter Vorgänger"), "muted"];
   if (container.excluded || !container.managed)
-    return ["Ausgeschlossen", "muted"];
+    return [t("Ausgeschlossen"), "muted"];
   const inactive = {
-    created: "Nicht gestartet",
-    exited: "Gestoppt",
-    paused: "Pausiert",
-    restarting: "Neustart läuft",
-    removing: "Wird entfernt",
-    dead: "Fehlerhafter Zustand",
+    created: t("Nicht gestartet"),
+    exited: t("Gestoppt"),
+    paused: t("Pausiert"),
+    restarting: t("Neustart läuft"),
+    removing: t("Wird entfernt"),
+    dead: t("Fehlerhafter Zustand"),
   };
   if (container.state !== "running")
-    return [inactive[container.state] || "Nicht aktiv", "muted"];
+    return [inactive[container.state] || t("Nicht aktiv"), "muted"];
   const candidate = currentCandidate(container);
   return candidate?.error
-    ? ["Prüfung fehlgeschlagen", "warning"]
+    ? [t("Prüfung fehlgeschlagen"), "warning"]
     : hasUpdate(container)
-      ? ["Update verfügbar", "warning"]
+      ? [t("Update verfügbar"), "warning"]
       : isCurrent(container)
-        ? ["Aktuell", "good"]
-        : ["Noch nicht geprüft", "muted"];
+        ? [t("Aktuell"), "good"]
+        : [t("Noch nicht geprüft"), "muted"];
 }

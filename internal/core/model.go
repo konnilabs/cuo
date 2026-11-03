@@ -80,30 +80,36 @@ type Window struct {
 	Enabled   bool     `json:"enabled"`
 }
 type Job struct {
-	SubscriptionGenerated bool   `json:"subscriptionGenerated,omitempty"`
-	TargetImage           string `json:"targetImage,omitempty"`
-	SubscriptionID        string `json:"subscriptionId,omitempty"`
-	ReleaseSetID          string `json:"releaseSetId,omitempty"`
-	TargetOrder           int    `json:"targetOrder,omitempty"`
-	RequesterRole         string `json:"requesterRole,omitempty"`
-	RunID                 string `json:"runId,omitempty"`
-	Immediate             bool   `json:"immediate,omitempty"`
-	EngineID              string `json:"engineId"`
-	Approved              bool   `json:"approved"`
-	ID                    string `json:"id"`
-	HostID                string `json:"hostId"`
-	ContainerID           string `json:"containerId"`
-	Name                  string `json:"name"`
-	State                 string `json:"state"`
-	Target                string `json:"targetDigest"`
-	Source                string `json:"sourceDigest"`
-	Image                 string `json:"image"`
-	Platform              string `json:"platform"`
-	Requester             string `json:"requester"`
-	Reason                string `json:"reason"`
-	WindowID              string `json:"windowId"`
-	Created               string `json:"createdAt"`
-	Updated               string `json:"updatedAt"`
+	LogsPruned            bool               `json:"logsPruned,omitempty"`
+	Started               string             `json:"startedAt,omitempty"`
+	Finished              string             `json:"finishedAt,omitempty"`
+	Stages                []StageTiming      `json:"stages,omitempty"`
+	Before                *ContainerSnapshot `json:"before,omitempty"`
+	After                 *ContainerSnapshot `json:"after,omitempty"`
+	SubscriptionGenerated bool               `json:"subscriptionGenerated,omitempty"`
+	TargetImage           string             `json:"targetImage,omitempty"`
+	SubscriptionID        string             `json:"subscriptionId,omitempty"`
+	ReleaseSetID          string             `json:"releaseSetId,omitempty"`
+	TargetOrder           int                `json:"targetOrder,omitempty"`
+	RequesterRole         string             `json:"requesterRole,omitempty"`
+	RunID                 string             `json:"runId,omitempty"`
+	Immediate             bool               `json:"immediate,omitempty"`
+	EngineID              string             `json:"engineId"`
+	Approved              bool               `json:"approved"`
+	ID                    string             `json:"id"`
+	HostID                string             `json:"hostId"`
+	ContainerID           string             `json:"containerId"`
+	Name                  string             `json:"name"`
+	State                 string             `json:"state"`
+	Target                string             `json:"targetDigest"`
+	Source                string             `json:"sourceDigest"`
+	Image                 string             `json:"image"`
+	Platform              string             `json:"platform"`
+	Requester             string             `json:"requester"`
+	Reason                string             `json:"reason"`
+	WindowID              string             `json:"windowId"`
+	Created               string             `json:"createdAt"`
+	Updated               string             `json:"updatedAt"`
 }
 type RunSkip struct {
 	ContainerID string `json:"containerId"`
@@ -118,6 +124,7 @@ type UpdateRun struct {
 	Skipped   []RunSkip `json:"skipped"`
 }
 type Event struct {
+	RunID     string `json:"runId,omitempty"`
 	ID        int64  `json:"id"`
 	HostID    string `json:"hostId"`
 	JobID     string `json:"jobId"`

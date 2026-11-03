@@ -15,7 +15,7 @@ fi
 registry_host=${registry_host:-localhost:5055}
 docker run --rm --pull never --network none --user 0 \
   --mount "type=bind,source=$(pwd)/.secrets,target=/setup" \
-  cuo-core:0.2.0 provision --directory /setup --owner-uid "$(id -u)" \
+  cuo-core:0.3.0 provision --directory /setup --owner-uid "$(id -u)" \
   --registry-host "$registry_host" $registry_flag
 if [ -n "$registry_flag" ]; then
   docker compose --profile registry create --no-build zot
@@ -24,5 +24,5 @@ if [ -n "$registry_flag" ]; then
   [ -n "$zot_volume" ]
   docker run --rm --pull never --network none --user 0 --entrypoint sh \
     --mount "type=volume,source=$zot_volume,target=/registry" \
-    cuo-core:0.2.0 -c 'chown 10001:10001 /registry; chmod 700 /registry'
+    cuo-core:0.3.0 -c 'chown 10001:10001 /registry; chmod 700 /registry'
 fi

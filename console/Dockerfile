@@ -6,6 +6,8 @@ COPY console/runtime ./runtime
 COPY console/tools/setup.mjs console/tools/resolve-framework.mjs ./tools/
 RUN node --use-env-proxy tools/setup.mjs
 COPY console/src ./src
+COPY console/shared ./shared
+COPY console/i18n ./i18n
 COPY console/components ./components
 COPY console/assets ./assets
 COPY console/brands ./brands
@@ -20,6 +22,7 @@ RUN apk upgrade --no-cache && rm -rf /usr/local/lib/node_modules /opt/yarn-* && 
 RUN mkdir /data && chown node:node /data
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/server ./server
+COPY --from=build /app/shared ./shared
 COPY --from=build /app/runtime ./runtime
 COPY --from=build /app/.framework/xtend-maraca ./.framework/xtend-maraca
 COPY LICENSE NOTICE third_party/XTend-LICENSE /usr/share/licenses/cuo/

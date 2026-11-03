@@ -94,6 +94,7 @@ try {
       : {}),
   });
   const context = await browser.newContext({
+      locale: "de-DE",
       viewport: { width: 1536, height: 1024 },
       reducedMotion: "reduce",
       colorScheme: "light",
@@ -385,17 +386,28 @@ try {
       window.XTendMaraca.model.getState("cuo.vm").page === "logs",
   );
   const terminal = logs.locator("x-log-stream[expanded]").getByRole("log"),
-    card = logs.locator(".logs-workspace");
+    stream = logs.locator("x-log-stream[expanded]");
   const screenRect = await terminal.boundingBox(),
-    cardRect = await card.boundingBox();
-  assert.ok(screenRect.height >= 350, JSON.stringify({ screenRect, cardRect }));
+    streamRect = await stream.boundingBox();
+  // Export and retention controls follow the stream in the shared card.
+  // The terminal must fill its own widget rather than cover those controls.
   assert.ok(
-    cardRect.y + cardRect.height - screenRect.y - screenRect.height <= 26,
-    JSON.stringify({ screenRect, cardRect }),
+    screenRect.height >= 320,
+    JSON.stringify({ screenRect, streamRect }),
   );
+  assert.ok(
+    streamRect.y + streamRect.height - screenRect.y - screenRect.height <= 26,
+    JSON.stringify({ screenRect, streamRect }),
+  );
+  await logs
+    .locator('x-cuo-data-export[dataset="logs"]')
+    .waitFor({ state: "visible" });
+  await logs
+    .locator("x-cuo-log-retention:visible")
+    .waitFor({ state: "visible" });
   await logs.screenshot({ path: out + "/logs-filled.png", fullPage: true });
   await logs.close();
-  const local = await browser.newContext();
+  const local = await browser.newContext({ locale: "de-DE" });
   assert.equal(
     (
       await local.request.post(origin + "/auth/login", {

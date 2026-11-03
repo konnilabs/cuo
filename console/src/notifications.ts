@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.mjs";
 import type { VM } from "./contracts.ts";
 import { hasUpdate } from "../components/update-candidates.mjs";
 export type Notification = {
@@ -14,8 +15,8 @@ export function notifications(vm: VM): Notification[] {
     .filter(hasUpdate)
     .map((c) => ({
       id: `update:${c.id}:${c.candidate!.targetDigest}`,
-      title: "Update verfügbar",
-      message: `${c.name}: Ein neues Image steht bereit.`,
+      title: t("Update verfügbar"),
+      message: t("{v0}: Ein neues Image steht bereit.", { v0: c.name }),
       page: "updates",
       tone: "update",
     }));
@@ -34,11 +35,14 @@ export function notifications(vm: VM): Notification[] {
         id: `job:${job.id}:${state}`,
         title:
           state === "succeeded"
-            ? "Update-Lauf abgeschlossen"
+            ? t("Update-Lauf abgeschlossen")
             : state === "pending_approval"
-              ? "Freigabe erforderlich"
-              : "Update-Lauf benötigt Aufmerksamkeit",
-        message: `Lauf ${String(job.id).slice(0, 8)}${names ? ` · ${names} Container` : ""}`,
+              ? t("Freigabe erforderlich")
+              : t("Update-Lauf benötigt Aufmerksamkeit"),
+        message: t("Lauf {v0}{v1}", {
+          v0: String(job.id).slice(0, 8),
+          v1: names ? ` · ${names} Container` : "",
+        }),
         page: state === "succeeded" ? "history" : "updates",
         tone: state === "succeeded" ? "success" : "attention",
       });

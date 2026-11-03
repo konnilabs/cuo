@@ -1,0 +1,58 @@
+{
+  "feature": "dashboard-responsive-layout",
+  "scope": "local CUO 0.2.0",
+  "implementation": {
+    "authoring": "XTend Maraca / RMT; existing custom maintenance planner",
+    "workspaceAndQuickPanelContainerQueries": true,
+    "statusColumns": [
+      1,
+      2,
+      4
+    ],
+    "quickActionColumns": [
+      1,
+      2,
+      3
+    ],
+    "dateAndBadgeWrapIndependently": true,
+    "longUserNamesWrapWithoutTruncation": true
+  },
+  "validation": {
+    "consoleTests": 39,
+    "strictMaracaBuild": "passed",
+    "dashboardLayouts": 32,
+    "locales": [
+      "de-DE",
+      "en-GB"
+    ],
+    "viewports": [
+      320,
+      390,
+      760,
+      850,
+      1050,
+      1119,
+      1300,
+      1536
+    ],
+    "sidebarStates": [
+      "expanded",
+      "rail"
+    ],
+    "actualTextLineBounds": "inside status, maintenance and action content boxes; not masked by overflow:hidden",
+    "dateBadgeOverlap": false,
+    "equalQuickActionWidthsAndNoOverlap": true,
+    "longUnbrokenMaintenanceNames": true,
+    "sidebarAnimationKeyboardAndMobileRegression": "passed",
+    "deployed1119pxLayouts": 4,
+    "errors": []
+  },
+  "localDeployment": {
+    "status": "healthy",
+    "services": 4,
+    "consoleImage": "sha256:bdaba92cb89d0b9511931bc1b62fc2dbcc317871d75192452c337f489e8d18b9",
+    "otherServicesUnchanged": true,
+    "accountsProfilesOidcPoliciesWindowsJobsUnchanged": true,
+    "rollbackImageRetained": true
+  }
+}

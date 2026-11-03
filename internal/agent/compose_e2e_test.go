@@ -18,7 +18,7 @@ import (
 
 func TestDisposableComposeReconcile(t *testing.T) {
 	if os.Getenv("CUO_DOCKER_E2E") != "1" {
-		t.Skip("requires freshly built cuo-agent:0.2.0 and disposable Docker fixtures")
+		t.Skip("requires freshly built cuo-agent:0.3.0 and disposable Docker fixtures")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Minute)
 	defer cancel()
@@ -64,7 +64,7 @@ volumes: {data: {}}
 	token := hex.EncodeToString(key)
 	agentName := project + "-agent"
 	journalVolume := project + "-journal"
-	run("run", "-d", "--name", agentName, "-p", "127.0.0.1::8092", "-e", "CUO_AGENT_TOKEN="+token, "-v", "/var/run/docker.sock:/var/run/docker.sock", "-v", dir+":/projects:ro", "-v", journalVolume+":/data", "cuo-agent:0.2.0")
+	run("run", "-d", "--name", agentName, "-p", "127.0.0.1::8092", "-e", "CUO_AGENT_TOKEN="+token, "-v", "/var/run/docker.sock:/var/run/docker.sock", "-v", dir+":/projects:ro", "-v", journalVolume+":/data", "cuo-agent:0.3.0")
 	t.Cleanup(func() {
 		exec.Command("docker", "rm", "-f", agentName).Run()
 		exec.Command("docker", "volume", "rm", journalVolume).Run()

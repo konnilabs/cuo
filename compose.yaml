@@ -1,7 +1,7 @@
 name: cuo
 services:
   console:
-    image: cuo-console:0.2.0
+    image: cuo-console:0.3.0
     build:
       context: .
       dockerfile: console/Dockerfile
@@ -28,7 +28,7 @@ services:
       timeout: 5s
       retries: 5
   core:
-    image: cuo-core:0.2.0
+    image: cuo-core:0.3.0
     build:
       context: .
       target: core
@@ -65,7 +65,7 @@ services:
       timeout: 5s
       retries: 5
   agent:
-    image: cuo-agent:0.2.0
+    image: cuo-agent:0.3.0
     build:
       context: .
       target: agent

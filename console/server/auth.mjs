@@ -1,3 +1,4 @@
+import { preferenceDefaults, palettes } from "../shared/ui-preferences.mjs";
 import { DatabaseSync } from "node:sqlite";
 import {
   randomBytes,
@@ -46,16 +47,17 @@ export class Auth {
     const row = this.db
       .prepare("SELECT data FROM profiles WHERE user=?")
       .get(user.id);
-    return row
-      ? JSON.parse(row.data)
-      : {
-          displayName: user.name,
-          avatar: "initials",
-          theme: "system",
-          updateNotifications: true,
-        };
+    return {
+      displayName: user.name,
+      avatar: "initials",
+      theme: "system",
+      updateNotifications: true,
+      ...preferenceDefaults,
+      ...(row ? JSON.parse(row.data) : {}),
+    };
   }
-  saveProfile(user, data) {
+  saveProfile(user, input) {
+    const data = { ...this.profile(user), ...input };
     const name =
       typeof data.displayName === "string" ? data.displayName.trim() : "";
     if (!name || name.length > 80)
@@ -64,11 +66,22 @@ export class Auth {
       throw Error("Ungültiges Profil-Icon");
     if (!["light", "dark", "system"].includes(data.theme))
       throw Error("Ungültiges Farbschema");
+    if (
+      !palettes.includes(data.palette) ||
+      typeof data.highContrast !== "boolean" ||
+      !["de", "en"].includes(data.language) ||
+      typeof data.languageAutomatic !== "boolean"
+    )
+      throw Error("Ungültige Darstellungs- oder Spracheinstellung");
     const profile = {
       displayName: name,
       avatar: data.avatar,
       theme: data.theme,
       updateNotifications: data.updateNotifications !== false,
+      palette: data.palette,
+      highContrast: data.highContrast,
+      language: data.language,
+      languageAutomatic: data.languageAutomatic,
     };
     this.db
       .prepare(
@@ -77,6 +90,7 @@ export class Auth {
       .run(user.id, JSON.stringify(profile));
     return profile;
   }
+
   federated(issuer, claims, config) {
     if (
       typeof claims.sub !== "string" ||

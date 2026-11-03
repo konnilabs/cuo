@@ -34,9 +34,27 @@ export type Container = {
   };
 };
 export type VM = {
+  processRuns: import("./generated-api.ts").ProcessRun[];
+  processTotal: number;
+  processUpcoming: import("./generated-api.ts").ProcessRun[];
+  processKind: string;
+  processQuery: string;
+  processStatus: string;
+  processFrom: string;
+  processTo: string;
+  processOffset: number;
+  processDetail: import("./generated-api.ts").ProcessDetail | null;
+  logStorage: import("./generated-api.ts").LogStorage | null;
   auth: string;
   theme: string;
   themeMode: string;
+  palette: string;
+  highContrast: boolean;
+  language: string;
+  languageAutomatic: boolean;
+  locale: string;
+  settingsTab: string;
+  labels: Record<string, string>;
   notificationsOpen: boolean;
   profileOpen: boolean;
   dismissed: string[];
@@ -57,6 +75,10 @@ export type VM = {
       displayName: string;
       avatar: string;
       theme: string;
+      palette?: string;
+      highContrast?: boolean;
+      language?: string;
+      languageAutomatic?: boolean;
       updateNotifications: boolean;
     };
   };

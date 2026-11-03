@@ -1,3 +1,4 @@
+import { t, localizedLabels } from "../i18n/index.mjs";
 import type { VM, Intent } from "./contracts.ts";
 import type {
   RegistryConnection,
@@ -19,7 +20,7 @@ type API = (
 type Context = { api: API; refresh: (vm: VM) => Promise<VM> };
 type Values = Record<string, string | boolean>;
 const resources = new Map<string, AbortController>();
-export const integrationPages: Record<string, string> = {
+export const integrationPages: Record<string, string> = localizedLabels({
   registries: "UniOCI Registries",
   registry: "Registry-Einstellungen",
   repositories: "Repositories",
@@ -27,7 +28,7 @@ export const integrationPages: Record<string, string> = {
   deliveries: "GitHub Inbox",
   subscriptions: "Release-Subscriptions",
   permissions: "Rollenberechtigungen",
-};
+});
 export const integrationRoutes = [
   { path: "/registries", page: "registries" },
   { path: "/registries/:id/repositories", page: "repositories" },
@@ -140,9 +141,9 @@ const parts = (value: string) =>
     .filter(Boolean);
 function sourceElement(source: string): IntegrationElement {
   if (!/^x-(?:unioci|cuo)-[a-z-]+$/.test(source))
-    throw Error("Ungültige Komponentenquelle");
+    throw Error(t("Ungültige Komponentenquelle"));
   const element = document.querySelector(source) as IntegrationElement | null;
-  if (!element?.takeSubmission) throw Error("Formular nicht verfügbar");
+  if (!element?.takeSubmission) throw Error(t("Formular nicht verfügbar"));
   return element;
 }
 function send(kind: string, data: Record<string, unknown>) {
@@ -206,7 +207,9 @@ function mutation(
       send("integrationMutationResult", {
         operation,
         message:
-          op === "save" ? "Änderung gespeichert." : "Aktion wurde angenommen.",
+          op === "save"
+            ? t("Änderung gespeichert.")
+            : t("Aktion wurde angenommen."),
         id: result.id || "",
         op,
         ...(op === "setup" || op === "install" ? { handoff: result } : {}),
@@ -233,7 +236,7 @@ function navigate(vm: VM, path: string): VM {
   const router = document.getElementById("cuo-router") as HTMLElement & {
     navigate(path: string): boolean;
   };
-  if (!router?.navigate("/" + path)) throw Error("Navigation nicht bereit");
+  if (!router?.navigate("/" + path)) throw Error(t("Navigation nicht bereit"));
   return {
     ...vm,
     ...routeDetails("/" + path),
@@ -328,8 +331,9 @@ export async function integrationIntent(
   if (vm.demo)
     return {
       ...vm,
-      notice:
+      notice: t(
         "Diese Ansicht ist eine Vorschau. Änderungen und Verbindungen benötigen die Live-Instanz.",
+      ),
       error: false,
     };
   if (kind === "integrationNewRegistry") return navigate(vm, "registries/new");
@@ -436,7 +440,7 @@ export async function integrationIntent(
       { repository: vm.repository, reference: value },
     );
   if (kind !== "integrationSubmit")
-    throw Error("Unbekannte Integrationsaktion");
+    throw Error(t("Unbekannte Integrationsaktion"));
   const element = sourceElement(String(data.source)),
     submission = element.takeSubmission(String(data.submission)),
     v = submission.values as Values,
@@ -558,7 +562,9 @@ export async function integrationIntent(
           (r: any) => r.full_name === repository,
         );
       if (!entry)
-        throw Error("Repository zuerst aus der freigegebenen Liste auswählen");
+        throw Error(
+          t("Repository zuerst aus der freigegebenen Liste auswählen"),
+        );
       return query(
         vm,
         api,
@@ -629,7 +635,7 @@ export async function integrationIntent(
           }),
         );
       const payload: PermissionPolicy = { revision, roles, reason };
-      if (!confirmed) throw Error("Änderung der Berechtigungen bestätigen");
+      if (!confirmed) throw Error(t("Änderung der Berechtigungen bestätigen"));
       return mutation(
         vm,
         api,
@@ -640,6 +646,6 @@ export async function integrationIntent(
       );
     }
     default:
-      throw Error("Unbekanntes Integrationsformular");
+      throw Error(t("Unbekanntes Integrationsformular"));
   }
 }

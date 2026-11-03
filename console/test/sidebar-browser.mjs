@@ -49,6 +49,7 @@ try {
       : {}),
   });
   const context = await browser.newContext({
+    locale: "de-DE",
     viewport: { width: 1536, height: 1024 },
     reducedMotion: "no-preference",
   });
@@ -255,7 +256,7 @@ try {
     );
     assert.ok(
       await mobile
-        .locator(".quick-actions .btn")
+        .locator(".quick-actions .quick-action")
         .evaluateAll((buttons) =>
           buttons.every(
             (button) => button.getBoundingClientRect().right <= innerWidth,

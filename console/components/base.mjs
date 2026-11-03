@@ -1,3 +1,4 @@
+import { t, localizedLabels, localeTag } from "../i18n/index.mjs";
 import "./icons.mjs";
 export const h = (tag, attrs = {}, ...children) => ({
   tag,
@@ -49,10 +50,10 @@ export function button(
         label ||
         {
           details: "Container-Aktionen",
-          calendar: "Monat wechseln",
-          page: "Seite wechseln",
-          close: "Dialog schließen",
-          filter: "Ausschlüsse filtern",
+          calendar: t("Monat wechseln"),
+          page: t("Seite wechseln"),
+          close: t("Dialog schließen"),
+          filter: t("Ausschlüsse filtern"),
         }[kind] ||
         kind,
       "data-kind": kind,
@@ -144,16 +145,41 @@ export function patch(parent, items) {
       node.value = attrs.value;
       node._cuoSelection = String(attrs.value);
     }
+    // Preferences commit immediately through RMT. Restore controls after a
+    // rejected request while leaving ordinary form drafts untouched.
+    const controlled = [
+      "data-palette",
+      "data-appearance-toggle",
+      "data-high-contrast",
+      "data-auto-theme",
+      "data-language",
+      "data-auto-language",
+    ].some((key) => Object.hasOwn(item.attrs, key));
+    if (
+      controlled &&
+      "checked" in item.attrs &&
+      node.checked !== !!item.attrs.checked
+    ) {
+      node.checked = !!item.attrs.checked;
+      node._cuoChecked = !!item.attrs.checked;
+    }
+    if (
+      controlled &&
+      node.tagName === "SELECT" &&
+      attrs.value !== undefined &&
+      node.value !== String(attrs.value)
+    )
+      node.value = String(attrs.value);
   });
   for (const n of old.values()) n.remove();
 }
-export const modeLabel = {
+export const modeLabel = localizedLabels({
   "scan-only": "Nur prüfen",
   automatic: "Automatisch",
   "approval-required": "Manuelle Freigabe",
   disabled: "Deaktiviert",
-};
-export const stageLabel = {
+});
+export const stageLabel = localizedLabels({
   pending_approval: "Freigabe ausstehend",
   scheduled: "Geplant",
   queued: "In Warteschlange",
@@ -165,13 +191,13 @@ export const stageLabel = {
   failed: "Fehlgeschlagen",
   intervention_required: "Eingriff erforderlich",
   cancelled: "Abgebrochen",
-};
+});
 export function formatDate(value) {
   if (/^\d{2}\.\d{2}\.\d{4}/.test(String(value))) return value;
   const d = new Date(value);
   return Number.isNaN(d.getTime())
     ? String(value || "–")
-    : d.toLocaleString("de-DE", { dateStyle: "short", timeStyle: "short" });
+    : d.toLocaleString(localeTag(), { dateStyle: "short", timeStyle: "short" });
 }
 export class Widget extends HTMLElement {
   static get observedAttributes() {
@@ -317,6 +343,7 @@ export class Widget extends HTMLElement {
     );
   }
   update() {
+    this.content.dataset.contrast = this.vm.highContrast ? "high" : "normal";
     patch(this.content, this.render?.() || []);
   }
 }

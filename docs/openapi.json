@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "CUO API",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Same-origin BFF API. Browser authenticates with HttpOnly session cookie and CSRF. Core is internal and requires a service bearer token plus server-supplied principal headers. Only host local is supported."
   },
   "servers": [
@@ -5818,6 +5818,1050 @@
         "x-cuo-capability": "inventory.read",
         "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
       }
+    },
+    "/api/v1/process-runs": {
+      "get": {
+        "operationId": "processes",
+        "x-cuo-min-role": "Viewer",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "UTC date (YYYY-MM-DD) or RFC3339; end date inclusive"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "UTC date (YYYY-MM-DD) or RFC3339; end date inclusive"
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "inventory.read",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/process-runs/{id}": {
+      "get": {
+        "operationId": "processDetail",
+        "x-cuo-min-role": "Viewer",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "description": "Event cursor; at most 200 events per page"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProcessDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "inventory.read",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/log-retention": {
+      "get": {
+        "operationId": "logStorage",
+        "x-cuo-min-role": "Viewer",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogStorage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "inventory.read",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      },
+      "put": {
+        "operationId": "saveLogRetention",
+        "x-cuo-min-role": "Owner",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogRetention"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogMaintenanceRequest"
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "logs.manage",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/log-retention/rotate": {
+      "post": {
+        "operationId": "logsrotate",
+        "x-cuo-min-role": "Owner",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogMaintenanceResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogMaintenanceRequest"
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "logs.manage",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/log-retention/reset": {
+      "post": {
+        "operationId": "logsreset",
+        "x-cuo-min-role": "Owner",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogMaintenanceResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogMaintenanceRequest"
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "logs.manage",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/log-retention/compact": {
+      "post": {
+        "operationId": "logscompact",
+        "x-cuo-min-role": "Owner",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 8,
+              "maxLength": 128
+            }
+          },
+          {
+            "name": "X-CSRF-Token",
+            "in": "header",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogMaintenanceResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogMaintenanceRequest"
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "logs.manage",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
+    },
+    "/api/v1/exports": {
+      "get": {
+        "operationId": "exportData",
+        "x-cuo-min-role": "Viewer",
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "runId",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "UTC date (YYYY-MM-DD) or RFC3339; end date inclusive"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            },
+            "description": "UTC date (YYYY-MM-DD) or RFC3339; end date inclusive"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DataExport"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "502": {
+            "description": "Stable error code and safe message",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "x-cuo-capability": "inventory.read",
+        "description": "The versioned role capability policy and host ACL are authoritative. x-cuo-min-role documents initial defaults only."
+      }
     }
   },
   "components": {
@@ -6092,6 +7136,27 @@
       "Job": {
         "type": "object",
         "properties": {
+          "logsPruned": {
+            "type": "boolean"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "finishedAt": {
+            "type": "string"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageTiming"
+            }
+          },
+          "before": {
+            "$ref": "#/components/schemas/ContainerSnapshot"
+          },
+          "after": {
+            "$ref": "#/components/schemas/ContainerSnapshot"
+          },
           "subscriptionGenerated": {
             "type": "boolean"
           },
@@ -6242,6 +7307,9 @@
       "Event": {
         "type": "object",
         "properties": {
+          "runId": {
+            "type": "string"
+          },
           "id": {
             "type": "integer"
           },
@@ -7003,6 +8071,433 @@
           "label",
           "description",
           "ownerOnly"
+        ],
+        "additionalProperties": false
+      },
+      "ContainerSnapshot": {
+        "type": "object",
+        "properties": {
+          "engineId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "imageId": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "platform": {
+            "type": "string"
+          },
+          "managed": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "engineId",
+          "name",
+          "image",
+          "imageId",
+          "state",
+          "platform",
+          "managed"
+        ],
+        "additionalProperties": false
+      },
+      "StageTiming": {
+        "type": "object",
+        "properties": {
+          "stage": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "finishedAt": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "stage",
+          "startedAt",
+          "durationMs"
+        ],
+        "additionalProperties": false
+      },
+      "ProcessAnomaly": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "severity",
+          "message"
+        ],
+        "additionalProperties": false
+      },
+      "ProcessRun": {
+        "type": "object",
+        "properties": {
+          "logsPruned": {
+            "type": "boolean"
+          },
+          "stages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StageTiming"
+            }
+          },
+          "containerNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "startedAt": {
+            "type": "string"
+          },
+          "finishedAt": {
+            "type": "string"
+          },
+          "nextStart": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": "integer"
+          },
+          "queueMs": {
+            "type": "integer"
+          },
+          "baselineMs": {
+            "type": "integer"
+          },
+          "baselineSamples": {
+            "type": "integer"
+          },
+          "containerCount": {
+            "type": "integer"
+          },
+          "succeeded": {
+            "type": "integer"
+          },
+          "failed": {
+            "type": "integer"
+          },
+          "pending": {
+            "type": "integer"
+          },
+          "jobIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "containerIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "anomalies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcessAnomaly"
+            }
+          },
+          "reason": {
+            "type": "string"
+          },
+          "requester": {
+            "type": "string"
+          },
+          "windowId": {
+            "type": "string"
+          },
+          "skipped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RunSkip"
+            }
+          },
+          "telemetryAvailable": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "state",
+          "createdAt",
+          "durationMs",
+          "queueMs",
+          "baselineMs",
+          "baselineSamples",
+          "containerCount",
+          "succeeded",
+          "failed",
+          "pending",
+          "jobIds",
+          "containerIds",
+          "anomalies",
+          "reason",
+          "requester",
+          "skipped",
+          "telemetryAvailable"
+        ],
+        "additionalProperties": false
+      },
+      "ProcessDetail": {
+        "type": "object",
+        "properties": {
+          "run": {
+            "$ref": "#/components/schemas/ProcessRun"
+          },
+          "jobs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Job"
+            }
+          },
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Event"
+            }
+          },
+          "eventCount": {
+            "type": "integer"
+          },
+          "nextEventId": {
+            "type": "integer"
+          },
+          "moreEvents": {
+            "type": "boolean"
+          },
+          "logsPruned": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "run",
+          "jobs",
+          "events",
+          "eventCount",
+          "nextEventId",
+          "moreEvents",
+          "logsPruned"
+        ],
+        "additionalProperties": false
+      },
+      "LogRetention": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "days": {
+            "type": "integer"
+          },
+          "maxEvents": {
+            "type": "integer"
+          },
+          "intervalHours": {
+            "type": "integer"
+          },
+          "lastRun": {
+            "type": "string"
+          },
+          "lastDeleted": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "revision",
+          "enabled",
+          "days",
+          "maxEvents",
+          "intervalHours",
+          "lastDeleted"
+        ],
+        "additionalProperties": false
+      },
+      "LogStorage": {
+        "type": "object",
+        "properties": {
+          "policy": {
+            "$ref": "#/components/schemas/LogRetention"
+          },
+          "events": {
+            "type": "integer"
+          },
+          "databaseBytes": {
+            "type": "integer"
+          },
+          "reusableBytes": {
+            "type": "integer"
+          },
+          "activeJobs": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "policy",
+          "events",
+          "databaseBytes",
+          "reusableBytes",
+          "activeJobs"
+        ],
+        "additionalProperties": false
+      },
+      "LogMaintenanceRequest": {
+        "type": "object",
+        "properties": {
+          "revision": {
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "days": {
+            "type": "integer"
+          },
+          "maxEvents": {
+            "type": "integer"
+          },
+          "intervalHours": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "confirmed": {
+            "type": "boolean"
+          },
+          "confirmation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason",
+          "confirmed"
+        ],
+        "additionalProperties": false
+      },
+      "LogMaintenanceResult": {
+        "type": "object",
+        "properties": {
+          "deleted": {
+            "type": "integer"
+          },
+          "protectedJobs": {
+            "type": "integer"
+          },
+          "compacted": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "deleted",
+          "protectedJobs",
+          "compacted"
+        ],
+        "additionalProperties": false
+      },
+      "DataExport": {
+        "type": "object",
+        "properties": {
+          "filename": {
+            "type": "string"
+          },
+          "contentType": {
+            "type": "string"
+          },
+          "content": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "integer"
+          },
+          "generatedAt": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "filename",
+          "contentType",
+          "content",
+          "rows",
+          "generatedAt"
+        ],
+        "additionalProperties": false
+      },
+      "ProcessPage": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcessRun"
+            }
+          },
+          "upcoming": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProcessRun"
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "upcoming",
+          "total",
+          "offset",
+          "limit"
         ],
         "additionalProperties": false
       },

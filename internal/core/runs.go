@@ -59,14 +59,14 @@ func (e *Engine) CreateRun(p Principal, reason string) (UpdateRun, error) {
 		if err = put("job", j.ID, j); err != nil {
 			return run, err
 		}
-		if err = event(Event{HostID: j.HostID, JobID: j.ID, Actor: p.ID, Operation: "job.create.immediate", Stage: "queued", Severity: "info", Message: j.Name + ": Sofortstart in Lauf " + run.ID + "; " + reason}); err != nil {
+		if err = event(Event{RunID: run.ID, HostID: j.HostID, JobID: j.ID, Actor: p.ID, Operation: "job.create.immediate", Stage: "queued", Severity: "info", Message: j.Name + ": Sofortstart in Lauf " + run.ID + "; " + reason}); err != nil {
 			return run, err
 		}
 	}
 	if err = put("run", run.ID, run); err != nil {
 		return run, err
 	}
-	if err = event(Event{Actor: p.ID, Operation: "run.create", Stage: "queued", Severity: "info", Message: fmt.Sprintf("Sofortlauf %s: %d Updates, %d übersprungen; %s", run.ID, len(run.Jobs), len(run.Skipped), reason)}); err != nil {
+	if err = event(Event{RunID: run.ID, Actor: p.ID, Operation: "run.create", Stage: "queued", Severity: "info", Message: fmt.Sprintf("Sofortlauf %s: %d Updates, %d übersprungen; %s", run.ID, len(run.Jobs), len(run.Skipped), reason)}); err != nil {
 		return run, err
 	}
 	if err = tx.Commit(); err != nil {

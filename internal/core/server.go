@@ -70,6 +70,7 @@ func Run() error {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go engine.Worker(ctx)
+	go engine.RetentionWorker(ctx)
 	go engine.IntegrationWorker(ctx)
 	go func() {
 		_, _ = engine.Discover(ctx)
@@ -77,6 +78,7 @@ func Run() error {
 		if err != nil || interval < time.Minute {
 			interval = 6 * time.Hour
 		}
+		_ = s.Put("meta", "nextScan", map[string]string{"time": time.Now().UTC().Add(interval).Format(time.RFC3339)})
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 		for {
@@ -84,6 +86,7 @@ func Run() error {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
+				_ = s.Put("meta", "nextScan", map[string]string{"time": time.Now().UTC().Add(interval).Format(time.RFC3339)})
 				if err := engine.Scan(ctx, "scheduler"); err != nil {
 					_ = s.Event(Event{Actor: "scheduler", Operation: "scan", Stage: "failed", Severity: "warning", Message: err.Error()})
 				}
@@ -107,7 +110,7 @@ func fail(w http.ResponseWriter, status int, code, msg string) {
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/health" {
-		respond(w, 200, map[string]any{"ok": true, "version": "0.2.0"})
+		respond(w, 200, map[string]any{"ok": true, "version": "0.3.0"})
 		return
 	}
 	if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+s.Token)) != 1 {
@@ -193,6 +196,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 }
 func (s *Server) get(w http.ResponseWriter, r *http.Request, p Principal) {
 	store := s.Engine.Store
+	if s.processGet(w, r, p) {
+		return
+	}
 	switch {
 	case r.URL.Path == "/api/v1/hosts":
 		host := Host{ID: "local", Name: "Lokaler Docker-Host", Endpoint: "constrained-agent", Capabilities: []string{"inventory", "registry-scan", "standalone-update", "registered-compose-reconcile"}}
@@ -319,6 +325,10 @@ func decode(body []byte, v any) error {
 	return nil
 }
 func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any) {
+	if status, value, handled := s.processMutation(path, method, body, p); handled {
+		return status, value
+	}
+
 	if integrationPath(path) {
 		return s.integrationMutate(path, method, body, p)
 	}
