@@ -2,7 +2,11 @@ import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 // The Go domain structs are the schema source; no registry or network needed.
-const source = ["internal/core/model.go", "internal/core/integration_models.go"]
+const source = [
+    "internal/core/model.go",
+    "internal/core/integration_models.go",
+    "internal/core/process_model.go",
+  ]
     .map((file) => fs.readFileSync(file, "utf8"))
     .join("\n"),
   schemas = {};
@@ -117,15 +121,17 @@ function endpoint(
   const responses = {};
   const status =
     method === "post"
-      ? path.endsWith("scans") || path.endsWith("/sync")
-        ? "202"
-        : path.endsWith("approve") || path.endsWith("cancel")
-          ? "200"
-          : path === "/api/v1/update-jobs" || path === "/api/v1/update-runs"
-            ? "201"
-            : path === "/api/v1/import-jobs"
-              ? "202"
-              : "200"
+      ? path.includes("log-retention")
+        ? 200
+        : path.endsWith("scans") || path.endsWith("/sync")
+          ? "202"
+          : path.endsWith("approve") || path.endsWith("cancel")
+            ? "200"
+            : path === "/api/v1/update-jobs" || path === "/api/v1/update-runs"
+              ? "201"
+              : path === "/api/v1/import-jobs"
+                ? "202"
+                : "200"
       : "200";
   const result = collection
     ? {
@@ -193,6 +199,33 @@ function endpoint(
         },
       })),
     );
+  if (
+    method === "get" &&
+    ["/api/v1/process-runs", "/api/v1/exports"].includes(path)
+  ) {
+    const names = path.endsWith("exports")
+      ? ["dataset", "format", "runId", "q", "status", "from", "to"]
+      : ["kind", "q", "status", "from", "to", "offset", "limit"];
+    parameters.push(
+      ...names.map((name) => ({
+        name,
+        in: "query",
+        schema: {
+          type: ["offset", "limit"].includes(name) ? "integer" : "string",
+        },
+        description: ["from", "to"].includes(name)
+          ? "UTC date (YYYY-MM-DD) or RFC3339; end date inclusive"
+          : undefined,
+      })),
+    );
+  }
+  if (path === "/api/v1/process-runs/{id}")
+    parameters.push({
+      name: "after",
+      in: "query",
+      schema: { type: "integer", minimum: 0 },
+      description: "Event cursor; at most 200 events per page",
+    });
   const operation = {
     operationId: id,
     "x-cuo-min-role": role,
@@ -520,10 +553,40 @@ paths["/api/v1/events"] = {
     },
   },
 };
+endpoint(
+  "/api/v1/process-runs",
+  "get",
+  "processes",
+  "ProcessPage",
+  undefined,
+  "Viewer",
+  false,
+);
+endpoint("/api/v1/process-runs/{id}", "get", "processDetail", "ProcessDetail");
+endpoint("/api/v1/log-retention", "get", "logStorage", "LogStorage");
+endpoint(
+  "/api/v1/log-retention",
+  "put",
+  "saveLogRetention",
+  "LogRetention",
+  "LogMaintenanceRequest",
+  "Owner",
+);
+for (const action of ["rotate", "reset", "compact"])
+  endpoint(
+    "/api/v1/log-retention/" + action,
+    "post",
+    "logs" + action,
+    "LogMaintenanceResult",
+    "LogMaintenanceRequest",
+    "Owner",
+  );
+endpoint("/api/v1/exports", "get", "exportData", "DataExport");
 for (const [path, methods] of Object.entries(paths))
   for (const [method, op] of Object.entries(methods)) {
     let cap = "inventory.read";
-    if (path.includes("permissions/me")) cap = "authenticated";
+    if (path.includes("log-retention") && method !== "get") cap = "logs.manage";
+    else if (path.includes("permissions/me")) cap = "authenticated";
     else if (path.includes("permission-policy")) cap = "roles.manage";
     else if (path.includes("registries"))
       cap =
@@ -561,7 +624,7 @@ const spec = {
   openapi: "3.1.0",
   info: {
     title: "CUO API",
-    version: "0.2.0",
+    version: "0.3.0",
     description:
       "Same-origin BFF API. Browser authenticates with HttpOnly session cookie and CSRF. Core is internal and requires a service bearer token plus server-supplied principal headers. Only host local is supported.",
   },

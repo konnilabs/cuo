@@ -1,0 +1,57 @@
+{
+  "version": "0.3.0",
+  "status": "local development preview; no publication or production deployment",
+  "features": [
+    "existing process manager, exports and retention",
+    "native XTend DE/EN, palettes, high contrast and responsive shell",
+    "registry success/error badges use existing semantic styles",
+    "user/engine card headings use an 8px wrapping gap",
+    "Alt + K display hint"
+  ],
+  "validation": {
+    "strictMaracaBuild": "passed",
+    "consoleTests": 39,
+    "toolTests": 5,
+    "goRace": "passed",
+    "badgePaletteModeContrastCases": 16,
+    "badgeTextContrastMinimum": 4.5,
+    "cardHeadingGapPx": 8,
+    "previousNavigationToggleAndProfileBrowserChecks": "passed",
+    "deployedBrowser": {
+      "version": "0.3.0",
+      "shortcut": "Alt + K",
+      "readyBadge": {
+        "color": "rgb(0, 110, 58)",
+        "background": "rgb(223, 249, 234)"
+      },
+      "gaps": [
+        {
+          "section": "users",
+          "gap": 8
+        },
+        {
+          "section": "integrations",
+          "gap": 8
+        }
+      ],
+      "errors": []
+    },
+    "versions": {
+      "console": "0.3.0",
+      "core": "0.3.0"
+    }
+  },
+  "localDeployment": {
+    "servicesHealthy": 4,
+    "images": {
+      "console": "sha256:2a8d9a8802fec6e12173d9285bbaa292c06214f939d5cbe76d82fd9e16424962",
+      "core": "sha256:0795c303cbe78e71cbd68c9dd79f7e767f93d27c5f4f3929f7ef5635ae6aa280",
+      "agent": "sha256:607ebe09d87253bbaf987ad7cb785a2342488611fd49cba630171d56c05013ee"
+    },
+    "accountsProfilesOidcPoliciesWindowsJobsUnchanged": true,
+    "zotContainerUnchanged": true,
+    "offlineBackupCreatedAndVerified": true,
+    "rollbackImagesRetained": true
+  },
+  "releaseLimits": "The existing external release gates remain open; historical 0.2.0 reports are not rewritten."
+}

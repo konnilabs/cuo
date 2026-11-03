@@ -1,15 +1,29 @@
+import { labelKey } from "../i18n/index.mjs";
+import { messages } from "../i18n/catalog.mjs";
 import fs from "node:fs";
 import { integrationRoutes } from "../src/integrations.ts";
 import { pageNames as initialPages, initial, present } from "../src/view.ts";
+const labelBinding = (value) =>
+  typeof value === "string" && Object.hasOwn(messages, value)
+    ? "$model.cuo.vm.labels." + labelKey(value)
+    : value;
 const el = (tag, attrs = {}, children = [], extra = {}) => ({
   type: "element",
   tag,
   ...(attrs.class ? { class: attrs.class } : {}),
   attributes: Object.fromEntries(
-    Object.entries(attrs).filter(([k]) => k !== "class"),
+    Object.entries(attrs)
+      .filter(([k]) => k !== "class")
+      .map(([key, value]) => [
+        key,
+        ["aria-label", "title", "placeholder", "alt"].includes(key)
+          ? labelBinding(value)
+          : value,
+      ]),
   ),
   children,
   ...extra,
+  ...(typeof extra.text === "string" ? { text: labelBinding(extra.text) } : {}),
 });
 const text = (tag, content, cls = "") =>
   el(tag, { class: cls }, [], { text: content });
@@ -45,10 +59,10 @@ const links = [
   ["updates", "Updates", "refresh", "core"],
   ["schedule", "Zeitplanung", "calendar", "cuo"],
   ["policies", "Richtlinien", "shield", "core"],
-  ["history", "Historie", "history", "cuo"],
+  ["history", "Prozesse", "history", "cuo"],
   ["logs", "Logs", "docs", "core"],
-  ["registries", "Registries", "cube", "cuo"],
-  ["subscriptions", "Subscriptions", "link", "cuo"],
+  ["registries", "Registries", "layers", "lucide"],
+  ["subscriptions", "Subscriptions", "rss", "cuo"],
   ["settings", "Einstellungen", "settings", "core"],
 ];
 const nav = ([page, label, name, pack]) =>
@@ -95,7 +109,7 @@ const sidebar = el(
           [
             el("div", { class: "brand-name" }, [
               text("strong", "CUO"),
-              text("small", "v0.2.0"),
+              text("small", "v0.3.0"),
             ]),
             text("p", "Container Update Orchestrator"),
           ],
@@ -166,7 +180,7 @@ const topbar = el("header", { class: "topbar" }, [
       [],
       { props: { value: "$model.cuo.vm.query" } },
     ),
-    text("kbd", "Alt K"),
+    text("kbd", "Alt + K"),
   ]),
   el("div", { class: "topbar-tools" }, [
     cmd("Hilfe und Lizenzen öffnen", "help", "", "question", "icon-btn", "cuo"),
@@ -299,7 +313,13 @@ const dashboard = el("div", { class: "$model.cuo.vm.dashboardClass" }, [
   ]),
 ]);
 const routed = [
-  ["containers", [widget("x-container-table")]],
+  [
+    "containers",
+    [
+      widget("x-container-table"),
+      widget("x-cuo-data-export", { dataset: "containers" }),
+    ],
+  ],
   ["updates", [widget("x-update-run-timeline"), widget("x-container-table")]],
   [
     "schedule",
@@ -312,8 +332,15 @@ const routed = [
     ],
   ],
   ["policies", [widget("x-policy-editor")]],
-  ["history", [widget("x-update-run-timeline")]],
-  ["logs", [widget("x-log-stream", { expanded: true })]],
+  ["history", [widget("x-cuo-process-manager"), widget("x-cuo-data-export")]],
+  [
+    "logs",
+    [
+      widget("x-log-stream", { expanded: true }),
+      widget("x-cuo-data-export", { dataset: "logs" }),
+      widget("x-cuo-log-retention"),
+    ],
+  ],
   ["hosts", [widget("x-host-health")]],
   [
     "users",
@@ -452,6 +479,7 @@ const shell = el(
       ),
     ]),
     widget("x-approval-dialog"),
+    widget("x-cuo-process-detail"),
     widget("x-cuo-profile"),
     widget("x-cuo-sidebar-motion", { hidden: true, "aria-hidden": true }),
   ],
@@ -461,6 +489,12 @@ const tree = {
   layoutEngine: "document-flow",
   viewTemplate: {
     class: "cuo-root",
+    attributes: {
+      "data-theme": "$model.cuo.vm.theme",
+      "data-palette": "$model.cuo.vm.palette",
+      "data-contrast": "$model.cuo.vm.contrastMode",
+      lang: "$model.cuo.vm.locale",
+    },
     children: [
       el("a", { href: "#main-content", class: "skip-link" }, [], {
         text: "Zum Inhalt springen",
@@ -604,6 +638,14 @@ fs.writeFileSync(
     {
       "x-icon": "../.framework/components/xicon.js",
       "x-container-icon": "./container-icon.mjs",
+      ...Object.fromEntries(
+        [
+          "x-cuo-process-manager",
+          "x-cuo-process-detail",
+          "x-cuo-data-export",
+          "x-cuo-log-retention",
+        ].map((tag) => [tag, "./processes.mjs"]),
+      ),
       ...Object.fromEntries(
         [
           "x-unioci-registry-list",

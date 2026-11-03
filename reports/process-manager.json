@@ -1,0 +1,79 @@
+{
+  "feature": "process-manager-exports-retention",
+  "scope": "local single-host CUO 0.2.0",
+  "xtend": {
+    "authoring": "RMT",
+    "components": [
+      "x-cuo-process-manager",
+      "x-cuo-process-detail",
+      "x-cuo-data-export",
+      "x-cuo-log-retention"
+    ],
+    "mcpConsulted": true,
+    "dependencyRevision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836"
+  },
+  "validation": {
+    "goRace": "passed",
+    "goVet": "passed",
+    "consoleTests": 35,
+    "strictMaracaBuild": "passed",
+    "realDisposableDockerUpdate": {
+      "state": "succeeded",
+      "durationMs": 10628,
+      "beforeAfterSnapshots": true,
+      "stageTimings": true,
+      "scopedLogDrilldown": true
+    },
+    "exportRows": {
+      "processes": 4,
+      "containers": 35,
+      "detail": 17,
+      "logs": 9
+    },
+    "independentXlsxReader": "openpyxl 3.1.5; no warnings or formula cells",
+    "browser": {
+      "errors": [],
+      "downloads": true,
+      "drilldown": true,
+      "forecast": true,
+      "filters": true,
+      "retentionSettings": true,
+      "mobileInputFontPx": 16
+    },
+    "logResetAndCompaction": "passed on disposable database only",
+    "retentionChecks": [
+      "owner-only RBAC",
+      "confirmation",
+      "settings revision and idempotency",
+      "audit transaction rollback",
+      "active jobs, batch siblings and scan log protection",
+      "age and count rotation",
+      "history and scheduler dedup retained",
+      "monotonic event IDs",
+      "physical SQLite space reclamation",
+      "backup rejects active scans"
+    ]
+  },
+  "limits": {
+    "exportRows": 10000,
+    "exportBytes": 16777216,
+    "detailLogPageSize": 200,
+    "historicalTelemetryBackfilled": false,
+    "forecastIsConditional": true,
+    "automaticRetentionDefault": false,
+    "permanentJobAndAgentJournalDeletion": false
+  },
+  "localDeployment": {
+    "status": "healthy",
+    "services": 4,
+    "updatedImages": {
+      "core": "sha256:fd2577e5a9324b05f81f15e11e92c370359ba6ae549a0b246d20adc657fb3ceb",
+      "agent": "sha256:91c459f5c7ddc4a42eb7f309ae31b875ed0015a0fc0bea60e37ad0e3f2dbfcdd",
+      "console": "sha256:897b83eb3c3fd042fab5442e7009c388d6e3e1ee5236d57a6d9625c23d4e8678"
+    },
+    "accountsProfilesOidcPoliciesWindowsAndJobsUnchanged": true,
+    "preExistingLogEventsPreserved": 80,
+    "automaticRetentionEnabled": false,
+    "offlineBackupValidated": true
+  }
+}

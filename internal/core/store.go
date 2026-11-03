@@ -174,9 +174,25 @@ func (s *Store) queryEvents(after int64, p Principal, latest bool) ([]Event, err
 func (s *Store) Policies() []Policy { var out []Policy; _ = s.List("policy", &out); return out }
 func (s *Store) Jobs() []Job        { var out []Job; _ = s.List("job", &out); return out }
 func (s *Store) Recover() error {
+	var scans []ProcessRun
+	_ = s.List("scan-run", &scans)
+	for _, r := range scans {
+		if r.State == "running" {
+			r.State = "intervention_required"
+			r.Finished = time.Now().UTC().Format(time.RFC3339Nano)
+			r.Reason = "Core-Neustart während der Prüfung; keine automatische Wiederholung"
+			finishProcessStage(&r, time.Now().UTC())
+			r.DurationMS = elapsed(r.Started, r.Finished, time.Now())
+			r.Anomalies = append(r.Anomalies, ProcessAnomaly{Code: "scan_interrupted", Severity: "warning", Message: r.Reason})
+			if err := s.Put("scan-run", r.ID, r); err != nil {
+				return err
+			}
+		}
+	}
 	for _, j := range s.Jobs() {
 		switch j.State {
 		case "preflight", "pulling", "recreating", "verifying":
+			recordStage(&j, "intervention_required", time.Now().UTC())
 			j.State = "intervention_required"
 			j.Reason = "Core restarted during execution. Inspect agent journal and container before retrying."
 			j.Updated = time.Now().UTC().Format(time.RFC3339)

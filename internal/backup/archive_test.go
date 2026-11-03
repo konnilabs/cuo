@@ -157,3 +157,24 @@ func TestRejectIncompleteOrIncompatibleBackup(t *testing.T) {
 		})
 	}
 }
+
+func TestScanProcessesMustBeQuiescentBeforeBackup(t *testing.T) {
+	for _, state := range []string{"running", "succeeded", "partial", "intervention_required"} {
+		t.Run(state, func(t *testing.T) {
+			root := fixture(t, "")
+			db, err := sql.Open("sqlite", filepath.Join(root, "core/cuo.db"))
+			if err != nil {
+				t.Fatal(err)
+			}
+			_, err = db.Exec(`INSERT INTO records VALUES('scan-run',?)`, `{"state":"`+state+`"}`)
+			db.Close()
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = Run(bytes.NewReader(archive(t, root, nil)), false, "")
+			if (err != nil) != (state == "running") {
+				t.Fatal(state, err)
+			}
+		})
+	}
+}

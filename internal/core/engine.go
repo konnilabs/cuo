@@ -103,16 +103,26 @@ func (e *Engine) Discover(ctx context.Context) ([]Container, error) {
 	}
 	return list, nil
 }
-func (e *Engine) Scan(ctx context.Context, actor string) error {
+func (e *Engine) Scan(ctx context.Context, actor string) (scanErr error) {
 	if !e.ScanMu.TryLock() {
 		return errors.New("scan already running")
 	}
 	defer e.ScanMu.Unlock()
+	scanRun, err := e.beginScan(actor)
+	if err != nil {
+		return err
+	}
+	defer func() { e.finishScan(&scanRun, scanErr) }()
 	list, err := e.Discover(ctx)
 	if err != nil {
 		return err
 	}
-	_ = e.Store.Event(Event{Actor: actor, Operation: "scan", Stage: "started", Severity: "info", Message: fmt.Sprintf("Prüfe %d lokale Container", len(list))})
+	finishProcessStage(&scanRun, time.Now().UTC())
+	scanRun.Stages = append(scanRun.Stages, StageTiming{Stage: "registry_scan", Started: time.Now().UTC().Format(time.RFC3339Nano)})
+	if err = e.Store.Put("scan-run", scanRun.ID, scanRun); err != nil {
+		return err
+	}
+	_ = e.Store.Event(Event{RunID: scanRun.ID, Actor: actor, Operation: "scan", Stage: "started", Severity: "info", Message: fmt.Sprintf("Prüfe %d lokale Container", len(list))})
 	for _, c := range list {
 		if ctx.Err() != nil {
 			return ctx.Err()
@@ -126,7 +136,11 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 				continue
 			}
 		}
+		scanRun.ContainerCount++
+		scanRun.ContainerIDs = append(scanRun.ContainerIDs, c.ID)
+		scanRun.Names = append(scanRun.Names, c.Name)
 		if c.LocalImage {
+			scanRun.Skipped = append(scanRun.Skipped, RunSkip{ContainerID: c.ID, Name: c.Name, Reason: "Lokales Image ohne Registry-Digest"})
 			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: "Lokales Image ohne veröffentlichten Registry-Digest"}
 			if _, err = e.publishCandidate(c, candidate); err != nil {
 				return err
@@ -138,6 +152,8 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		}
 		access, accessErr := e.accessForImage(c.Image)
 		if accessErr != nil {
+			scanRun.Failed++
+			scanRun.Anomalies = append(scanRun.Anomalies, ProcessAnomaly{Code: "registry_access", Severity: "warning", Message: c.Name + ": " + accessErr.Error()})
 			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: accessErr.Error()}
 			if _, err = e.publishCandidate(c, candidate); err != nil {
 				return err
@@ -153,7 +169,7 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		}
 		if r.StatusCode != 200 {
 			r.Body.Close()
-			continue
+			return fmt.Errorf("Agent-Prüfung HTTP %d", r.StatusCode)
 		}
 		var candidate Candidate
 		err = json.NewDecoder(io.LimitReader(r.Body, 16384)).Decode(&candidate)
@@ -171,15 +187,20 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		message := c.Name + ": aktuell"
 		severity := "info"
 		if candidate.Error != "" {
+			scanRun.Failed++
+			scanRun.Anomalies = append(scanRun.Anomalies, ProcessAnomaly{Code: "registry_warning", Severity: "warning", Message: c.Name + ": " + candidate.Error})
 			message = c.Name + ": " + candidate.Error
 			severity = "warning"
 		} else if candidate.Target != "" {
 			message = c.Name + ": neuer Plattform-Digest verfügbar"
 		}
-		_ = e.Store.Event(Event{Actor: actor, Operation: "scan", Stage: "discovered", Severity: severity, Message: message})
+		if candidate.Error == "" {
+			scanRun.Succeeded++
+		}
+		_ = e.Store.Event(Event{RunID: scanRun.ID, Actor: actor, Operation: "scan", Stage: "discovered", Severity: severity, Message: message})
 	}
 	_ = e.Store.Put("meta", "lastScan", map[string]any{"time": time.Now().UTC().Format(time.RFC3339)})
-	_ = e.Store.Event(Event{Actor: actor, Operation: "scan", Stage: "completed", Severity: "info", Message: "Update-Prüfung abgeschlossen"})
+	_ = e.Store.Event(Event{RunID: scanRun.ID, Actor: actor, Operation: "scan", Stage: "completed", Severity: "info", Message: "Update-Prüfung abgeschlossen"})
 	e.Notify()
 	return nil
 }
@@ -205,7 +226,7 @@ func (e *Engine) CreateJob(c Container, p Principal, reason string, automatic bo
 	if err = bindReleaseJob(tx, j); err != nil {
 		return j, err
 	}
-	event := Event{HostID: j.HostID, JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: j.State, Severity: "info", Message: c.Name + ": Update angelegt", Time: j.Created}
+	event := Event{RunID: processID(j), HostID: j.HostID, JobID: j.ID, Actor: p.ID, Operation: "job.create", Stage: j.State, Severity: "info", Message: c.Name + ": Update angelegt", Time: j.Created}
 	if _, err = tx.Exec(`INSERT INTO events(host,data) VALUES(?,?)`, event.HostID, encode(event)); err != nil {
 		return j, err
 	}
@@ -255,6 +276,7 @@ func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, 
 	}
 	now := time.Now().UTC().Format(time.RFC3339)
 	j := Job{ID: ID(), EngineID: c.EngineID, HostID: c.HostID, ContainerID: c.ID, Name: c.Name, State: state, Target: c.Candidate.Target, Source: c.Candidate.Source, Image: c.Image, Platform: c.Platform, Requester: p.ID, Reason: reason, WindowID: policy.WindowID, Created: now, Updated: now}
+	j.Before = snapshotContainer(c)
 	j.RequesterRole = p.Role
 	j.TargetImage = c.Candidate.TargetImage
 	j.SubscriptionID = c.Candidate.SubscriptionID
@@ -266,12 +288,14 @@ func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, 
 		j.Approved = true
 		j.Immediate = true
 	}
+	j.Stages = []StageTiming{{Stage: j.State, Started: now}}
 	return j, nil
 }
 func terminal(s string) bool {
 	return s == "succeeded" || s == "failed" || s == "intervention_required" || s == "cancelled"
 }
 func (e *Engine) update(j *Job, state, message string) {
+	recordStage(j, state, time.Now().UTC())
 	j.State = state
 	j.Updated = time.Now().UTC().Format(time.RFC3339)
 	if terminal(state) {
@@ -284,7 +308,7 @@ func (e *Engine) update(j *Job, state, message string) {
 	if state == "failed" || state == "intervention_required" {
 		severity = "error"
 	}
-	if err := e.Store.Event(Event{JobID: j.ID, Actor: "core", Operation: "update", Stage: state, Severity: severity, Message: j.Name + ": " + message}); err != nil {
+	if err := e.Store.Event(Event{RunID: processID(*j), JobID: j.ID, Actor: "core", Operation: "update", Stage: state, Severity: severity, Message: j.Name + ": " + message}); err != nil {
 		panic(err)
 	}
 }
@@ -348,6 +372,7 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 			return
 		}
 	}
+	j.Before = snapshotContainer(current)
 	e.update(&j, "preflight", "Vorprüfung gestartet")
 	e.Mu.Unlock()
 	ctx, cancel := context.WithTimeout(parent, 16*time.Minute)
@@ -394,7 +419,11 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 	discoverCtx, discoverCancel := context.WithTimeout(parent, 15*time.Second)
 	defer discoverCancel()
 	if _, err := e.Discover(discoverCtx); err == nil {
-		_ = e.Store.Event(Event{HostID: j.HostID, JobID: j.ID, Actor: "core", Operation: "inventory", Stage: "refreshed", Severity: "info", Message: "Containerbestand nach dem Update-Lauf aktualisiert"})
+		var observed Container
+		if e.Store.Get("container", j.ContainerID, &observed) == nil {
+			_, _ = e.Store.DB.Exec(`UPDATE records SET data=json_set(data,'$.after',json(?)) WHERE kind='job' AND id=?`, encode(snapshotContainer(observed)), j.ID)
+		}
+		_ = e.Store.Event(Event{RunID: processID(j), HostID: j.HostID, JobID: j.ID, Actor: "core", Operation: "inventory", Stage: "refreshed", Severity: "info", Message: "Containerbestand nach dem Update-Lauf aktualisiert"})
 	}
 }
 func (e *Engine) Tick(now time.Time) {

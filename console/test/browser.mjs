@@ -17,6 +17,7 @@ const browser = await chromium.launch({
     : {}),
 });
 const context = await browser.newContext({
+    locale: "de-DE",
     viewport: { width: 1536, height: 1024 },
     reducedMotion: "reduce",
   }),
@@ -193,7 +194,7 @@ try {
       data: { name: viewer, password: vp, role: "Viewer" },
     })
     .then(async (r) => assert.equal(r.status(), 201, await r.text()));
-  const viewContext = await browser.newContext();
+  const viewContext = await browser.newContext({ locale: "de-DE" });
   const login = await viewContext.request.post(origin + "/auth/login", {
     headers: { Origin: origin },
     data: { name: viewer, password: vp },
@@ -216,7 +217,7 @@ try {
   );
   assert.equal(staticSource.status(), 404);
   await viewContext.close();
-  const anonymous = await browser.newContext();
+  const anonymous = await browser.newContext({ locale: "de-DE" });
   assert.equal(
     (await anonymous.request.get(origin + "/api/v1/containers")).status(),
     401,

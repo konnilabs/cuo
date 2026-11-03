@@ -8,7 +8,8 @@ mkdir -p "$(dirname "$backup_file")"
 # Background scheduling can race this check. Archive validation repeats it after
 # shutdown against the actual offline database before accepting the backup.
 docker compose exec -T console node --input-type=module -e '
-const response=await fetch((process.env.CUO_CORE_URL||"http://core:8091")+"/api/v1/update-jobs",{headers:{Authorization:"Bearer "+process.env.CUO_CORE_TOKEN,"X-CUO-Actor":"backup-check","X-CUO-Role":"Viewer","X-CUO-Hosts":"local"}});if(!response.ok)throw Error("Core must be reachable before backup");const data=await response.json();if(data.items.some(j=>!["succeeded","failed","cancelled","intervention_required"].includes(j.state))){console.error("Backup refused: finish/cancel all pending and active updates first.");process.exit(1)}'
+const response=await fetch((process.env.CUO_CORE_URL||"http://core:8091")+"/api/v1/update-jobs",{headers:{Authorization:"Bearer "+process.env.CUO_CORE_TOKEN,"X-CUO-Actor":"backup-check","X-CUO-Role":"Viewer","X-CUO-Hosts":"local"}});if(!response.ok)throw Error("Core must be reachable before backup");const data=await response.json();if(data.items.some(j=>!["succeeded","failed","cancelled","intervention_required"].includes(j.state))){console.error("Backup refused: finish/cancel all pending and active updates first.");process.exit(1)}
+const storage=await fetch((process.env.CUO_CORE_URL||"http://core:8091")+"/api/v1/log-retention",{headers:{Authorization:"Bearer "+process.env.CUO_CORE_TOKEN,"X-CUO-Actor":"backup-check","X-CUO-Role":"Viewer","X-CUO-Hosts":"local"}});if(storage.ok){const state=await storage.json();if(state.activeJobs>0){console.error("Backup refused: wait for all processes, including image scans, to finish.");process.exit(1)}}else if(storage.status!==404){throw Error("Core process status must be reachable before backup")}'
 umask 077
 partial=$(mktemp "$backup_file.partial.XXXXXX")
 restart=0

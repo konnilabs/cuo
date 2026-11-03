@@ -531,6 +531,7 @@ th[aria-sort] .sort x-icon {
   left: calc(50% - 3px);
 }
 .window-card {
+  min-width: 0;
   margin-top: 10px;
   padding: 12px 14px 10px;
   border: 1px solid var(--cuo-border, #e3e9f3);
@@ -544,7 +545,35 @@ th[aria-sort] .sort x-icon {
 }
 .window-card h3 {
   font-size: 13px;
-  white-space: nowrap;
+  white-space: normal;
+}
+.planner-heading,
+.window-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 8px;
+}
+.planner-heading h2,
+.window-heading h3 {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.planner-heading .btn,
+.window-card :is(h3, p, small, .badge, .btn) {
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.window-heading .badge {
+  flex: 0 1 auto;
+  margin-inline-start: auto;
+  text-align: center;
+}
+.window-card .time span {
+  min-width: 0;
 }
 .window-card .badge {
   font-size: 9.5px;
@@ -1413,11 +1442,30 @@ x-drawer {
 .profile-form .appearance-controls {
   margin: 0;
 }
-.appearance-controls x-toggle {
+/* Native XToggle tokens apply to every CUO switch, including accessibility.
+   Leave room beside the thumb for the localized EIN/AUS state labels. */
+x-toggle {
   --xtend-toggle-text: var(--cuo-text);
   --xtend-toggle-label-text: var(--cuo-text);
+  --xtend-toggle-track-off-color: var(--cuo-canvas);
   --xtend-toggle-track-on-color: var(--cuo-primary);
+  --xtend-toggle-border-color: var(--cuo-border);
+  --xtend-toggle-thumb-color: var(--cuo-text);
+  --xtend-toggle-state-text: var(--cuo-text);
+  --xtend-toggle-focus-ring: 3px solid var(--cuo-focus);
   --xtend-toggle-font-size: 13px;
+  --xtend-toggle-state-font-size: 0.75rem;
+  --xtend-form-toggle-width: 4rem;
+}
+x-toggle[checked] {
+  --xtend-toggle-thumb-color: var(--cuo-primary-ink);
+  --xtend-toggle-state-text: var(--cuo-primary-ink);
+}
+/* Keep the native slot geometry stable, but never rely on the moving circular
+   thumb to mask the inactive state text. The reflected state updates at once. */
+x-toggle:not([checked]) > [slot="on-label"],
+x-toggle[checked] > [slot="off-label"] {
+  visibility: hidden;
 }
 x-drawer::part(surface) {
   width: min(380px, 94vw);
@@ -1643,4 +1691,379 @@ summary {
     white-space: normal;
     overflow-wrap: anywhere;
   }
+}
+/* Process management uses the same light/dark tokens as the existing widgets. */
+.process-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+  margin: 16px 0;
+}
+.process-metric {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 14px;
+  border: 1px solid var(--cuo-border);
+  border-radius: 12px;
+  background: var(--cuo-surface);
+}
+.process-metric strong {
+  font-size: 20px;
+}
+.process-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin: 16px 0;
+}
+.process-filters > label {
+  flex: 1 1 140px;
+  min-width: 0;
+}
+.process-filters button {
+  margin-bottom: 0;
+}
+.process-id {
+  display: block;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  color: var(--cuo-muted);
+}
+.process-table td {
+  vertical-align: top;
+  max-width: 310px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+.process-table td:first-child {
+  min-width: 180px;
+}
+.process-table td:nth-child(6) {
+  min-width: 160px;
+}
+.process-dialog {
+  width: min(1100px, calc(100vw - 32px));
+  max-width: 1100px;
+}
+.process-dialog .dialog-content {
+  max-height: 78dvh;
+  overflow: auto;
+}
+.process-facts,
+.snapshot-data {
+  display: grid;
+  grid-template-columns: 130px minmax(0, 1fr);
+  gap: 8px;
+  font-size: 12px;
+}
+.process-facts dd,
+.snapshot-data dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.process-facts dt,
+.snapshot-data dt {
+  color: var(--cuo-muted);
+}
+.process-snapshots {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.process-stages {
+  padding-left: 20px;
+}
+.process-stages li {
+  display: flex;
+  gap: 12px;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--cuo-border);
+  font-size: 12px;
+}
+.process-log {
+  background: #172131;
+  color: #dbe9fb;
+  border-radius: 10px;
+  padding: 12px;
+  max-height: 340px;
+  overflow: auto;
+  font-family: monospace;
+  font-size: 11px;
+}
+.process-log-line {
+  display: grid;
+  grid-template-columns: 130px 65px 90px minmax(200px, 1fr);
+  gap: 8px;
+  padding: 5px 0;
+}
+.export-panel,
+.retention-panel {
+  margin-top: 24px;
+  padding-top: 18px;
+  border-top: 1px solid var(--cuo-border);
+}
+.retention-panel details {
+  margin-top: 20px;
+}
+.retention-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+.retention-panel form > label {
+  margin-bottom: 12px;
+}
+@media (max-width: 760px) {
+  .process-snapshots {
+    grid-template-columns: 1fr;
+  }
+  .process-facts,
+  .snapshot-data {
+    grid-template-columns: 100px minmax(0, 1fr);
+  }
+  .process-stages li {
+    flex-wrap: wrap;
+  }
+  .process-log-line {
+    grid-template-columns: 130px 60px minmax(220px, 1fr);
+  }
+  .process-log-line > span:nth-child(3) {
+    display: none;
+  }
+  .process-dialog {
+    width: calc(100vw - 16px);
+    max-height: 95dvh;
+  }
+  .process-filters input,
+  .process-filters select,
+  .retention-panel input,
+  .retention-panel select {
+    font-size: 16px;
+  }
+}
+
+.process-dialog .dialog-heading > div {
+  min-width: 0;
+}
+.process-dialog h2 {
+  overflow-wrap: anywhere;
+}
+.process-dialog h3 {
+  margin-top: 20px;
+}
+
+/* Shared appearance and accessible workspace controls. */
+.palette-picker {
+  border: 0;
+  padding: 0;
+  margin: 0 0 18px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.palette-picker legend {
+  margin-bottom: 10px;
+  font-weight: 500;
+}
+.palette-option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px;
+  border: 1px solid var(--cuo-border);
+  border-radius: 10px;
+  background: var(--cuo-surface);
+  cursor: pointer;
+  min-width: 0;
+}
+.palette-option:has(input:checked) {
+  border-color: var(--cuo-primary);
+  outline: 1px solid var(--cuo-primary);
+}
+.palette-swatch {
+  width: 22px;
+  height: 22px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 1px solid var(--cuo-border);
+}
+.palette-swatch.slate {
+  background: #295bff;
+}
+.palette-swatch.black {
+  background: #171717;
+}
+.palette-swatch.green {
+  background: #166534;
+}
+.palette-swatch.wine {
+  background: #9f1645;
+}
+.settings-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 20px 0;
+  border-bottom: 1px solid var(--cuo-border);
+  padding-bottom: 12px;
+}
+.settings-tab {
+  padding: 10px 14px;
+  border: 1px solid var(--cuo-border);
+  border-radius: 8px;
+  background: var(--cuo-surface);
+  color: var(--cuo-text);
+}
+.settings-tab[aria-selected="true"] {
+  background: var(--cuo-primary);
+  color: var(--cuo-primary-ink);
+  border-color: var(--cuo-primary);
+}
+.settings-content {
+  max-width: 900px;
+  display: grid;
+  gap: 18px;
+  line-height: 1.5;
+}
+.settings-content:focus-visible {
+  outline: 3px solid var(--cuo-focus);
+  outline-offset: 4px;
+}
+.appearance-controls {
+  max-width: 660px;
+}
+.appearance-controls x-toggle {
+  --xtend-color-primary: var(--cuo-primary);
+}
+input {
+  accent-color: var(--cuo-primary);
+}
+.btn.primary,
+.tab.selected,
+.page-btn.selected,
+.day.chosen {
+  background: var(--cuo-primary);
+  color: var(--cuo-primary-ink);
+  border-color: var(--cuo-primary);
+}
+:is(button, a, input, select, textarea):focus-visible {
+  outline: 3px solid var(--cuo-focus, var(--cuo-primary));
+  outline-offset: 3px;
+}
+[data-contrast="high"]
+  :is(
+    input,
+    select,
+    textarea,
+    button,
+    .badge,
+    .policy-card,
+    .job-card,
+    .window-card,
+    .process-metric,
+    .notice,
+    .callout,
+    .palette-option,
+    .tab,
+    .page-btn
+  ) {
+  border: 2px solid var(--cuo-border);
+  box-shadow: none;
+}
+[data-contrast="high"]
+  :is(
+    .badge,
+    .callout,
+    .notice,
+    .tab,
+    .page-btn,
+    .btn,
+    .settings-tab,
+    .day,
+    .month-btn
+  ) {
+  background: var(--cuo-surface);
+  color: var(--cuo-text);
+}
+[data-contrast="high"]
+  :is(
+    .btn.primary,
+    .tab.selected,
+    .page-btn.selected,
+    .day.chosen,
+    .settings-tab[aria-selected="true"]
+  ) {
+  background: var(--cuo-primary);
+  color: var(--cuo-primary-ink);
+}
+[data-contrast="high"] :is(.muted, small, th, td, .process-id, .version.new) {
+  color: var(--cuo-text);
+}
+[data-contrast="high"] .terminal {
+  border: 2px solid var(--cuo-border);
+}
+@media (max-width: 480px) {
+  .settings-tab {
+    flex: 1 1 42%;
+    min-height: 44px;
+  }
+  .palette-picker {
+    grid-template-columns: 1fr;
+  }
+}
+@media (forced-colors: active) {
+  button,
+  input,
+  select,
+  textarea,
+  .badge,
+  .policy-card,
+  .settings-tab {
+    forced-color-adjust: auto;
+  }
+}
+
+[data-contrast="high"] :is(.terminal, .process-log) {
+  background: var(--cuo-surface);
+  color: var(--cuo-text);
+  border: 2px solid var(--cuo-border);
+}
+[data-contrast="high"] :is(.terminal, .process-log) span {
+  color: var(--cuo-text);
+}
+
+.tab.selected .count {
+  background: transparent;
+  color: var(--cuo-primary-ink);
+  border: 1px solid currentColor;
+}
+.checkbox input,
+.check input,
+.weekday-checks input,
+.permission-matrix input[type="checkbox"] {
+  accent-color: var(--cuo-primary);
+}
+.permission-matrix input[type="checkbox"]:focus-visible {
+  outline: 3px solid var(--cuo-focus);
+  outline-offset: 3px;
+}
+[data-contrast="high"] .count {
+  background: var(--cuo-surface);
+  color: var(--cuo-text);
+  border: 1px solid var(--cuo-border);
+}
+[data-contrast="high"] .toast-stack x-toast {
+  --xtend-info-bg: var(--cuo-surface);
+  --xtend-success-bg: var(--cuo-surface);
+  --xtend-warning-bg: var(--cuo-surface);
+  --xtend-error-bg: var(--cuo-surface);
+  --xtend-info-fg: var(--cuo-text);
+  --xtend-success-fg: var(--cuo-text);
+  --xtend-warning-fg: var(--cuo-text);
+  --xtend-error-fg: var(--cuo-text);
+  --xtend-feedback-border: 2px solid var(--cuo-border);
+  --xtend-focus-outline: 3px solid var(--cuo-focus);
 }

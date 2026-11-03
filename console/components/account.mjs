@@ -1,3 +1,4 @@
+import { t } from "../i18n/index.mjs";
 import { Widget, register, h, icon, button, field, select } from "./base.mjs";
 import "../.framework/components/xtoggle.js";
 import "../vendor/xdrawer.mjs";
@@ -5,12 +6,42 @@ export function appearance(vm) {
   return h(
     "div",
     { class: "appearance-controls" },
-    h("x-toggle", {
-      label: "Dunkles Farbschema",
-      checked: vm.theme === "dark",
-      disabled: vm.themeMode === "system",
-      "data-appearance-toggle": true,
-    }),
+    h(
+      "fieldset",
+      { class: "palette-picker" },
+      h("legend", {}, t("Farbfamilie")),
+      [
+        ["slate", t("Slate")],
+        ["black", t("Schwarz")],
+        ["green", t("Waldgrün")],
+        ["wine", t("Weinrot")],
+      ].map(([value, label]) =>
+        h(
+          "label",
+          { class: "palette-option" },
+          h("input", {
+            type: "radio",
+            name: "palette",
+            value,
+            checked: (vm.palette || "slate") === value,
+            "data-palette": true,
+          }),
+          h("span", { class: "palette-swatch " + value, "aria-hidden": true }),
+          h("span", {}, label),
+        ),
+      ),
+    ),
+    h(
+      "x-toggle",
+      {
+        label: t("Dunkles Farbschema"),
+        checked: vm.theme === "dark",
+        disabled: vm.themeMode === "system",
+        "data-appearance-toggle": true,
+      },
+      h("span", { slot: "on-label" }, t("Ein")),
+      h("span", { slot: "off-label" }, t("Aus")),
+    ),
     h(
       "label",
       { class: "check" },
@@ -19,14 +50,14 @@ export function appearance(vm) {
         checked: vm.themeMode === "system",
         "data-auto-theme": true,
       }),
-      "Automatisch",
+      t("Automatisch"),
     ),
     h(
       "p",
       { class: "muted small" },
       vm.themeMode === "system"
-        ? "Folgt der Systemeinstellung."
-        : "Deine Auswahl wird im Profil gespeichert.",
+        ? t("Folgt der Systemeinstellung.")
+        : t("Deine Auswahl wird im Profil gespeichert."),
     ),
   );
 }
@@ -35,6 +66,8 @@ export function bindAppearance(widget) {
   widget.shadowRoot.addEventListener(
     "toggle-changed",
     (e) => {
+      if (e.target.matches("[data-high-contrast]"))
+        widget.emit("highContrast", String(e.detail.checked));
       if (e.target.matches("[data-appearance-toggle]"))
         widget.emit("themeSet", String(e.detail.checked));
     },
@@ -43,6 +76,12 @@ export function bindAppearance(widget) {
   widget.shadowRoot.addEventListener(
     "change",
     (e) => {
+      if (e.target.matches("[data-palette]"))
+        widget.emit("palette", e.target.value);
+      if (e.target.matches("[data-language]"))
+        widget.emit("language", e.target.value);
+      if (e.target.matches("[data-auto-language]"))
+        widget.emit("languageAuto", String(e.target.checked));
       if (e.target.matches("[data-auto-theme]"))
         widget.emit("themeAuto", String(e.target.checked));
     },
@@ -87,18 +126,18 @@ export class XNotificationCenter extends Widget {
         {
           class: "notification-center",
           role: "region",
-          "aria-label": "Benachrichtigungen",
+          "aria-label": t("Benachrichtigungen"),
         },
         h(
           "div",
           { class: "panel-heading" },
-          h("h2", {}, "Benachrichtigungen"),
+          h("h2", {}, t("Benachrichtigungen")),
           h(
             "div",
             { class: "notification-tools" },
             items.length
               ? button(
-                  "Alle löschen",
+                  t("Alle löschen"),
                   "clearNotifications",
                   "",
                   "",
@@ -110,7 +149,7 @@ export class XNotificationCenter extends Widget {
               {
                 type: "button",
                 class: "icon-btn",
-                "aria-label": "Benachrichtigungen schließen",
+                "aria-label": t("Benachrichtigungen schließen"),
                 "data-kind": "closeNotifications",
               },
               icon("x"),
@@ -149,7 +188,8 @@ export class XNotificationCenter extends Widget {
                     {
                       type: "button",
                       class: "icon-btn",
-                      "aria-label": "Benachrichtigung schließen: " + n.message,
+                      "aria-label":
+                        t("Benachrichtigung schließen: ") + n.message,
                       "data-kind": "dismissNotification",
                       "data-id": n.id,
                     },
@@ -162,19 +202,21 @@ export class XNotificationCenter extends Widget {
               "div",
               { class: "notification-empty" },
               icon("check"),
-              h("strong", {}, "Alles erledigt"),
+              h("strong", {}, t("Alles erledigt")),
               h(
                 "p",
                 {},
                 this.vm.user.profile?.updateNotifications === false
-                  ? "Update-Benachrichtigungen sind in deinem Profil deaktiviert."
-                  : "Keine neuen Update-Benachrichtigungen.",
+                  ? t(
+                      "Update-Benachrichtigungen sind in deinem Profil deaktiviert.",
+                    )
+                  : t("Keine neuen Update-Benachrichtigungen."),
               ),
             ),
         h(
           "p",
           { class: "muted small notification-footer" },
-          "Geschlossene Meldungen bleiben für dein Konto ausgeblendet.",
+          t("Geschlossene Meldungen bleiben für dein Konto ausgeblendet."),
         ),
       ),
     ];
@@ -207,11 +249,11 @@ export class XProfileDrawer extends Widget {
           id: "cuo-profile-drawer",
           placement: "right",
           modal: true,
-          label: "Dein Profil",
+          label: t("Dein Profil"),
           open: vm.profileOpen,
           "data-theme": vm.theme,
         },
-        h("strong", { slot: "header" }, "Dein Profil"),
+        h("strong", { slot: "header" }, t("Dein Profil")),
         h(
           "form",
           { "data-form": "saveProfile", class: "profile-form" },
@@ -230,26 +272,28 @@ export class XProfileDrawer extends Widget {
               h("span", { class: "badge blue" }, vm.user.role),
             ),
           ),
-          field("Anzeigename", "displayName", p.displayName, "text", {
+          field(t("Anzeigename"), "displayName", p.displayName, "text", {
             required: true,
             maxlength: 80,
             autocomplete: "nickname",
           }),
-          select("Profil-Icon", "avatar", p.avatar, [
-            ["initials", "Initialen"],
-            ["user", "Person"],
-            ["shield", "Schild"],
-            ["cube", "Container"],
-            ["cloud", "Cloud"],
+          select(t("Profil-Icon"), "avatar", p.avatar, [
+            ["initials", t("Initialen")],
+            ["user", t("Person")],
+            ["shield", t("Schild")],
+            ["cube", t("Container")],
+            ["cloud", t("Cloud")],
           ]),
           h(
             "p",
             { class: "muted small" },
-            "Deine Rolle und Host-Berechtigungen werden vom Administrator verwaltet.",
+            t(
+              "Deine Rolle und Host-Berechtigungen werden vom Administrator verwaltet.",
+            ),
           ),
-          h("h3", {}, "Darstellung"),
+          h("h3", {}, t("Darstellung")),
           appearance(vm),
-          h("h3", {}, "Benachrichtigungen"),
+          h("h3", {}, t("Benachrichtigungen")),
           h(
             "label",
             { class: "check" },
@@ -258,19 +302,19 @@ export class XProfileDrawer extends Widget {
               name: "updateNotifications",
               checked: p.updateNotifications !== false,
             }),
-            "Update-Benachrichtigungen anzeigen",
+            t("Update-Benachrichtigungen anzeigen"),
           ),
           h(
             "button",
             { type: "submit", class: "btn primary full" },
-            "Profil speichern",
+            t("Profil speichern"),
           ),
         ),
         h(
           "div",
           { slot: "footer", class: "profile-footer" },
-          button("Schließen", "closeProfile", "", "", "btn"),
-          button("Abmelden", "logout", "", "", "text-btn"),
+          button(t("Schließen"), "closeProfile", "", "", "btn"),
+          button(t("Abmelden"), "logout", "", "", "text-btn"),
         ),
       ),
     ];
@@ -289,16 +333,16 @@ export function oidcSettings(vm) {
     return h(
       "article",
       { class: "policy-card" },
-      h("h3", {}, "OpenID Connect"),
+      h("h3", {}, t("OpenID Connect")),
       h(
         "span",
         { class: "badge " + (vm.oidc?.enabled ? "good" : "muted") },
-        vm.oidc?.enabled ? "Aktiviert" : "Nicht aktiviert",
+        vm.oidc?.enabled ? t("Aktiviert") : t("Nicht aktiviert"),
       ),
       h(
         "p",
         { class: "muted" },
-        "Der Owner kann einen beliebigen OIDC-Provider konfigurieren.",
+        t("Der Owner kann einen beliebigen OIDC-Provider konfigurieren."),
       ),
     );
   return h(
@@ -307,26 +351,28 @@ export function oidcSettings(vm) {
     h(
       "div",
       { class: "panel-heading" },
-      h("h3", {}, "OpenID Connect"),
+      h("h3", {}, t("OpenID Connect")),
       h(
         "span",
         { class: "badge " + (c.enabled ? "good" : "muted") },
-        c.enabled ? "Aktiviert" : "Nicht aktiviert",
+        c.enabled ? t("Aktiviert") : t("Nicht aktiviert"),
       ),
     ),
     h(
       "p",
       { class: "muted" },
-      "Verbinde CUO mit deinem OIDC-Provider. Registriere dort einen Web-Client mit Authorization Code Flow und PKCE (S256).",
+      t(
+        "Verbinde CUO mit deinem OIDC-Provider. Registriere dort einen Web-Client mit Authorization Code Flow und PKCE (S256).",
+      ),
     ),
     h(
       "label",
       { class: "field" },
-      h("span", {}, "Redirect-URI für den Provider"),
+      h("span", {}, t("Redirect-URI für den Provider")),
       h("input", {
         readonly: true,
         value: c.redirectUri,
-        "aria-label": "Redirect-URI",
+        "aria-label": t("Redirect-URI"),
         class: "redirect-uri",
       }),
     ),
@@ -337,7 +383,7 @@ export function oidcSettings(vm) {
         "label",
         { class: "check" },
         h("input", { name: "enabled", type: "checkbox", checked: c.enabled }),
-        "SSO-Anmeldung aktivieren",
+        t("SSO-Anmeldung aktivieren"),
       ),
       h(
         "label",
@@ -347,32 +393,40 @@ export function oidcSettings(vm) {
           type: "checkbox",
           checked: c.localLoginEnabled !== false,
         }),
-        "Lokale Anmeldung mit Benutzername und Passwort erlauben",
+        t("Lokale Anmeldung mit Benutzername und Passwort erlauben"),
       ),
       h(
         "p",
         { class: "callout small" },
-        "Ohne lokale Anmeldung zeigt der Login nur SSO; auch der Passwort-Endpunkt wird gesperrt. Aktiviere dies erst nach einem erfolgreichen SSO-Test. Bei Provider-Ausfall und für lokale Owner-Konten lässt sich der Zugang ausschließlich über das Host-Terminal wiederherstellen: ./tools/recover-login.sh. Bestehende Sitzungen bleiben gültig.",
+        t(
+          "Ohne lokale Anmeldung zeigt der Login nur SSO; auch der Passwort-Endpunkt wird gesperrt. Aktiviere dies erst nach einem erfolgreichen SSO-Test. Bei Provider-Ausfall und für lokale Owner-Konten lässt sich der Zugang ausschließlich über das Host-Terminal wiederherstellen: ./tools/recover-login.sh. Bestehende Sitzungen bleiben gültig.",
+        ),
       ),
-      field("Beschriftung der Anmeldung", "label", c.label, "text", {
+      field(t("Beschriftung der Anmeldung"), "label", c.label, "text", {
         maxlength: 80,
       }),
-      field("Issuer-URL", "issuer", c.issuer, "url", {
+      field(t("Issuer-URL"), "issuer", c.issuer, "url", {
         placeholder: "https://identity.example.org",
         maxlength: 2048,
       }),
-      field("Discovery-URL (optional)", "discoveryUrl", c.discoveryUrl, "url", {
-        placeholder:
-          "https://identity.example.org/.well-known/openid-configuration",
-        maxlength: 2048,
-      }),
-      field("Client-ID", "clientId", c.clientId, "text", {
+      field(
+        t("Discovery-URL (optional)"),
+        "discoveryUrl",
+        c.discoveryUrl,
+        "url",
+        {
+          placeholder:
+            "https://identity.example.org/.well-known/openid-configuration",
+          maxlength: 2048,
+        },
+      ),
+      field(t("Client-ID"), "clientId", c.clientId, "text", {
         maxlength: 500,
         autocomplete: "off",
       }),
       field(
         c.secretConfigured
-          ? "Client-Secret (gespeichert; leer lassen zum Beibehalten)"
+          ? t("Client-Secret (gespeichert; leer lassen zum Beibehalten)")
           : "Client-Secret",
         "clientSecret",
         "",
@@ -383,14 +437,14 @@ export function oidcSettings(vm) {
         "label",
         { class: "check" },
         h("input", { name: "clearSecret", type: "checkbox" }),
-        "Gespeichertes Client-Secret entfernen",
+        t("Gespeichertes Client-Secret entfernen"),
       ),
-      select("Client-Authentifizierung", "authMethod", c.authMethod, [
-        ["client_secret_post", "Client-Secret im Request-Body"],
-        ["client_secret_basic", "HTTP Basic"],
-        ["none", "Öffentlicher Client (PKCE)"],
+      select(t("Client-Authentifizierung"), "authMethod", c.authMethod, [
+        ["client_secret_post", t("Client-Secret im Request-Body")],
+        ["client_secret_basic", t("HTTP Basic")],
+        ["none", t("Öffentlicher Client (PKCE)")],
       ]),
-      field("Scopes", "scope", c.scope, "text", {
+      field(t("Scopes"), "scope", c.scope, "text", {
         required: true,
         maxlength: 500,
       }),
@@ -402,9 +456,9 @@ export function oidcSettings(vm) {
           type: "checkbox",
           checked: c.autoProvision,
         }),
-        "Neue SSO-Benutzer automatisch anlegen",
+        t("Neue SSO-Benutzer automatisch anlegen"),
       ),
-      select("Rolle für neue SSO-Benutzer", "defaultRole", c.defaultRole, [
+      select(t("Rolle für neue SSO-Benutzer"), "defaultRole", c.defaultRole, [
         ["Viewer", "Viewer"],
         ["Operator", "Operator"],
         ["Administrator", "Administrator"],
@@ -412,12 +466,14 @@ export function oidcSettings(vm) {
       h(
         "p",
         { class: "callout" },
-        "Bei automatischer Anlage erhalten alle vom Provider zugelassenen Benutzer diese Rolle auf dem lokalen Host. Bestehende Rollen werden beibehalten.",
+        t(
+          "Bei automatischer Anlage erhalten alle vom Provider zugelassenen Benutzer diese Rolle auf dem lokalen Host. Bestehende Rollen werden beibehalten.",
+        ),
       ),
       h(
         "button",
         { type: "submit", class: "btn primary" },
-        "Speichern und Verbindung prüfen",
+        t("Speichern und Verbindung prüfen"),
       ),
     ),
   );

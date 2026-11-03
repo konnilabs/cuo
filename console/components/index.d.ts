@@ -33,6 +33,10 @@ declare global {
         source: "catalog" | "override" | "fallback";
       };
     };
+    "x-cuo-process-manager": CUOWidget;
+    "x-cuo-process-detail": CUOWidget;
+    "x-cuo-data-export": CUOWidget;
+    "x-cuo-log-retention": CUOWidget;
     "x-container-table": CUOWidget;
     "x-maintenance-planner": CUOWidget;
     "x-update-run-timeline": CUOWidget;

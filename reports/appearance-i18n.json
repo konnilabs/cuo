@@ -1,0 +1,110 @@
+{
+  "feature": "workspace-appearance-accessibility-i18n",
+  "scope": "local CUO 0.2.0",
+  "xtend": {
+    "authoring": "RMT",
+    "i18n": "native xtendI18n; local de/en catalogs",
+    "mcpConsulted": true,
+    "dependencyRevision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "dependencyChanges": false
+  },
+  "preferences": {
+    "palettes": [
+      "slate",
+      "black",
+      "green",
+      "wine"
+    ],
+    "highContrast": true,
+    "languages": [
+      "de",
+      "en"
+    ],
+    "browserLanguageAutomaticDefault": true,
+    "unsupportedLanguageFallback": "en",
+    "storage": "existing per-user profile JSON; demo uses localStorage",
+    "readOnlyLegacyDefaults": true
+  },
+  "validation": {
+    "consoleTests": 39,
+    "strictMaracaBuild": "passed",
+    "paletteModeContrastCombinations": 16,
+    "textAndPrimaryInkContrastMinimum": 4.5,
+    "highContrastTextMinimum": 7,
+    "highContrastBorderMinimum": 3,
+    "existingAuthOidcProfileNotificationsBrowser": "passed",
+    "appearanceBrowser": {
+      "browserAutomaticDefault": true,
+      "manualAndAutomaticLanguage": true,
+      "languageChangeEvent": true,
+      "unsupportedFallback": "en",
+      "profilePersistence": true,
+      "highContrastToastOverDrawer": true,
+      "dataAndNamesPreserved": true,
+      "keyboardTabs": true,
+      "mobile": true,
+      "forcedColorsSmoke": true,
+      "errors": []
+    },
+    "deployedBrowserSmoke": {
+      "health": 200,
+      "results": [
+        {
+          "locale": "de-DE",
+          "resolved": "de",
+          "tabs": 4,
+          "palette": "green",
+          "highContrast": true,
+          "automaticLanguageDefault": true,
+          "errors": []
+        },
+        {
+          "locale": "en-GB",
+          "resolved": "en",
+          "tabs": 4,
+          "palette": "green",
+          "highContrast": true,
+          "automaticLanguageDefault": true,
+          "errors": []
+        }
+      ]
+    },
+    "nativeToggleLabels": {
+      "contrastAndUnclippedBounds": "passed across all palettes, light/dark and high contrast; German EIN/AUS also checked",
+      "minimumLabelAndStateTextContrast": 4.5,
+      "thumbOverlap": false,
+      "deployedConsoleGermanSmoke": "passed",
+      "inactiveLabelExplicitlyHidden": true,
+      "profileBothStates": "passed",
+      "normalMotionFrameChecks": 42,
+      "dependencyUnmodified": true
+    },
+    "sidebarContrast": {
+      "paletteModeContrastCombinations": 16,
+      "selectedRoutesChecked": 13,
+      "snapshots": 31,
+      "allThreeIconPacks": true,
+      "activeAndInactiveLabelsAndIcons": true,
+      "textContrastMinimum": 4.5,
+      "iconContrastMinimum": 3,
+      "badgeContrastMinimum": 4.5,
+      "collapsedAndHover": true,
+      "forcedColors": true,
+      "deployedBlackDarkRegistrySmoke": "passed"
+    }
+  },
+  "localDeployment": {
+    "status": "healthy",
+    "services": 4,
+    "consoleImage": "sha256:dcecbd65471c3c7db02a27757b130683df3e6bca267912e7ff6d5d626efd0a08",
+    "otherServicesUnchanged": true,
+    "accountsProfilesOidcPoliciesWindowsJobsUnchanged": true,
+    "consistentIdentityBackup": true,
+    "rollbackImageRetained": true
+  },
+  "limits": {
+    "fullWcagCertification": false,
+    "nativeIosDeviceAudit": false,
+    "persistedLogsAndUserDataTranslated": false
+  }
+}

@@ -1,3 +1,4 @@
+import { t, localeTag } from "../i18n/index.mjs";
 import {
   Widget,
   register,
@@ -23,7 +24,10 @@ function sortHeader(column, state, table) {
   const descendingNext = active
     ? state.direction === "asc"
     : table === "history" && column.key === "createdAt";
-  const action = `${column.label}: ${descendingNext ? "absteigend" : "aufsteigend"} sortieren`;
+  const action = t("{v0}: {v1} sortieren", {
+    v0: column.label,
+    v1: descendingNext ? t("absteigend") : t("aufsteigend"),
+  });
   return h(
     "th",
     {
@@ -80,26 +84,26 @@ export class XContainerTable extends Widget {
     const vm = this.vm;
     const sorting = tableSort(vm, "containers");
     const columns = [
-      { key: "name", label: "Name", value: (c) => c.name },
+      { key: "name", label: t("Name"), value: (c) => c.name },
       {
         key: "image",
-        label: "Image",
+        label: t("Image"),
         value: (c) => c.image.split("/").pop().split(/[:@]/)[0],
       },
       {
         key: "currentVersion",
-        label: "Aktuelle Version",
+        label: t("Aktuelle Version"),
         value: (c) => version(c.image),
       },
       {
         key: "availableVersion",
-        label: "Verfügbare Version",
+        label: t("Verfügbare Version"),
         value: (c) => (hasUpdate(c) ? c.candidate.targetDigest : undefined),
       },
-      { key: "status", label: "Status", value: (c) => status(c)[0] },
+      { key: "status", label: t("Status"), value: (c) => status(c)[0] },
       {
         key: "mode",
-        label: "Richtlinie",
+        label: t("Richtlinie"),
         value: (c) => modeLabel[c.mode] || c.mode,
       },
     ];
@@ -129,11 +133,11 @@ export class XContainerTable extends Widget {
         h(
           "div",
           {},
-          h("h2", {}, "Container"),
+          h("h2", {}, t("Container")),
           h(
             "p",
             { class: "muted" },
-            "Alle überwachten Container und ihr Update-Status.",
+            t("Alle überwachten Container und ihr Update-Status."),
           ),
         ),
         h(
@@ -144,8 +148,8 @@ export class XContainerTable extends Widget {
             { class: "search" },
             icon("search"),
             h("input", {
-              "aria-label": "Container suchen",
-              placeholder: "Container suchen ...",
+              "aria-label": t("Container suchen"),
+              placeholder: t("Container suchen ..."),
               value: vm.query || "",
               "data-input": "query",
             }),
@@ -162,18 +166,18 @@ export class XContainerTable extends Widget {
       ),
       h(
         "div",
-        { class: "tabs", role: "group", "aria-label": "Container filtern" },
+        { class: "tabs", role: "group", "aria-label": t("Container filtern") },
         [
-          ["all", "Alle", vm.demo ? 24 : all],
-          ["updates", "Update verfügbar", update],
+          ["all", t("Alle"), vm.demo ? 24 : all],
+          ["updates", t("Update verfügbar"), update],
           [
             "current",
-            "Aktuell",
+            t("Aktuell"),
             vm.demo
               ? 18
               : (vm.containers || []).filter((c) => isCurrent(c)).length,
           ],
-          ["excluded", "Ausgeschlossen", vm.demo ? 4 : excluded],
+          ["excluded", t("Ausgeschlossen"), vm.demo ? 4 : excluded],
         ].map(([value, label, count]) =>
           h(
             "button",
@@ -213,7 +217,7 @@ export class XContainerTable extends Widget {
               columns.map((column) =>
                 sortHeader(column, sorting, "containers"),
               ),
-              h("th", { scope: "col" }, "Aktionen"),
+              h("th", { scope: "col" }, t("Aktionen")),
             ),
           ),
           h(
@@ -291,8 +295,10 @@ export class XContainerTable extends Widget {
                     "td",
                     { colspan: 7, class: "empty" },
                     vm.query
-                      ? "Keine Container gefunden."
-                      : "Noch keine Container. Docker-Inventar aktualisieren.",
+                      ? t("Keine Container gefunden.")
+                      : t(
+                          "Noch keine Container. Docker-Inventar aktualisieren.",
+                        ),
                   ),
                 ),
           ),
@@ -305,7 +311,11 @@ export class XContainerTable extends Widget {
           "span",
           {},
           total
-            ? `${offset + 1}–${Math.min(offset + 8, total)} von ${vm.demo ? 24 : total} Containern`
+            ? t("{v0}–{v1} von {v2} Containern", {
+                v0: offset + 1,
+                v1: Math.min(offset + 8, total),
+                v2: vm.demo ? 24 : total,
+              })
             : "0 Container",
         ),
         h(
@@ -377,7 +387,7 @@ export class XMaintenancePlanner extends Widget {
     const [y, m] = vm.calendar.split("-").map(Number);
     const first = new Date(y, m - 1, 1),
       offset = (first.getDay() + 6) % 7;
-    const month = first.toLocaleDateString("de-DE", {
+    const month = first.toLocaleDateString(localeTag(), {
       month: "long",
       year: "numeric",
     });
@@ -413,7 +423,7 @@ export class XMaintenancePlanner extends Widget {
               "data-kind": "date",
               "data-value": date,
               "aria-label":
-                day.toLocaleDateString("de-DE", { dateStyle: "full" }) +
+                day.toLocaleDateString(localeTag(), { dateStyle: "full" }) +
                 (planned ? ", Wartungsfenster" : ""),
               "aria-pressed": String(vm.selectedDate === date),
             },
@@ -424,7 +434,7 @@ export class XMaintenancePlanner extends Widget {
       );
     }
     const selected = new Date(vm.selectedDate + "T12:00:00");
-    let label = selected.toLocaleDateString("de-DE", { dateStyle: "full" });
+    let label = selected.toLocaleDateString(localeTag(), { dateStyle: "full" });
     if (vm.demo && vm.selectedDate === "2026-11-02")
       label = "Sonntag, 2. November 2026";
     const windows = vm.windows || [];
@@ -437,10 +447,10 @@ export class XMaintenancePlanner extends Widget {
     return [
       h(
         "div",
-        { class: "panel-heading" },
-        h("h2", {}, "Wartungsplan"),
+        { class: "panel-heading planner-heading" },
+        h("h2", {}, t("Wartungsplan")),
         button(
-          "Kalender öffnen",
+          t("Kalender öffnen"),
           "navigate",
           "schedule",
           "",
@@ -458,7 +468,9 @@ export class XMaintenancePlanner extends Widget {
       h(
         "div",
         { class: "weekdays" },
-        ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"].map((v) => h("span", {}, v)),
+        [t("Mo"), t("Di"), t("Mi"), t("Do"), t("Fr"), t("Sa"), t("So")].map(
+          (v) => h("span", {}, v),
+        ),
       ),
       h("div", { class: "calendar-grid" }, days),
       h(
@@ -466,41 +478,52 @@ export class XMaintenancePlanner extends Widget {
         { class: "window-card" },
         h(
           "div",
-          { class: "inline spread" },
+          { class: "window-heading" },
           h("h3", {}, label),
           h(
             "span",
             { class: "badge blue" },
-            chosen ? "Wartungsfenster" : "Kein Fenster",
+            chosen ? t("Wartungsfenster") : t("Kein Fenster"),
           ),
         ),
         h(
           "p",
           { class: "time" },
           icon("clock", "cuo"),
-          chosen
-            ? `${chosen.start} – ${vm.demo ? "04:00" : chosen.durationMinutes + " Min."} Uhr`
-            : "Für diesen Tag ist nichts geplant",
+          h(
+            "span",
+            {},
+            chosen
+              ? t("{v0} – {v1} Uhr", {
+                  v0: chosen.start,
+                  v1: vm.demo ? "04:00" : chosen.durationMinutes + t(" Min."),
+                })
+              : t("Für diesen Tag ist nichts geplant"),
+          ),
         ),
         h(
           "p",
           { class: "window-description" },
           chosen
-            ? `Automatische Updates – Gruppe „${chosen.name}“`
-            : "Plane sichere Updates zu einer passenden Zeit.",
+            ? t("Automatische Updates – Gruppe „{v0}“", { v0: chosen.name })
+            : t("Plane sichere Updates zu einer passenden Zeit."),
         ),
         h(
           "small",
           { class: "muted indent" },
           chosen
-            ? `Max. ${(vm.policies || []).find((p) => p.scope === "global")?.concurrency || 1} parallele Updates · Healthcheck erforderlich`
-            : "IANA-Zeitzonen · Sommerzeit berücksichtigt",
+            ? t("Max. {v0} parallele Updates · Healthcheck erforderlich", {
+                v0:
+                  (vm.policies || []).find((p) => p.scope === "global")
+                    ?.concurrency || 1,
+              })
+            : t("IANA-Zeitzonen · Sommerzeit berücksichtigt"),
         ),
         h(
           "div",
           { class: "align-right" },
           button(
-            chosen ? "Details anzeigen" : "Fenster erstellen",
+            chosen ? t("Details anzeigen") : t("Fenster erstellen"),
             chosen ? "windowDetails" : "window",
             "",
             chosen?.id || "",
@@ -521,19 +544,19 @@ export class XUpdateRunTimeline extends Widget {
     const columns = [
       {
         key: "createdAt",
-        label: "Startzeit",
+        label: t("Startzeit"),
         value: (j) => timestamp(j.createdAt),
         numeric: true,
       },
-      { key: "duration", label: "Dauer", value: duration, numeric: true },
+      { key: "duration", label: t("Dauer"), value: duration, numeric: true },
       {
         key: "affected",
-        label: "Betroffene Container",
+        label: t("Betroffene Container"),
         value: (j) => j.count ?? j.name,
       },
       {
         key: "result",
-        label: "Ergebnis",
+        label: t("Ergebnis"),
         value: (j) =>
           vm.demo && j.reason ? j.reason : stageLabel[j.state] || j.state,
       },
@@ -546,10 +569,10 @@ export class XUpdateRunTimeline extends Widget {
       h(
         "div",
         { class: "panel-heading" },
-        h("h2", {}, compact ? "Letzte Update-Läufe" : "Update-Läufe"),
+        h("h2", {}, compact ? t("Letzte Update-Läufe") : t("Update-Läufe")),
         compact
           ? button(
-              "Alle anzeigen",
+              t("Alle anzeigen"),
               "navigate",
               "history",
               "",
@@ -571,7 +594,7 @@ export class XUpdateRunTimeline extends Widget {
               "tr",
               {},
               columns.map((column) => sortHeader(column, sorting, "history")),
-              h("th", { scope: "col" }, "Aktionen"),
+              h("th", { scope: "col" }, t("Aktionen")),
             ),
           ),
           h(
@@ -632,17 +655,22 @@ export class XUpdateRunTimeline extends Widget {
                       "td",
                       {},
                       j.state === "pending_approval"
-                        ? button("Freigeben", "approve", "", j.id, "btn small")
+                        ? button(
+                            t("Freigeben"),
+                            "approve",
+                            "",
+                            j.id,
+                            "btn small",
+                          )
                         : ["queued", "scheduled"].includes(j.state)
-                          ? button("Abbrechen", "cancel", "", j.id, "btn small")
-                          : button(
+                          ? button(
+                              t("Abbrechen"),
+                              "cancel",
                               "",
-                              "details",
-                              "",
-                              j.containerId || j.id,
-                              "more",
-                              "more",
-                            ),
+                              j.id,
+                              "btn small",
+                            )
+                          : button("", "processJob", "", j.id, "more", "more"),
                     ),
                   ),
                 )
@@ -652,7 +680,7 @@ export class XUpdateRunTimeline extends Widget {
                   h(
                     "td",
                     { colspan: 5, class: "empty" },
-                    "Noch keine Update-Läufe. Neue Jobs erscheinen hier.",
+                    t("Noch keine Update-Läufe. Neue Jobs erscheinen hier."),
                   ),
                 ),
           ),
@@ -707,8 +735,14 @@ export class XLogStream extends Widget {
       h(
         "div",
         { class: "panel-heading" },
-        h("h2", {}, "Systemaktivität (Live)"),
-        button(vm.live ? "Aktuell" : "Pausiert", "live", "", "", "live-toggle"),
+        h("h2", {}, t("Systemaktivität (Live)")),
+        button(
+          vm.live ? t("Aktuell") : t("Pausiert"),
+          "live",
+          "",
+          "",
+          "live-toggle",
+        ),
       ),
       h(
         "div",
@@ -716,7 +750,7 @@ export class XLogStream extends Widget {
           class: "log-screen",
           role: "log",
           "aria-live": vm.live ? "polite" : "off",
-          "aria-label": "CUO Systemaktivität",
+          "aria-label": t("CUO Systemaktivität"),
         },
         (vm.events || [])
           .filter((e) =>
@@ -733,7 +767,7 @@ export class XLogStream extends Widget {
                 "time",
                 {},
                 vm.demo
-                  ? new Date(e.time).toLocaleTimeString("de-DE")
+                  ? new Date(e.time).toLocaleTimeString(localeTag())
                   : formatDate(e.time),
               ),
               h(
@@ -748,11 +782,24 @@ export class XLogStream extends Widget {
                 },
                 String(e.severity || "info").toUpperCase(),
               ),
-              h("span", {}, e.message),
+              h(
+                "span",
+                {},
+                e.message,
+                e.runId || e.jobId
+                  ? button(
+                      t("Laufdetails"),
+                      e.runId ? "processDetails" : "processJob",
+                      "",
+                      e.runId || e.jobId,
+                      "text-btn small",
+                    )
+                  : null,
+              ),
             ),
           ),
         !(vm.events || []).length
-          ? h("div", { class: "empty" }, "Warte auf Systemereignisse …")
+          ? h("div", { class: "empty" }, t("Warte auf Systemereignisse …"))
           : null,
       ),
     ];
@@ -769,14 +816,23 @@ export class XPolicyEditor extends Widget {
         h(
           "div",
           {},
-          h("h2", {}, "Update-Richtlinien"),
+          h("h2", {}, t("Update-Richtlinien")),
           h(
             "p",
             { class: "muted" },
-            "Global → Host → Gruppe → Container. Ausschlüsse bleiben wirksam.",
+            t(
+              "Global → Host → Gruppe → Container. Ausschlüsse bleiben wirksam.",
+            ),
           ),
         ),
-        button("Richtlinie anlegen", "policy", "", "", "btn primary", "plus"),
+        button(
+          t("Richtlinie anlegen"),
+          "policy",
+          "",
+          "",
+          "btn primary",
+          "plus",
+        ),
       ),
       h(
         "div",
@@ -792,13 +848,13 @@ export class XPolicyEditor extends Widget {
               h(
                 "span",
                 { class: "badge " + (p.excluded ? "muted" : "blue") },
-                p.excluded ? "Ausgeschlossen" : modeLabel[p.mode],
+                p.excluded ? t("Ausgeschlossen") : modeLabel[p.mode],
               ),
             ),
             h(
               "p",
               { class: "muted" },
-              `${p.scope} · ${(p.scope === "container" ? (vm.containers || []).find((c) => c.id === p.target)?.name : p.scope === "host" ? (vm.hosts || []).find((host) => host.id === p.target)?.name : "") || p.target || "Alle Container"}`,
+              `${p.scope} · ${(p.scope === "container" ? (vm.containers || []).find((c) => c.id === p.target)?.name : p.scope === "host" ? (vm.hosts || []).find((host) => host.id === p.target)?.name : "") || p.target || t("Alle Container")}`,
             ),
             h(
               "p",
@@ -807,19 +863,19 @@ export class XPolicyEditor extends Widget {
                 ((vm.windows || []).find((window) => window.id === p.windowId)
                   ?.name ||
                   p.windowId ||
-                  "Keines"),
+                  t("Keines")),
             ),
-            button("Bearbeiten", "policy", "", p.id, "btn"),
+            button(t("Bearbeiten"), "policy", "", p.id, "btn"),
             h(
               "p",
               { class: "muted small" },
-              `Parallelität: max. ${p.concurrency || 1}`,
+              t("Parallelität: max. {v0}", { v0: p.concurrency || 1 }),
             ),
             p.permissions?.readOnlyHostMonitoring
               ? h(
                   "p",
                   { class: "small" },
-                  "Ausführungsfreigabe: lesendes Host-Monitoring",
+                  t("Ausführungsfreigabe: lesendes Host-Monitoring"),
                 )
               : null,
           ),
@@ -828,7 +884,9 @@ export class XPolicyEditor extends Widget {
       h(
         "p",
         { class: "callout" },
-        "Ausführung benötigt zusätzlich cuo.managed=true am Container. Die globale Standardeinstellung ist „Nur prüfen“.",
+        t(
+          "Ausführung benötigt zusätzlich cuo.managed=true am Container. Die globale Standardeinstellung ist „Nur prüfen“.",
+        ),
       ),
     ];
   }
@@ -844,58 +902,60 @@ export class XHostHealth extends Widget {
           "div",
           { class: "core-heading" },
           h("i", { class: "dot green" }),
-          h("strong", {}, "CUO Core"),
-          h("span", {}, "v0.2.0"),
+          h("strong", {}, t("CUO Core")),
+          h("span", {}, "v0.3.0"),
         ),
         h(
           "div",
           { class: "core-line" },
           icon("docker", "cuo"),
-          h("span", {}, "Docker"),
+          h("span", {}, t("Docker")),
           h(
             "b",
             {},
             vm.hosts?.some((h) => h.connected !== false)
-              ? "Verbunden"
-              : "Getrennt",
+              ? t("Verbunden")
+              : t("Getrennt"),
           ),
         ),
         h(
           "div",
           { class: "core-line" },
           icon("shield"),
-          h("span", {}, "Anmeldung"),
+          h("span", {}, t("Anmeldung")),
           h(
             "b",
             {},
             vm.oidc?.enabled
               ? vm.oidc.localLoginEnabled === false
-                ? "Nur SSO"
+                ? t("Nur SSO")
                 : "SSO + lokal"
-              : "Lokal",
+              : t("Lokal"),
           ),
         ),
         h(
           "div",
           { class: "core-line" },
           icon("database", "lucide"),
-          h("span", {}, "Datenbank"),
+          h("span", {}, t("Datenbank")),
           h("b", {}, "OK"),
         ),
         h(
           "div",
           { class: "core-line core-bottom" },
           icon("shield"),
-          h("span", {}, "Systemzustand"),
+          h("span", {}, t("Systemzustand")),
           h(
             "b",
             {},
-            vm.hosts?.some((h) => h.connected === false) ? "Prüfen" : "Gesund",
+            vm.hosts?.some((h) => h.connected === false)
+              ? t("Prüfen")
+              : t("Gesund"),
           ),
         ),
       ];
     return [
-      h("h2", {}, "Docker-Hosts"),
+      h("h2", {}, t("Docker-Hosts")),
       ...(vm.hosts || []).map((host) =>
         h(
           "article",
@@ -908,13 +968,15 @@ export class XHostHealth extends Widget {
             h(
               "span",
               { class: "badge " + (host.connected ? "good" : "warning") },
-              host.connected ? "Verbunden" : "Nicht erreichbar",
+              host.connected ? t("Verbunden") : t("Nicht erreichbar"),
             ),
           ),
           h(
             "p",
             { class: "muted" },
-            "Docker-Zugriff über den internen CUO-Agent. Socket bleibt innerhalb der Ausführungsgrenze.",
+            t(
+              "Docker-Zugriff über den internen CUO-Agent. Socket bleibt innerhalb der Ausführungsgrenze.",
+            ),
           ),
           h("code", {}, host.endpoint || "constrained-agent"),
           h(
@@ -931,7 +993,7 @@ export class XHostHealth extends Widget {
           ),
         ),
       ),
-      button("Inventar aktualisieren", "discover", "", "", "btn", "refresh"),
+      button(t("Inventar aktualisieren"), "discover", "", "", "btn", "refresh"),
     ];
   }
 }

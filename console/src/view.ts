@@ -1,40 +1,50 @@
+import { shellLabels, t, localeTag, localizedLabels } from "../i18n/index.mjs";
+import { processInitial, seedDemoProcesses } from "./processes.ts";
 import type { VM } from "./contracts.ts";
 import { integrationInitial, integrationPages } from "./integrations.ts";
 import { notifications } from "./notifications.ts";
 import { hasUpdate, isCurrent } from "../components/update-candidates.mjs";
-export const pageNames: Record<string, string> = {
+export const pageNames: Record<string, string> = localizedLabels({
   dashboard: "Dashboard",
   containers: "Container",
   updates: "Updates",
   schedule: "Zeitplanung",
   policies: "Richtlinien",
-  history: "Historie",
+  history: "Prozessmanager",
   logs: "Logs",
   settings: "Einstellungen",
   hosts: "Hosts",
   users: "Benutzer",
   integrations: "Integrationen",
   ...integrationPages,
-};
-const descriptions: Record<string, string> = {
+});
+const descriptions: Record<string, string> = localizedLabels({
   dashboard: "Übersicht über deine Container, Updates und den Systemstatus.",
   containers: "Alle überwachten Container und ihr Update-Status.",
   updates: "Verfügbare Updates prüfen, freigeben und ausführen.",
   schedule: "Wartungsfenster und automatische Updates planen.",
   policies: "Richtlinien für globale, Gruppen- und Container-Einstellungen.",
-  history: "Dauerhafte Update-Läufe und ihre Ergebnisse.",
-  logs: "Systemaktivität und unveränderliche Audit-Ereignisse.",
+  history: "Vergangene Läufe, nächste Ausführungen und Telemetrie im Detail.",
+  logs: "Systemaktivität und nachvollziehbare Audit-Ereignisse.",
   hosts: "Verbindung und Ausführungsgrenze deines Docker-Hosts.",
   users: "Lokale Benutzer, Rollen und Host-Berechtigungen verwalten.",
   settings: "CUO nach deinen Anforderungen konfigurieren.",
   integrations: "Lokale Dienste und optionale Integrationen.",
-};
+});
 export function initial(): VM {
   return {
     ...integrationInitial(),
+    ...processInitial(),
     auth: "loading",
     theme: "light",
     themeMode: "system",
+    palette: "slate",
+    highContrast: false,
+    language: "de",
+    languageAutomatic: true,
+    locale: "de",
+    settingsTab: "appearance",
+    labels: {},
     notificationsOpen: false,
     profileOpen: false,
     containerTab: "overview",
@@ -78,16 +88,18 @@ export function present(vm: VM): VM {
     vm.hosts.filter((h) => h.connected === false).length +
     vm.jobs.filter((j) => ["intervention_required"].includes(String(j.state)))
       .length;
-  const title = pageNames[vm.page] || "Dashboard";
+  const title = pageNames[vm.page] || t("Dashboard");
   const auth = vm.auth === "ready" || vm.demo;
   const items = notifications(vm);
   const result: VM = {
     ...vm,
+    labels: shellLabels(),
+    contrastMode: vm.highContrast ? "high" : "normal",
     themeToggleIcon: vm.theme === "dark" ? "sun" : "moon",
     themeToggleLabel:
       vm.theme === "dark"
-        ? "Farbschema wechseln: Hellen Modus aktivieren"
-        : "Farbschema wechseln: Dunklen Modus aktivieren",
+        ? t("Farbschema wechseln: Hellen Modus aktivieren")
+        : t("Farbschema wechseln: Dunklen Modus aktivieren"),
     notifications: items,
     notificationCount: String(items.length),
     notificationClass: items.length ? "notification-count" : "is-hidden",
@@ -112,10 +124,21 @@ export function present(vm: VM): VM {
     monitored: String(total - excluded),
     excludedCount: String(excluded),
     updateCount: String(updates),
-    updateHint: `${updates} laufende Container`,
+    updateHint: t("{v0} laufende Container", { v0: updates }),
     currentCount: String(vm.containers.filter(isCurrent).length),
-    systemTitle: issue ? "Aufmerksamkeit nötig" : "Alles in Ordnung",
-    systemDetail: `${issue} Fehler · ${vm.jobs.filter((j) => !["succeeded", "failed", "intervention_required", "cancelled"].includes(String(j.state))).length} ausstehende Jobs`,
+    systemTitle: issue ? t("Aufmerksamkeit nötig") : t("Alles in Ordnung"),
+    systemDetail: t("{v0} Fehler · {v1} ausstehende Jobs", {
+      v0: issue,
+      v1: vm.jobs.filter(
+        (j) =>
+          ![
+            "succeeded",
+            "failed",
+            "intervention_required",
+            "cancelled",
+          ].includes(String(j.state)),
+      ).length,
+    }),
     userInitials:
       vm.user.name
         .split(/\s/)
@@ -126,8 +149,8 @@ export function present(vm: VM): VM {
     shellClass: `cuo-shell${vm.sidebarCollapsed ? " sidebar-collapsed" : ""}${auth ? "" : " is-hidden"}`,
     sidebarExpanded: String(!vm.sidebarCollapsed),
     sidebarToggleLabel: vm.sidebarCollapsed
-      ? "Navigation ausklappen"
-      : "Navigation einklappen",
+      ? t("Navigation ausklappen")
+      : t("Navigation einklappen"),
     authClass: auth ? "is-hidden" : "auth-wrap",
     dashboardClass: vm.page === "dashboard" ? "dashboard-grid" : "is-hidden",
     workspaceClass:
@@ -140,8 +163,8 @@ export function present(vm: VM): VM {
       vm.page === "logs" ? "main-content logs-page" : "main-content",
     demoClass: vm.demo ? "demo-note" : "is-hidden",
     pageTitle: title,
-    nextDate: "Kein Fenster geplant",
-    nextTime: "Wartungsfenster erstellen",
+    nextDate: t("Kein Fenster geplant"),
+    nextTime: t("Wartungsfenster erstellen"),
   };
   if (vm.windows.length) {
     const w = vm.windows
@@ -152,7 +175,7 @@ export function present(vm: VM): VM {
     if (w) {
       const start = new Date(String(w.nextStart)),
         end = new Date(start.getTime() + Number(w.durationMinutes) * 60000);
-      result.nextDate = start.toLocaleDateString("de-DE", {
+      result.nextDate = start.toLocaleDateString(localeTag(), {
         weekday: "short",
         day: "numeric",
         month: "short",
@@ -160,13 +183,13 @@ export function present(vm: VM): VM {
         timeZone: String(w.timezone),
       });
       result.nextTime =
-        start.toLocaleTimeString("de-DE", {
+        start.toLocaleTimeString(localeTag(), {
           hour: "2-digit",
           minute: "2-digit",
           timeZone: String(w.timezone),
         }) +
         " – " +
-        end.toLocaleTimeString("de-DE", {
+        end.toLocaleTimeString(localeTag(), {
           hour: "2-digit",
           minute: "2-digit",
           timeZone: String(w.timezone),
@@ -175,16 +198,16 @@ export function present(vm: VM): VM {
     }
   }
   if (vm.demo) {
-    result.updateHint = "2 wichtig · 1 normal";
-    result.systemTitle = "Alles in Ordnung";
-    result.systemDetail = "Keine Fehler · 0 ausstehende Jobs";
+    result.updateHint = t("2 wichtig · 1 normal");
+    result.systemTitle = t("Alles in Ordnung");
+    result.systemDetail = t("Keine Fehler · 0 ausstehende Jobs");
     result.total = "24";
     result.monitored = "20";
     result.excludedCount = "4";
     result.updateCount = "3";
     result.currentCount = "18";
-    result.nextDate = "So, 2. Nov. 2026";
-    result.nextTime = "03:00 – 04:00 Uhr";
+    result.nextDate = t("So, 2. Nov. 2026");
+    result.nextTime = t("03:00 – 04:00 Uhr");
   }
   for (const page of Object.keys(pageNames)) {
     result["nav" + page] =
@@ -206,26 +229,33 @@ export function demoVM(): VM {
   const examples = [
     [
       "nextcloud",
-      "Produktiv",
+      t("Produktiv"),
       "nextcloud",
       "29.0.7",
       "29.0.8",
       "approval-required",
     ],
-    ["nginx-proxy", "Infrastruktur", "nginx", "1.27.2", "1.27.3", "automatic"],
-    ["redis", "Cache", "redis", "7.2.5", "", "automatic"],
-    ["postgres", "Datenbank", "postgres", "17.1", "", "approval-required"],
+    [
+      "nginx-proxy",
+      t("Infrastruktur"),
+      "nginx",
+      "1.27.2",
+      "1.27.3",
+      "automatic",
+    ],
+    ["redis", t("Cache"), "redis", "7.2.5", "", "automatic"],
+    ["postgres", t("Datenbank"), "postgres", "17.1", "", "approval-required"],
     [
       "vaultwarden",
-      "Sicherheit",
+      t("Sicherheit"),
       "vaultwarden",
       "1.32.4",
       "1.33.0",
       "automatic",
     ],
-    ["appsmith", "Tools", "appsmith", "1.23.0", "", "automatic"],
-    ["portainer", "Management", "portainer", "2.21.1", "", "automatic"],
-    ["immich", "Medien", "immich", "1.124.2", "", "automatic"],
+    ["appsmith", t("Tools"), "appsmith", "1.23.0", "", "automatic"],
+    ["portainer", t("Management"), "portainer", "2.21.1", "", "automatic"],
+    ["immich", t("Medien"), "immich", "1.124.2", "", "automatic"],
   ];
   vm.containers = examples.map(
     ([name, group, image, version, target, mode], i) => ({
@@ -267,7 +297,7 @@ export function demoVM(): VM {
     vm.containers.push({
       id: "demo-extra-" + i,
       name,
-      group: i >= 12 ? "Ausgeschlossen" : "Infrastruktur",
+      group: i >= 12 ? t("Ausgeschlossen") : t("Infrastruktur"),
       image: name + ":stable",
       imageId: "demo",
       candidate: { targetDigest: "", sourceDigest: "demo" },
@@ -281,7 +311,13 @@ export function demoVM(): VM {
     }),
   );
   vm.jobs = [
-    ["26.10.2026", "12 min", "4", "succeeded", "3 erfolgreich · 1 unverändert"],
+    [
+      "26.10.2026",
+      "12 min",
+      "4",
+      "succeeded",
+      t("3 erfolgreich · 1 unverändert"),
+    ],
     ["19.10.2026", "8 min", "2", "succeeded", "2 erfolgreich"],
     ["12.10.2026", "6 min", "1", "failed", "1 fehlgeschlagen"],
     ["05.10.2026", "11 min", "3", "succeeded", "3 erfolgreich"],
@@ -295,16 +331,16 @@ export function demoVM(): VM {
     name: "Update-Lauf",
   }));
   vm.events = [
-    "Prüfe nextcloud:stable ...",
-    "Neues Image verfügbar: 29.0.7 → 29.0.8",
-    "Container in Warteschlange (manuelle Freigabe)",
-    "Prüfe nginx:stable ...",
-    "Neues Image verfügbar: 1.27.2 → 1.27.3",
-    "Container in Warteschlange (automatisch)",
-    "Prüfe redis:7 ...",
-    "Kein Update verfügbar",
-    "Prüfe postgres:17 ...",
-    "Kein Update verfügbar",
+    t("Prüfe nextcloud:stable ..."),
+    t("Neues Image verfügbar: 29.0.7 → 29.0.8"),
+    t("Container in Warteschlange (manuelle Freigabe)"),
+    t("Prüfe nginx:stable ..."),
+    t("Neues Image verfügbar: 1.27.2 → 1.27.3"),
+    t("Container in Warteschlange (automatisch)"),
+    t("Prüfe redis:7 ..."),
+    t("Kein Update verfügbar"),
+    t("Prüfe postgres:17 ..."),
+    t("Kein Update verfügbar"),
   ].map((message, i) => ({
     id: i,
     time: `2026-11-01T08:14:${String(22 + i).padStart(2, "0")}Z`,
@@ -325,7 +361,7 @@ export function demoVM(): VM {
   vm.windows = [
     {
       id: "standard",
-      name: "Standard",
+      name: t("Standard"),
       start: "03:00",
       durationMinutes: 60,
       timezone: "Europe/Berlin",
@@ -336,10 +372,10 @@ export function demoVM(): VM {
   vm.hosts = [
     {
       id: "local",
-      name: "Lokaler Docker-Host",
+      name: t("Lokaler Docker-Host"),
       connected: true,
       capabilities: ["inventory", "registry-scan"],
     },
   ];
-  return present(vm);
+  return present(seedDemoProcesses(vm));
 }

@@ -1,6 +1,10 @@
 {
   "x-icon": "../.framework/components/xicon.js",
   "x-container-icon": "./container-icon.mjs",
+  "x-cuo-process-manager": "./processes.mjs",
+  "x-cuo-process-detail": "./processes.mjs",
+  "x-cuo-data-export": "./processes.mjs",
+  "x-cuo-log-retention": "./processes.mjs",
   "x-unioci-registry-list": "./integrations.mjs",
   "x-unioci-registry-settings": "./integrations.mjs",
   "x-unioci-repository-browser": "./integrations.mjs",

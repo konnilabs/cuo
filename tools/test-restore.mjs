@@ -22,13 +22,13 @@ const env = {
 const withRegistry = process.env.CUO_RESTORE_REGISTRY === "1";
 const services = {
   agent: {
-    image: "cuo-agent:0.2.0",
+    image: "cuo-agent:0.3.0",
     entrypoint: ["sh", "-c", "while :; do sleep 3600; done"],
     stop_grace_period: "1s",
     volumes: ["agent:/data"],
   },
   core: {
-    image: "cuo-core:0.2.0",
+    image: "cuo-core:0.3.0",
     environment: {
       CUO_CORE_TOKEN: env.CUO_CORE_TOKEN,
       CUO_AGENT_URL: "http://127.0.0.1:1",
@@ -51,7 +51,7 @@ const services = {
     },
   },
   console: {
-    image: "cuo-console:0.2.0",
+    image: "cuo-console:0.3.0",
     environment: {
       CUO_CORE_TOKEN: env.CUO_CORE_TOKEN,
       CUO_CORE_URL: "http://core:8091",
@@ -151,7 +151,7 @@ const helper = (code) =>
           `type=bind,source=${directory}/secrets/zot-client.json,target=/fixture-credentials.json,readonly`,
         ]
       : []),
-    "cuo-console:0.2.0",
+    "cuo-console:0.3.0",
     "--input-type=module",
     "-e",
     code,
@@ -168,7 +168,7 @@ try {
     "0",
     "--mount",
     `type=bind,source=${directory}/secrets,target=/setup`,
-    "cuo-core:0.2.0",
+    "cuo-core:0.3.0",
     "provision",
     "--directory",
     "/setup",
@@ -187,7 +187,7 @@ try {
       "chown",
       "--mount",
       `type=volume,source=${project}_zot,target=/registry`,
-      "cuo-core:0.2.0",
+      "cuo-core:0.3.0",
       "10001:10001",
       "/registry",
     ]);
@@ -283,7 +283,7 @@ try {
           "inspect",
           "--format",
           "{{.Id}}",
-          `cuo-${s}:0.2.0`,
+          `cuo-${s}:0.3.0`,
         ]).trim(),
       ]),
     ),
@@ -331,7 +331,7 @@ try {
       "sh",
       "--mount",
       `type=bind,source=${directory},target=/fixture`,
-      "cuo-core:0.2.0",
+      "cuo-core:0.3.0",
       "-c",
       "find /fixture -mindepth 1 -delete",
     ]);
