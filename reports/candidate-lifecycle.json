@@ -1,0 +1,108 @@
+{
+  "schema": "cuo.candidate-lifecycle-check.v1",
+  "completedAt": "2026-11-03T18:50:45.932886+00:00",
+  "version": "0.2.0",
+  "scope": "Local disposable CUO Core/Agent/Console containers, isolated Zot and own data; installed local instance upgraded afterwards. Production server unchanged.",
+  "findings": [
+    {
+      "case": "non-running old image and retained predecessor",
+      "before": "Two non-actionable registry observations counted as updates; one notified",
+      "after": "Neither counted or notified; explicit runtime/predecessor statuses"
+    },
+    {
+      "case": "already updated container subsequently stopped",
+      "result": "Real successful update changed image/config and engine ID; subsequent registry scan reported no update and UI displayed Gestoppt"
+    },
+    {
+      "case": "newly created container already using current image",
+      "result": "No update candidate; UI displayed Nicht gestartet"
+    },
+    {
+      "case": "reference changed with identical image config",
+      "before": "Prior candidate reused before another scan",
+      "after": "Prior candidate invalidated on discovery"
+    },
+    {
+      "case": "late scan racing container replacement",
+      "before": "Older scan could overwrite newer inventory",
+      "after": "Transactional current-snapshot check rejects late result"
+    },
+    {
+      "case": "terminal job event precedes inventory reconciliation",
+      "after": "Additional inventory event refreshes UI after reconciliation"
+    },
+    {
+      "case": "Docker list display alias differs from configured reference/name/state",
+      "after": "Agent uses inspected configuration and actual runtime state"
+    }
+  ],
+  "browser": {
+    "beforeUpdateCount": "2",
+    "afterUpdateCount": "0",
+    "beforeUpdateNotifications": 1,
+    "afterUpdateNotifications": 0,
+    "afterStatuses": [
+      "Nicht gestartet",
+      "Nicht gestartet",
+      "Aktuell",
+      "Gestoppt",
+      "Aufbewahrter Vorgänger"
+    ],
+    "pageErrors": []
+  },
+  "admission": {
+    "inactiveRequestsRejected": 4,
+    "emptyBulkRejected": true
+  },
+  "verification": {
+    "consoleTests": {
+      "passed": 32,
+      "failed": 0
+    },
+    "go": "go test -race ./...; changed Core/Agent packages rechecked after final edits",
+    "rmt": "TypeScript, source gate, RMT lint, strict Maraca build passed",
+    "docker": "Actual confirmed CUO update through private local fixture registry; positive running update candidate preserved",
+    "installedBrowserSmoke": "passed",
+    "backup": "Offline data backup created and verified before local upgrade",
+    "preserved": "Identity/OIDC/profile hashes, policies, existing jobs and all non-CUO Docker workloads unchanged",
+    "temporaryContainers": "removed",
+    "additionalPrChecks": [
+      "go vet ./...",
+      "5 tooling tests passed",
+      "OpenAPI/client generation unchanged",
+      "Enrollment, routing, appearance, notifications and profile browser tests passed"
+    ]
+  },
+  "services": [
+    {
+      "name": "/cuo-core-1",
+      "imageId": "sha256:13d2dab23c8f01d523c501112ba08428855e9c543a11ba18df50417226adf0d9",
+      "health": "healthy"
+    },
+    {
+      "name": "/cuo-agent-1",
+      "imageId": "sha256:4f68ba35cf182d6cb24aa3c69b68a3be4b2e51e6cf800178f19fe317a39c87ba",
+      "health": "healthy"
+    },
+    {
+      "name": "/cuo-console-1",
+      "imageId": "sha256:9ed76cab3efaedc24fabe39e08989a225a36bf495ae340038dc45064d6f1bb44",
+      "health": "healthy"
+    },
+    {
+      "name": "/cuo-zot-1",
+      "imageId": "sha256:be279845926de82a0e3c1421ae4a032eda4792745327d71de3632fd126662b25",
+      "health": "healthy"
+    }
+  ],
+  "sourceSha256": {
+    "internal/core/candidates.go": "396101562554533a8a4c6a31259d4bad3d7c48506e1a2f25befa3ecd69ee53c6",
+    "internal/core/engine.go": "1ac6766c07bd0c32000c0a5dd944933859797a25bcd3bf4fa0642a09a368cd08",
+    "internal/core/server.go": "3e00b85ac1839c597a197af1035bf1636de16abbe7d3646021dcf1c23935af4c",
+    "internal/agent/server.go": "4bddecb7e561711c7a0354120bfa6f841b3addbe2b638b8449ef3c7a3f9cb038",
+    "console/components/update-candidates.mjs": "05c60e1ee24f2bcb50250548b47dfdc5b851c55d86947dfce33b9823593c9c8e",
+    "console/components/widgets.mjs": "c6b4d2645c6171f9a81c2cbc9a7010a3652aa0c8abb03d05fb81f92435a51091",
+    "console/src/view.ts": "af79b87592af69bece4c0dd88fa237193a97011941fb7780ba93efeb15dc36e4",
+    "console/src/notifications.ts": "6f89ac2d926f2830d50b10200a8e706ef17a0f7af3cea4e2f950a5834791c101"
+  }
+}

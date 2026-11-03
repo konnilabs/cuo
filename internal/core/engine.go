@@ -81,8 +81,13 @@ func (e *Engine) Discover(ctx context.Context) ([]Container, error) {
 		c.Mode = p.Mode
 		c.Excluded = p.Excluded || p.Mode == "disabled"
 		var candidate Candidate
-		if e.Store.Get("candidate", c.ID, &candidate) == nil && candidate.Source == c.ImageID {
-			c.Candidate = &candidate
+		c.Candidate = nil
+		if e.Store.Get("candidate", c.ID, &candidate) == nil {
+			if candidateMatches(*c, candidate) {
+				c.Candidate = &candidate
+			} else if err = e.Store.Delete("candidate", c.ID); err != nil {
+				return nil, err
+			}
 		}
 		if err = e.Store.Put("container", c.ID, c); err != nil {
 			return nil, err
@@ -123,7 +128,9 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		}
 		if c.LocalImage {
 			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: "Lokales Image ohne veröffentlichten Registry-Digest"}
-			_ = e.Store.Put("candidate", c.ID, candidate)
+			if _, err = e.publishCandidate(c, candidate); err != nil {
+				return err
+			}
 			continue
 		}
 		if strings.HasPrefix(c.Image, "sha256:") || !strings.Contains(c.Image, ":") && len(c.Image) == 64 {
@@ -132,9 +139,9 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		access, accessErr := e.accessForImage(c.Image)
 		if accessErr != nil {
 			candidate := Candidate{ContainerID: c.ID, Source: c.ImageID, Ref: c.Image, Platform: c.Platform, Discovered: time.Now().UTC().Format(time.RFC3339), Error: accessErr.Error()}
-			_ = e.Store.Put("candidate", c.ID, candidate)
-			c.Candidate = &candidate
-			_ = e.Store.Put("container", c.ID, c)
+			if _, err = e.publishCandidate(c, candidate); err != nil {
+				return err
+			}
 			continue
 		}
 		r, err := e.agent(ctx, "POST", "/scan", struct {
@@ -154,11 +161,13 @@ func (e *Engine) Scan(ctx context.Context, actor string) error {
 		if err != nil {
 			return err
 		}
-		if err = e.Store.Put("candidate", c.ID, candidate); err != nil {
+		published, err := e.publishCandidate(c, candidate)
+		if err != nil {
 			return err
 		}
-		c.Candidate = &candidate
-		_ = e.Store.Put("container", c.ID, c)
+		if !published {
+			continue
+		}
 		message := c.Name + ": aktuell"
 		severity := "info"
 		if candidate.Error != "" {
@@ -226,7 +235,7 @@ func (e *Engine) prepareJob(c Container, p Principal, reason string, automatic, 
 	if c.Candidate == nil || c.Candidate.Target == "" || c.Candidate.Error != "" {
 		return Job{}, errors.New("no valid update candidate")
 	}
-	if c.Candidate.Source != c.ImageID {
+	if !candidateMatches(c, *c.Candidate) {
 		return Job{}, errors.New("stale candidate")
 	}
 	for _, j := range e.Store.Jobs() {
@@ -384,7 +393,9 @@ func (e *Engine) executeContext(parent context.Context, j Job) {
 	}
 	discoverCtx, discoverCancel := context.WithTimeout(parent, 15*time.Second)
 	defer discoverCancel()
-	_, _ = e.Discover(discoverCtx)
+	if _, err := e.Discover(discoverCtx); err == nil {
+		_ = e.Store.Event(Event{HostID: j.HostID, JobID: j.ID, Actor: "core", Operation: "inventory", Stage: "refreshed", Severity: "info", Message: "Containerbestand nach dem Update-Lauf aktualisiert"})
+	}
 }
 func (e *Engine) Tick(now time.Time) {
 	e.Mu.Lock()

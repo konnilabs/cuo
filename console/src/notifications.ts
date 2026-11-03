@@ -1,4 +1,5 @@
 import type { VM } from "./contracts.ts";
+import { hasUpdate } from "../components/update-candidates.mjs";
 export type Notification = {
   id: string;
   title: string;
@@ -10,9 +11,7 @@ export function notifications(vm: VM): Notification[] {
   if (vm.user.profile?.updateNotifications === false) return [];
   const dismissed = new Set(vm.dismissed);
   const candidates: Notification[] = vm.containers
-    .filter(
-      (c) => !c.excluded && c.candidate?.targetDigest && !c.candidate.error,
-    )
+    .filter(hasUpdate)
     .map((c) => ({
       id: `update:${c.id}:${c.candidate!.targetDigest}`,
       title: "Update verfügbar",

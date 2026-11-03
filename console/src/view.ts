@@ -1,6 +1,7 @@
 import type { VM } from "./contracts.ts";
 import { integrationInitial, integrationPages } from "./integrations.ts";
 import { notifications } from "./notifications.ts";
+import { hasUpdate, isCurrent } from "../components/update-candidates.mjs";
 export const pageNames: Record<string, string> = {
   dashboard: "Dashboard",
   containers: "Container",
@@ -72,9 +73,7 @@ export function initial(): VM {
 export function present(vm: VM): VM {
   const total = vm.containers.length,
     excluded = vm.containers.filter((c) => c.excluded).length,
-    updates = vm.containers.filter(
-      (c) => c.candidate?.targetDigest && !c.candidate.error,
-    ).length;
+    updates = vm.containers.filter(hasUpdate).length;
   const issue =
     vm.hosts.filter((h) => h.connected === false).length +
     vm.jobs.filter((j) => ["intervention_required"].includes(String(j.state)))
@@ -113,16 +112,8 @@ export function present(vm: VM): VM {
     monitored: String(total - excluded),
     excludedCount: String(excluded),
     updateCount: String(updates),
-    updateHint: `${updates} Image-Änderungen verfügbar`,
-    currentCount: String(
-      vm.containers.filter(
-        (c) =>
-          c.candidate &&
-          !c.candidate.error &&
-          !c.candidate.targetDigest &&
-          !c.excluded,
-      ).length,
-    ),
+    updateHint: `${updates} laufende Container`,
+    currentCount: String(vm.containers.filter(isCurrent).length),
     systemTitle: issue ? "Aufmerksamkeit nötig" : "Alles in Ordnung",
     systemDetail: `${issue} Fehler · ${vm.jobs.filter((j) => !["succeeded", "failed", "intervention_required", "cancelled"].includes(String(j.state))).length} ausstehende Jobs`,
     userInitials:

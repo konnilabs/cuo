@@ -12,6 +12,11 @@ import {
   select,
 } from "./base.mjs";
 import "./container-icon.mjs";
+import {
+  hasUpdate,
+  isCurrent,
+  containerStatus as status,
+} from "./update-candidates.mjs";
 import { tableSort, sortRows, timestamp, duration } from "./table-sorting.mjs";
 function sortHeader(column, state, table) {
   const active = column.key === state.key;
@@ -54,17 +59,6 @@ function sortHeader(column, state, table) {
     ),
   );
 }
-function status(c) {
-  return c.candidate?.error
-    ? ["Prüfung fehlgeschlagen", "warning"]
-    : c.excluded
-      ? ["Ausgeschlossen", "muted"]
-      : c.candidate?.targetDigest
-        ? ["Update verfügbar", "warning"]
-        : c.candidate
-          ? ["Aktuell", "good"]
-          : ["Noch nicht geprüft", "muted"];
-}
 function version(image) {
   return image.includes("@")
     ? image.split("@")[1].slice(0, 19)
@@ -100,7 +94,7 @@ export class XContainerTable extends Widget {
       {
         key: "availableVersion",
         label: "Verfügbare Version",
-        value: (c) => c.candidate?.targetDigest,
+        value: (c) => (hasUpdate(c) ? c.candidate.targetDigest : undefined),
       },
       { key: "status", label: "Status", value: (c) => status(c)[0] },
       {
@@ -116,12 +110,8 @@ export class XContainerTable extends Widget {
       return (
         matches &&
         (vm.filter === "all" ||
-          (vm.filter === "updates" && c.candidate?.targetDigest) ||
-          (vm.filter === "current" &&
-            c.candidate &&
-            !c.candidate.error &&
-            !c.candidate.targetDigest &&
-            !c.excluded) ||
+          (vm.filter === "updates" && hasUpdate(c)) ||
+          (vm.filter === "current" && isCurrent(c)) ||
           (vm.filter === "excluded" && c.excluded))
       );
     });
@@ -130,9 +120,7 @@ export class XContainerTable extends Widget {
     const offset = Math.min(vm.offset || 0, Math.max(0, total - 1));
     rows = rows.slice(offset, offset + 8);
     const all = (vm.containers || []).length,
-      update = (vm.containers || []).filter(
-        (c) => c.candidate?.targetDigest,
-      ).length,
+      update = (vm.containers || []).filter((c) => hasUpdate(c)).length,
       excluded = (vm.containers || []).filter((c) => c.excluded).length;
     return [
       h(
@@ -183,13 +171,7 @@ export class XContainerTable extends Widget {
             "Aktuell",
             vm.demo
               ? 18
-              : (vm.containers || []).filter(
-                  (c) =>
-                    c.candidate &&
-                    !c.candidate.error &&
-                    !c.candidate.targetDigest &&
-                    !c.excluded,
-                ).length,
+              : (vm.containers || []).filter((c) => isCurrent(c)).length,
           ],
           ["excluded", "Ausgeschlossen", vm.demo ? 4 : excluded],
         ].map(([value, label, count]) =>
@@ -276,14 +258,14 @@ export class XContainerTable extends Widget {
                     h(
                       "td",
                       {
-                        class: c.candidate?.targetDigest
+                        class: hasUpdate(c)
                           ? "available " +
                             (c.updateTone === "critical"
                               ? "critical"
                               : "positive")
                           : "muted",
                       },
-                      c.candidate?.targetDigest
+                      hasUpdate(c)
                         ? "› " + smallDigest(c.candidate.targetDigest)
                         : "–",
                     ),
