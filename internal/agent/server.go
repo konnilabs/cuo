@@ -193,12 +193,17 @@ func (a *Agent) Inventory(ctx context.Context) ([]core.Container, error) {
 	}
 	out := []core.Container{}
 	for _, v := range list {
-		labels := obj(v, "Labels")
-		name := ""
-		if names, ok := v["Names"].([]any); ok && len(names) > 0 {
+		inspect, err := a.Docker.Inspect(ctx, str(v, "Id"))
+		if err != nil {
+			return nil, err
+		}
+		config := obj(inspect, "Config")
+		labels := obj(config, "Labels")
+		name := strings.TrimPrefix(str(inspect, "Name"), "/")
+		if names, ok := v["Names"].([]any); name == "" && ok && len(names) > 0 {
 			name = strings.TrimPrefix(fmt.Sprint(names[0]), "/")
 		}
-		c := core.Container{ID: str(v, "Id"), EngineID: str(v, "Id"), HostID: "local", Name: name, Image: str(v, "Image"), ImageID: str(v, "ImageID"), State: str(v, "State"), Group: str(labels, "com.docker.compose.project"), Compose: str(labels, "com.docker.compose.project") != "", Managed: str(labels, "cuo.managed") == "true", Platform: "linux/amd64"}
+		c := core.Container{ID: str(v, "Id"), EngineID: str(v, "Id"), HostID: "local", Name: name, Image: str(config, "Image"), ImageID: str(inspect, "Image"), State: str(obj(inspect, "State"), "Status"), Group: str(labels, "com.docker.compose.project"), Compose: str(labels, "com.docker.compose.project") != "", Managed: str(labels, "cuo.managed") == "true", Platform: "linux/amd64"}
 		im := map[string]any{}
 		if e := a.Docker.Request(ctx, "GET", a.Docker.Path("/images/"+c.ImageID+"/json"), nil, &im); e == nil {
 			if digests, ok := im["RepoDigests"].([]any); ok && len(digests) == 0 {

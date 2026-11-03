@@ -134,7 +134,7 @@ func TestIdempotencyConflictRBACAndHostScope(t *testing.T) {
 func TestCandidateCannotBypassScanOnlyOrDuplicateActiveJob(t *testing.T) {
 	store := testStore(t)
 	e := NewEngine(store)
-	c := Container{ID: "c", HostID: "local", Name: "test", State: "running", Image: "alpine:3", Managed: true, ImageID: "sha256:a", Candidate: &Candidate{Source: "sha256:a", Target: "sha256:b"}}
+	c := Container{ID: "c", HostID: "local", Name: "test", State: "running", Image: "alpine:3", Managed: true, ImageID: "sha256:a", Candidate: &Candidate{ContainerID: "c", Source: "sha256:a", Target: "sha256:b", Ref: "alpine:3"}}
 	p := Principal{ID: "owner", Role: "Owner", Hosts: []string{"local"}}
 	if _, err := e.CreateJob(c, p, "test", false); err == nil {
 		t.Fatal("scan-only must reject execution")

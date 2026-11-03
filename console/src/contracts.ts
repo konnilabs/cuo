@@ -25,7 +25,13 @@ export type Container = {
   mode: string;
   reason: string;
   updateTone?: "critical" | "positive";
-  candidate?: { targetDigest: string; sourceDigest: string; error?: string };
+  candidate?: {
+    targetDigest: string;
+    sourceDigest: string;
+    image?: string;
+    platform?: string;
+    error?: string;
+  };
 };
 export type VM = {
   auth: string;

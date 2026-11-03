@@ -125,3 +125,28 @@ func TestDefaultVersusPrivilegedCapabilities(t *testing.T) {
 		}
 	}
 }
+
+func TestInventoryUsesConfiguredReferenceWhenDockerTagMoved(t *testing.T) {
+	backend := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		switch r.URL.Path {
+		case "/containers/json":
+			w.Write([]byte(`[{"Id":"engine","Names":["/app"],"Image":"sha256:old","ImageID":"sha256:old","State":"running","Labels":{"cuo.managed":"true"}}]`))
+		case "/containers/engine/json":
+			w.Write([]byte(`{"Name":"/app-cuo-deadbeef","Image":"sha256:old","Config":{"Image":"example/app:stable","Labels":{"cuo.managed":"true"}},"State":{"Status":"exited"}}`))
+		case "/images/sha256:old/json":
+			w.Write([]byte(`{"Os":"linux","Architecture":"amd64","RepoDigests":["example/app@sha256:old"]}`))
+		default:
+			t.Error("unexpected request", r.URL.Path)
+			w.WriteHeader(404)
+		}
+	}))
+	defer backend.Close()
+	a := &Agent{Docker: &Docker{HTTP: &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(mustURL(backend.URL))}}}}
+	rows, err := a.Inventory(context.Background())
+	if err != nil || len(rows) != 1 {
+		t.Fatal(rows, err)
+	}
+	if rows[0].Image != "example/app:stable" || rows[0].ImageID != "sha256:old" || rows[0].State != "exited" || rows[0].Name != "app-cuo-deadbeef" || rows[0].Managed {
+		t.Fatal("inventory used Docker's stale display alias/state instead of inspected configuration", rows[0])
+	}
+}

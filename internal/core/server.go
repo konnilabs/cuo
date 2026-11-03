@@ -252,7 +252,14 @@ func (s *Server) get(w http.ResponseWriter, r *http.Request, p Principal) {
 	case r.URL.Path == "/api/v1/update-candidates":
 		var list []Candidate
 		_ = store.List("candidate", &list)
-		respond(w, 200, map[string]any{"items": list})
+		current := []Candidate{}
+		for _, candidate := range list {
+			var container Container
+			if store.Get("container", candidate.ContainerID, &container) == nil && candidateMatches(container, candidate) {
+				current = append(current, candidate)
+			}
+		}
+		respond(w, 200, map[string]any{"items": current})
 	case r.URL.Path == "/api/v1/update-jobs":
 		jobs := store.Jobs()
 		sort.Slice(jobs, func(i, j int) bool { return jobs[i].Created > jobs[j].Created })
