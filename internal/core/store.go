@@ -67,9 +67,9 @@ func (s *Store) SavePolicy(policy Policy, actor string, permissionChanged bool) 
 	}
 	events := []Event{{Actor: actor, Operation: "policy.save", Stage: "saved", Severity: "info", Message: "Richtlinie " + policy.ID + " aktualisiert"}}
 	if permissionChanged {
-		message := "Lesender Host-Monitoring-Zugriff widerrufen"
-		if policy.Permissions.ReadOnlyHostMonitoring {
-			message = "Lesender Host-Monitoring-Zugriff freigegeben: " + policy.PermissionReason
+		message := "Erweiterte Ausführungsfreigaben widerrufen"
+		if policy.Permissions.Any() {
+			message = "Ausführungsfreigaben aktualisiert: " + encode(policy.Permissions) + "; Grund: " + policy.PermissionReason
 		}
 		events = append(events, Event{Actor: actor, Operation: "policy.permissions", Stage: "saved", Severity: "warning", Message: "Richtlinie " + policy.ID + ": " + message})
 	}

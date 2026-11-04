@@ -63,6 +63,57 @@ export function button(
     ...(symbol === "arrow-right" ? [label, mark] : [mark, label]),
   );
 }
+
+// Shared dismissal control for CUO surfaces. XIcon stays decorative; the
+// translated accessible name and tooltip describe the action, not the glyph.
+export function closeButton(kind = "close", label = t("Dialog schließen")) {
+  const control = button("", kind, "", "", "icon-btn dialog-close", "close");
+  control.attrs["aria-label"] = label;
+  control.attrs.title = label;
+  return control;
+}
+
+export function surfaceHeading(title, id = "dialog-title") {
+  return h("div", { class: "dialog-heading" }, h("h2", { id }, title), closeButton());
+}
+
+// Native dialogs share one focus lifecycle, including dialogs removed by RMT.
+const modalTraps = new WeakSet();
+export function syncModal(widget, open) {
+  const dialog = widget.content.querySelector("dialog");
+  if (open && dialog && !dialog.open && widget.isConnected) {
+    if (!modalTraps.has(dialog)) {
+      modalTraps.add(dialog);
+      dialog.addEventListener("keydown", (event) => {
+        if (event.key !== "Tab") return;
+        const controls = [...dialog.querySelectorAll("button, input, select, textarea, a[href], summary, [tabindex]")]
+          .filter((control) => !control.disabled && control.tabIndex >= 0 && control.getClientRects().length && getComputedStyle(control).visibility !== "hidden");
+        const first = controls[0], last = controls.at(-1), active = widget.shadowRoot.activeElement;
+        if (event.shiftKey && active === first) {
+          event.preventDefault(); last?.focus();
+        } else if (!event.shiftKey && active === last) {
+          event.preventDefault(); first?.focus();
+        }
+      });
+    }
+    let trigger = document.activeElement;
+    while (trigger?.shadowRoot?.activeElement) trigger = trigger.shadowRoot.activeElement;
+    widget.modalTrigger = trigger;
+    widget.activeModal = dialog;
+    dialog.showModal();
+    queueMicrotask(() => {
+      if (dialog.open && dialog.isConnected) dialog.querySelector("button, input, select")?.focus();
+    });
+  } else if (!open && widget.activeModal) {
+    if (widget.activeModal.open) widget.activeModal.close();
+    widget.activeModal = null;
+    const trigger = widget.modalTrigger;
+    widget.modalTrigger = null;
+    queueMicrotask(() => {
+      if (trigger?.isConnected) trigger.focus({ preventScroll: true });
+    });
+  }
+}
 // Small keyed reconciler restricted to a custom element's own shadow root.
 // User values enter text nodes or native value properties; never markup.
 export function patch(parent, items) {

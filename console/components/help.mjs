@@ -85,7 +85,7 @@ export function tutorial(notices, state) {
         "p",
         {},
         t(
-          "CUO 0.3.0 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.",
+          "CUO 0.3.1 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.",
         ),
       ),
       h(

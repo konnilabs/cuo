@@ -827,13 +827,14 @@ th[aria-sort] .sort x-icon {
   white-space: nowrap;
 }
 .auth-card {
-  width: min(440px, calc(100vw - 40px));
-  background: white;
-  border: 1px solid #e1e8f2;
-  box-shadow: 0 15px 60px #193d7b14;
+  width: 100%;
+  max-width: 440px;
+  background: var(--cuo-surface, #fff);
+  border: 1px solid var(--cuo-border, #e3e9f3);
+  box-shadow: var(--cuo-shadow, 0 3px 12px #223c6410);
   border-radius: 18px;
   padding: 34px;
-  color: #0b1735;
+  color: var(--cuo-text, #0b1231);
 }
 .auth-brand {
   display: flex;
@@ -845,7 +846,7 @@ th[aria-sort] .sort x-icon {
   letter-spacing: 1px;
 }
 .cube-mark {
-  color: #2c62ff;
+  color: var(--cuo-primary, #295bff);
 }
 .cube-mark x-icon {
   --xtend-icon-size: 42px;
@@ -853,7 +854,7 @@ th[aria-sort] .sort x-icon {
 .eyebrow {
   font-size: 9px;
   letter-spacing: 1.2px;
-  color: #6b7e9b;
+  color: var(--cuo-muted, #627298);
   margin: 10px 0 28px;
 }
 .auth-card h1 {
@@ -897,7 +898,7 @@ th[aria-sort] .sort x-icon {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  color: #6b7e9b;
+  color: var(--cuo-muted, #627298);
   font-size: 11px;
   margin: 24px 0 17px;
 }
@@ -964,16 +965,18 @@ dialog {
   padding: 0;
   box-shadow: 0 30px 100px #12254b44;
 }
+dialog[open] {
+  display: flex;
+  flex-direction: column;
+  max-height: 90dvh;
+  overflow: hidden;
+}
 dialog::backdrop {
   background: #101c33aa;
   backdrop-filter: blur(3px);
 }
 .help-dialog {
   width: min(780px, calc(100vw - 30px));
-}
-.help-dialog .dialog-content {
-  max-height: calc(90vh - 80px);
-  overflow: auto;
 }
 .tutorial-steps {
   display: grid;
@@ -1025,22 +1028,82 @@ dialog::backdrop {
   gap: 15px;
   padding: 20px 24px;
   border-bottom: 1px solid var(--cuo-border, #e3e9f3);
+  flex: none;
 }
 .dialog-heading h2 {
   font-size: 20px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.dialog-close {
+  width: 40px;
+  height: 40px;
+  min-height: 40px;
+  flex: none;
+  color: var(--cuo-text, #0b1231);
+  border: 1px solid var(--cuo-border, #e3e9f3);
+  border-radius: 8px;
+}
+.dialog-close:hover {
+  background: var(--cuo-canvas, #f4f7fb);
+}
+.dialog-close:focus-visible,
+x-drawer::part(close):focus-visible {
+  outline: 2px solid var(--cuo-primary, #285bff);
+  outline-offset: 3px;
 }
 .dialog-content {
   padding: 9px 24px 24px;
   line-height: 1.6;
+  min-height: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  scrollbar-gutter: stable;
 }
 .dialog-content > p {
   margin: 15px 0;
 }
 .dialog-actions {
   display: flex;
+  flex-wrap: wrap;
   justify-content: flex-end;
   gap: 10px;
   margin-top: 20px;
+}
+.dialog-content form > .btn[type="submit"] {
+  display: flex;
+  margin-top: 20px;
+  margin-inline-start: auto;
+}
+.dialog-content .btn,
+.profile-footer .btn {
+  white-space: normal;
+  overflow-wrap: anywhere;
+  padding-block: 8px;
+}
+.execution-permissions {
+  min-width: 0;
+  border: 1px solid var(--cuo-border, #e3e9f3);
+  border-radius: 10px;
+  padding: 16px;
+  margin-block: 20px;
+}
+.execution-permissions legend {
+  font-weight: 600;
+  padding-inline: 6px;
+}
+.permission-options {
+  display: grid;
+  gap: 12px;
+  margin-block: 16px;
+}
+.permission-options .checkbox {
+  align-items: center;
+  margin: 0;
+  min-height: 32px;
+}
+.execution-permissions .field {
+  margin-block: 16px;
 }
 .detail-grid {
   display: grid;
@@ -1369,7 +1432,7 @@ dialog::backdrop {
 }
 .profile-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 12px;
 }
 .oidc-card {
@@ -1400,6 +1463,30 @@ x-drawer {
   --drawer-bg-dark: var(--cuo-surface, #182235);
   --drawer-color-dark: var(--cuo-text, #edf1fa);
   --drawer-border-dark: var(--cuo-border, #344259);
+  --xdrawer-close-size: 40px;
+  --xdrawer-close-color: var(--cuo-text, #0b1231);
+  --xdrawer-close-border: var(--cuo-border, #e3e9f3);
+  --xdrawer-close-hover: var(--cuo-canvas, #f4f7fb);
+}
+x-drawer::part(close) {
+  border-radius: 8px;
+}
+x-drawer::part(header) {
+  padding: 20px 24px;
+  gap: 15px;
+}
+@media (pointer: coarse) {
+  .permission-options .checkbox {
+    min-height: 44px;
+  }
+  .dialog-close {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  x-drawer {
+    --xdrawer-close-size: 44px;
+  }
 }
 @media (max-width: 600px) {
   .notification-center {
@@ -1537,20 +1624,6 @@ x-drawer::part(surface) {
   height: auto;
   min-height: 320px;
   max-height: none;
-}
-.execution-permissions {
-  min-width: 0;
-  margin: 16px 0;
-  padding: 14px;
-  border: 1px solid var(--cuo-border, #e3e9f3);
-  border-radius: 10px;
-}
-.execution-permissions legend {
-  font-weight: 600;
-  padding: 0 6px;
-}
-.execution-permissions .checkbox {
-  align-items: flex-start;
 }
 .integration-grid {
   display: grid;
@@ -1747,10 +1820,6 @@ summary {
 .process-dialog {
   width: min(1100px, calc(100vw - 32px));
   max-width: 1100px;
-}
-.process-dialog .dialog-content {
-  max-height: 78dvh;
-  overflow: auto;
 }
 .process-facts,
 .snapshot-data {

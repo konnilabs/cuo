@@ -36,7 +36,9 @@ export function initial(): VM {
     ...integrationInitial(),
     ...processInitial(),
     auth: "loading",
-    theme: "light",
+    // The build serializes this state before a browser/media query exists.
+    // CSS follows the system until boot resolves system/profile preferences.
+    theme: "system",
     themeMode: "system",
     palette: "slate",
     highContrast: false,

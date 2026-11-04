@@ -70,7 +70,7 @@ async function main() {
       "inspect",
       "--format",
       "{{.Id}}",
-      `cuo-${service}:0.3.0`,
+      `cuo-${service}:0.3.1`,
     ]),
   }));
   const zot=JSON.parse(fs.readFileSync("dependencies/zot/zot.lock.json","utf8"));

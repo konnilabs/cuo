@@ -624,7 +624,7 @@ const spec = {
   openapi: "3.1.0",
   info: {
     title: "CUO API",
-    version: "0.3.0",
+    version: "0.3.1",
     description:
       "Same-origin BFF API. Browser authenticates with HttpOnly session cookie and CSRF. Core is internal and requires a service bearer token plus server-supplied principal headers. Only host local is supported.",
   },

@@ -54,7 +54,17 @@ type Candidate struct {
 // default execution boundary. New operation types need their own reviewed grant.
 type ExecutionPermissions struct {
 	ReadOnlyHostMonitoring bool `json:"readOnlyHostMonitoring,omitempty"`
+	PreserveSysAdmin       bool `json:"preserveSysAdmin,omitempty"`
+	PreserveSysPtrace      bool `json:"preserveSysPtrace,omitempty"`
+	PreserveDacReadSearch  bool `json:"preserveDacReadSearch,omitempty"`
+	PreserveHostPID        bool `json:"preserveHostPid,omitempty"`
 }
+
+func (p ExecutionPermissions) Elevated() bool {
+	return p.PreserveSysAdmin || p.PreserveSysPtrace || p.PreserveDacReadSearch || p.PreserveHostPID
+}
+
+func (p ExecutionPermissions) Any() bool { return p.ReadOnlyHostMonitoring || p.Elevated() }
 
 type Policy struct {
 	ID                   string               `json:"id"`
@@ -194,7 +204,7 @@ func ValidatePolicy(p Policy) error {
 	if p.Concurrency < 1 || p.Concurrency > 4 {
 		return errors.New("concurrency must be 1..4")
 	}
-	if p.Permissions.ReadOnlyHostMonitoring {
+	if p.Permissions.Any() {
 		if p.Scope != "container" || !regexp.MustCompile(`^[a-f0-9]{64}$`).MatchString(p.Target) {
 			return errors.New("execution permissions require a specific container")
 		}

@@ -18,7 +18,7 @@ import (
 
 func TestDisposableComposeReconcile(t *testing.T) {
 	if os.Getenv("CUO_DOCKER_E2E") != "1" {
-		t.Skip("requires freshly built cuo-agent:0.3.0 and disposable Docker fixtures")
+		t.Skip("requires freshly built cuo-agent:0.3.1 and disposable Docker fixtures")
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 4*time.Minute)
 	defer cancel()
@@ -36,6 +36,9 @@ func TestDisposableComposeReconcile(t *testing.T) {
 	compose := `services:
   app:
     image: busybox:1.36.0
+    pid: host
+    cap_add: [SYS_ADMIN, SYS_PTRACE, DAC_READ_SEARCH]
+    security_opt: ["apparmor=unconfined"]
     command: [sh, -c, "test -f /data/sentinel || echo preserved > /data/sentinel; exec sleep 3600"]
     env_file: [config.env]
     environment: {MESSAGE: "${DOTENV_VALUE}"}
@@ -64,7 +67,7 @@ volumes: {data: {}}
 	token := hex.EncodeToString(key)
 	agentName := project + "-agent"
 	journalVolume := project + "-journal"
-	run("run", "-d", "--name", agentName, "-p", "127.0.0.1::8092", "-e", "CUO_AGENT_TOKEN="+token, "-v", "/var/run/docker.sock:/var/run/docker.sock", "-v", dir+":/projects:ro", "-v", journalVolume+":/data", "cuo-agent:0.3.0")
+	run("run", "-d", "--name", agentName, "-p", "127.0.0.1::8092", "-e", "CUO_AGENT_TOKEN="+token, "-v", "/var/run/docker.sock:/var/run/docker.sock", "-v", dir+":/projects:ro", "-v", journalVolume+":/data", "cuo-agent:0.3.1")
 	t.Cleanup(func() {
 		exec.Command("docker", "rm", "-f", agentName).Run()
 		exec.Command("docker", "volume", "rm", journalVolume).Run()
@@ -104,7 +107,7 @@ volumes: {data: {}}
 		if err != nil {
 			t.Fatal(err)
 		}
-		op := Operation{JobID: jobID, ContainerID: id, Source: str(before, "Image"), Target: target, Image: str(obj(before, "Config"), "Image"), Platform: platform}
+		op := Operation{JobID: jobID, ContainerID: id, Source: str(before, "Image"), Target: target, Image: str(obj(before, "Config"), "Image"), Platform: platform, Permissions: monitoringGrants()}
 		request, _ := http.NewRequestWithContext(ctx, "POST", endpoint+"/execute", strings.NewReader(string(marshal(op))))
 		request.Header.Set("Authorization", "Bearer "+token)
 		r, err := client.Do(request)
@@ -133,6 +136,17 @@ volumes: {data: {}}
 			logs, _ := exec.Command("docker", "logs", agentName).CombinedOutput()
 			t.Fatal(last, string(logs))
 		}
+		after, err := d.Inspect(ctx, last.NewID)
+		if err != nil {
+			t.Fatal(err)
+		}
+		for _, key := range []string{"CapAdd", "PidMode", "SecurityOpt", "Privileged"} {
+			a, _ := json.Marshal(obj(before, "HostConfig")[key])
+			b, _ := json.Marshal(obj(after, "HostConfig")[key])
+			if string(a) != string(b) {
+				t.Fatalf("Compose changed host privileges: %s %s != %s", key, a, b)
+			}
+		}
 		return last.NewID
 	}
 	id = update("busybox:1.37.0", strings.Repeat("c", 32))
@@ -146,5 +160,5 @@ volumes: {data: {}}
 	if run("exec", id, "cat", "/binding/marker") != "host-binding" {
 		t.Fatal("subsequent reconciliation lost original host-directory mapping")
 	}
-	t.Log("two real Compose reconciliations preserved desired pins, .env, env_file, named volume and relative host bind across engine-ID changes")
+	t.Log("two real Compose reconciliations preserved selected host capabilities/PID/profile, desired pins, .env, env_file, named volume and relative host bind across engine-ID changes")
 }

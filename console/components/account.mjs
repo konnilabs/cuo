@@ -1,5 +1,5 @@
 import { t } from "../i18n/index.mjs";
-import { Widget, register, h, icon, button, field, select } from "./base.mjs";
+import { Widget, register, h, icon, button, closeButton, field, select } from "./base.mjs";
 import "../.framework/components/xtoggle.js";
 import "../vendor/xdrawer.mjs";
 export function appearance(vm) {
@@ -144,16 +144,7 @@ export class XNotificationCenter extends Widget {
                   "text-btn small",
                 )
               : null,
-            h(
-              "button",
-              {
-                type: "button",
-                class: "icon-btn",
-                "aria-label": t("Benachrichtigungen schließen"),
-                "data-kind": "closeNotifications",
-              },
-              icon("x"),
-            ),
+            closeButton("closeNotifications", t("Benachrichtigungen schließen")),
           ),
         ),
         items.length
@@ -313,7 +304,6 @@ export class XProfileDrawer extends Widget {
         h(
           "div",
           { slot: "footer", class: "profile-footer" },
-          button(t("Schließen"), "closeProfile", "", "", "btn"),
           button(t("Abmelden"), "logout", "", "", "text-btn"),
         ),
       ),

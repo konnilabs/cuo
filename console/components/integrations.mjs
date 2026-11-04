@@ -669,7 +669,6 @@ export class UniOCIArtifactDetail extends IntegrationWidget {
                   ),
                 ),
               ),
-          button(t("Schließen"), "integrationCloseArtifact"),
         ),
       ),
     ];

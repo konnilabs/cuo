@@ -13,6 +13,7 @@
 :root {
   --cuo-navy: #1b2435;
   --cuo-primary: #295bff;
+  --cuo-primary-ink: #fff;
   --cuo-canvas: #f6f9fe;
   --cuo-surface: #fff;
   --cuo-border: #e3e9f3;
@@ -27,6 +28,22 @@
   font-family: var(--font);
   font-size: 13px;
   background: var(--cuo-canvas);
+  color-scheme: light;
+}
+/* Match the system before RMT and the authenticated profile are ready. An
+   explicit shell palette below takes precedence once its theme is resolved. */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --cuo-canvas: #10192a;
+    --cuo-surface: #1a263a;
+    --cuo-text: #edf3ff;
+    --cuo-muted: #b1c0dc;
+    --cuo-border: #536581;
+    --cuo-primary: #8ba6ff;
+    --cuo-primary-ink: #09152b;
+    --cuo-shadow: 0 3px 12px #0002;
+    color-scheme: dark;
+  }
 }
 /* Top-layer RMT widgets inherit the same palette as the shell. */
 :root[data-theme="dark"] {
@@ -710,10 +727,18 @@ x-icon {
 }
 .auth-wrap {
   min-height: 100vh;
-  background: radial-gradient(circle at 55% 30%, #dfeaff, #f4f7fb 55%);
+  min-height: 100svh;
+  background: radial-gradient(
+    circle at 55% 30%,
+    color-mix(in srgb, var(--cuo-primary) 12%, var(--cuo-canvas)),
+    var(--cuo-canvas) 55%
+  );
   display: grid;
   place-items: center;
-  padding: 30px;
+  padding: clamp(16px, 4vw, 30px);
+}
+.auth-wrap > x-cuo-auth {
+  width: min(440px, 100%);
 }
 @media (min-width: 1700px) {
   .main-content {

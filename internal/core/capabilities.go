@@ -13,6 +13,7 @@ var Capabilities = []Capability{
 	{ID: "updates.approve", Label: "Updates freigeben und Sofortläufe starten"},
 	{ID: "policies.manage", Label: "Richtlinien und Wartungsfenster verwalten"},
 	{ID: "execution.monitoring.grant", Label: "Lesenden Host-Monitoring-Zugriff freigeben", Description: "Erlaubt zusätzliche containerbezogene Freigaben; die Host-Prüfungen bleiben wirksam."},
+	{ID: "execution.host-preservation.grant", Label: "Bestehende erweiterte Hostrechte freigeben", Description: "Erlaubt containerbezogene Freigaben zum Erhalten von SYS_ADMIN, SYS_PTRACE, DAC_READ_SEARCH und Host-PID bei Updates. Fügt keine neuen Container-Rechte hinzu.", OwnerOnly: true},
 	{ID: "registry.read", Label: "Autorisierte Registry-Metadaten lesen"},
 	{ID: "registry.manage", Label: "Registry-Verbindungen und Credentials verwalten", Description: "Zugangsdaten können ersetzt, aber nie ausgelesen werden."},
 	{ID: "registry.scan", Label: "Registry-Verbindung prüfen"},

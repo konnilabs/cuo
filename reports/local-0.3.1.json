@@ -1,0 +1,156 @@
+{
+  "version": "0.3.1",
+  "verifiedAt": "2026-11-04T17:09:13.477020+00:00",
+  "status": "local development preview; source is an uncommitted working tree",
+  "source": {
+    "branch": "codex/cuo-0.3.1",
+    "baseCommit": "30323ae78e66463ec06ce2e52e10a3768d155703",
+    "applicationSourceSha256": "72578ee231d8734a4318fe7a44f01fff2a3f7c7f0172357ecb361ce07423a157",
+    "fingerprintScope": "tracked and nonignored application files, excluding reports"
+  },
+  "features": [
+    "container-specific preservation of existing SYS_ADMIN, SYS_PTRACE, DAC_READ_SEARCH and host PID",
+    "nondelegable Owner grant/revoke with reason, acknowledgement and atomic audit",
+    "Compose checks prevent new effective capabilities, changed security restrictions or new host access; Docker implicit label handling is covered",
+    "one accessible X dismissal per modal/drawer; shared header, scrolling, action layout, Escape and native-modal focus trap/return",
+    "German and English permission UI",
+    "system-aware pre-boot/loading, login/enrollment and OIDC-only surfaces use shared theme tokens; explicit authenticated profile palettes remain authoritative"
+  ],
+  "xtend": {
+    "dependencyRevision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "mcpKnowledgeRevision": "681228cee924d2c519cc615f1fd73c095648a0ee",
+    "recipeCatalogAvailable": true,
+    "recipeCatalogEntriesAtVerification": 6,
+    "strictRmtMaracaBuild": "passed",
+    "dependencyUpgradeRequired": false
+  },
+  "validation": {
+    "goRace": "passed",
+    "goVet": "passed",
+    "consoleUnitTests": 40,
+    "toolTests": 5,
+    "disposableStandaloneDockerUpdates": {
+      "ordinaryMonitoring": "passed",
+      "allFourHostGrants": "passed",
+      "missingGrantsBlockedBeforePull": true,
+      "preserved": [
+        "capabilities",
+        "PID mode",
+        "security profile",
+        "volume data",
+        "read-only host mounts",
+        "environment",
+        "labels",
+        "published port",
+        "healthcheck"
+      ]
+    },
+    "disposableComposeReconciliations": {
+      "updates": 2,
+      "passed": true,
+      "preserved": [
+        "capabilities",
+        "host PID",
+        "security profile",
+        "named volume",
+        "relative bind",
+        "env_file",
+        ".env interpolation",
+        "image pins"
+      ]
+    },
+    "composeEscalationRegressionTests": [
+      "additional capabilities",
+      "removed capability drops",
+      "adding Docker-default capabilities after drop ALL",
+      "changed or removed security profiles",
+      "removed no-new-privileges",
+      "new host PID",
+      "new or writable monitoring mounts",
+      "GPU/device requests",
+      "shared IPC or network"
+    ],
+    "browserSurfaceCases": 208,
+    "browserDimensions": {
+      "widths": [
+        390,
+        1119
+      ],
+      "palettes": [
+        "slate",
+        "black",
+        "green",
+        "wine"
+      ],
+      "modes": [
+        "light",
+        "dark"
+      ],
+      "dialogStates": 13
+    },
+    "paletteAndHighContrastCases": 16,
+    "installedBrowser": {
+      "version": "0.3.1",
+      "processX": true,
+      "helpXAndEscapeAndFocus": true,
+      "permissionCheckboxes": 4,
+      "errors": []
+    },
+    "authAppearance": {
+      "cases": 20,
+      "installedCases": 20,
+      "preBootAndDelayedSession": true,
+      "normalLoginEnrollmentAndSsoOnly": true,
+      "systemLightDarkChanges": true,
+      "mobileWidth": 320,
+      "mobileInputFontMinimumPx": 16,
+      "textContrastMinimum": 4.5,
+      "explicitProfilePalettes": 4,
+      "oppositeSystemPreferencesTested": true,
+      "errors": []
+    }
+  },
+  "localDeployment": {
+    "services": {
+      "console": {
+        "id": "f42410da5b6dfdb9df78170822bc14b3182b9e8c4d9bc0dc3389b68000d9e3ae",
+        "imageId": "sha256:9c7de1a2e81dcdaef1db857d8d07282ad4f022427a1387f010510c9894011bc5",
+        "image": "cuo-console:0.3.1",
+        "health": "healthy"
+      },
+      "core": {
+        "id": "a97a655dd42847229bc12a81134fdc3267b481e429ed31877d414a935e334d92",
+        "imageId": "sha256:057463cac3f4e0aeff500861dcccb8b35f6e3e63df386bf0bbb48155de213132",
+        "image": "cuo-core:0.3.1",
+        "health": "healthy"
+      },
+      "agent": {
+        "id": "d50556ff0ca2ad4981ed2562879c3c04c893c47e2e34a65aea0513ed6ba51420",
+        "imageId": "sha256:2b78fc6fdb6d4cb126d55d3fc4a8c586f9c43ea7ea5d6ea791a7a80ef3d3b5ee",
+        "image": "cuo-agent:0.3.1",
+        "health": "healthy"
+      },
+      "zot": {
+        "id": "acc71d6f1f3a930fa1475d07c4159e877ca251f91e1b7732408a80fb866167e4",
+        "imageId": "sha256:be279845926de82a0e3c1421ae4a032eda4792745327d71de3632fd126662b25",
+        "image": "ghcr.io/project-zot/zot-linux-amd64@sha256:b68f727fe35c1eb45b2ae91519dfb0e33192d69b5104882c3e7809b7146c4a02",
+        "health": "healthy"
+      }
+    },
+    "offlineBackupCreatedAndVerified": true,
+    "rollbackImagesRetained": true,
+    "protectedConfigurationArchiveVerified": true,
+    "accountsProfilesSettingsOidcJobsPoliciesWindowsUnchanged": true,
+    "zotContainerAndImageUnchanged": true,
+    "authThemeConsoleOnlyUpdate": true,
+    "authThemeDataFingerprintsUnchanged": true,
+    "authThemePreviousConsoleImageRetained": true
+  },
+  "limits": [
+    "Permissions preserve existing rights only; no new host privileges are added.",
+    "Existing containers receive no automatic grants.",
+    "Privileged mode, unsupported capabilities, writable host-system mounts, devices/GPU, host IPC/network and shared container namespaces remain blocked.",
+    "Local tests do not replace a full accessibility audit or the existing external stable-release gates."
+  ],
+  "initialVerifiedAt": "2026-11-04T16:37:51.232535+00:00"
+}

@@ -106,5 +106,48 @@ test("Owner grant requires warning acknowledgement; administrators preserve gran
     approved.permissionReason,
   );
   assert.equal(commands.at(-1).data.permissionsConfirmed, true);
+  const keys = ["preserveSysAdmin", "preserveSysPtrace", "preserveDacReadSearch", "preserveHostPid"];
+  element.vm = { ...element.vm, policies: [policy], user: { role: "Owner" } };
+  const ownerForm = element.shadowRoot.querySelector("form");
+  for (const key of keys) {
+    assert.equal(ownerForm.elements[key].disabled, false);
+    ownerForm.elements[key].checked = true;
+  }
+  ownerForm.elements.permissionReason.value = "Trusted monitoring image with existing rights";
+  ownerForm.elements.permissionsConfirmed.checked = true;
+  ownerForm.requestSubmit();
+  const granted = { ...policy, ...commands.at(-1).data };
+  for (const key of keys) assert.equal(granted.permissions[key], true);
+  element.vm = {
+    ...element.vm, policies: [granted], user: { role: "Administrator" },
+    capabilities: ["execution.monitoring.grant"],
+  };
+  const immutable = element.shadowRoot.querySelector("form");
+  for (const key of [...keys, "readOnlyHostMonitoring", "permissionReason", "permissionsConfirmed"])
+    assert.equal(immutable.elements[key].disabled, true, key);
+  // A modified DOM still cannot turn off protected permissions or their reason.
+  for (const key of keys) immutable.elements[key].checked = false;
+  immutable.elements.permissionReason.value = "tampered";
+  immutable.requestSubmit();
+  assert.deepEqual(commands.at(-1).data.permissions, granted.permissions);
+  assert.equal(commands.at(-1).data.permissionReason, granted.permissionReason);
+  element.vm = { ...element.vm, user: { role: "Owner" } };
+  const revoke = element.shadowRoot.querySelector("form");
+  for (const key of keys) revoke.elements[key].checked = false;
+  revoke.elements.readOnlyHostMonitoring.checked = false;
+  revoke.requestSubmit();
+  assert.ok(Object.values(commands.at(-1).data.permissions).every((value) => !value));
+  assert.equal(commands.at(-1).data.permissionReason, "");
+  assert.equal(commands.at(-1).data.permissionsConfirmed, false);
+  element.vm = { ...element.vm, policies: [policy] };
+  const global = element.shadowRoot.querySelector("form");
+  global.elements.scope.value = "global";
+  global.elements.preserveSysAdmin.checked = true;
+  global.elements.permissionsConfirmed.checked = true;
+  global.elements.permissionReason.value = "Must not inherit";
+  const before = commands.length;
+  global.requestSubmit();
+  assert.equal(commands.length, before);
+  assert.match(global.elements.target.validationMessage, /Container-Richtlinie/);
   dom.window.close();
 });

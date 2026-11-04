@@ -903,7 +903,7 @@ export class XHostHealth extends Widget {
           { class: "core-heading" },
           h("i", { class: "dot green" }),
           h("strong", {}, t("CUO Core")),
-          h("span", {}, "v0.3.0"),
+          h("span", {}, "v0.3.1"),
         ),
         h(
           "div",

@@ -1,6 +1,8 @@
 import { t } from "../i18n/index.mjs";
 import {
   Widget,
+  closeButton,
+  syncModal,
   register,
   h,
   button,
@@ -287,11 +289,7 @@ export class XCUOProcessDetail extends Widget {
   }
   update() {
     super.update();
-    const dialog = this.content.querySelector("dialog");
-    if (dialog && !dialog.open && this.isConnected) {
-      dialog.showModal();
-      queueMicrotask(() => dialog.querySelector("button")?.focus());
-    }
+    syncModal(this, this.vm.dialog === "process");
   }
   render() {
     const vm = this.vm;
@@ -306,7 +304,7 @@ export class XCUOProcessDetail extends Widget {
             "div",
             { class: "dialog-heading" },
             h("h2", {}, t("Laufdetails werden geladen")),
-            button(t("Schließen"), "close", "", "", "btn"),
+            closeButton(),
           ),
         ),
       ];
@@ -417,7 +415,7 @@ export class XCUOProcessDetail extends Widget {
             h("h2", { id: "process-title" }, r.name),
             h("code", { class: "process-id" }, r.id),
           ),
-          button(t("Schließen"), "close", "", "", "btn"),
+          closeButton(),
         ),
         h(
           "div",

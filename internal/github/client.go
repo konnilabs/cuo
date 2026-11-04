@@ -158,7 +158,7 @@ func (c *Client) request(ctx context.Context, method, path, token string, input,
 	}
 	req.Header.Set("Accept", "application/vnd.github+json")
 	req.Header.Set("X-GitHub-Api-Version", "2026-03-10")
-	req.Header.Set("User-Agent", "CUO/0.3.0")
+	req.Header.Set("User-Agent", "CUO/0.3.1")
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Authorization", "Bearer "+token)
 	response, err := c.HTTP.Do(req)
@@ -370,7 +370,7 @@ func (c *Client) ReleaseArtifact(ctx context.Context, installation, repository, 
 	}
 	req, _ := http.NewRequestWithContext(ctx, "GET", fmt.Sprintf("%s/repos/%s/actions/artifacts/%d/zip", c.BaseURL, repository, found), nil)
 	req.Header.Set("Authorization", "Bearer "+token)
-	req.Header.Set("User-Agent", "CUO/0.3.0")
+	req.Header.Set("User-Agent", "CUO/0.3.1")
 	noRedirect := *c.HTTP
 	noRedirect.CheckRedirect = func(*http.Request, []*http.Request) error { return http.ErrUseLastResponse }
 	response, err := noRedirect.Do(req)
@@ -440,7 +440,7 @@ func ExchangeManifest(ctx context.Context, code string) (ManifestResult, error) 
 	}
 	req, _ := http.NewRequestWithContext(ctx, "POST", "https://api.github.com/app-manifests/"+code+"/conversions", nil)
 	req.Header.Set("Accept", "application/vnd.github+json")
-	req.Header.Set("User-Agent", "CUO/0.3.0")
+	req.Header.Set("User-Agent", "CUO/0.3.1")
 	response, err := guard.HTTP.Do(req)
 	if err != nil {
 		return result, errors.New("GitHub-App-Registrierung nicht erreichbar")
