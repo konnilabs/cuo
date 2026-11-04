@@ -1,8 +1,8 @@
 # Release-Reife des Single-Host-MVP
 
-Stand: **2026-11-03 / 0.3.0**. Vereinbart ist zunächst eine lokal installierbare CUO-Instanz auf einem Linux-Docker-Host, keine verteilte Plattform. Das Repository ist bereits öffentlich. Öffentlicher Quellcode, grüne PR-Prüfungen und ein stabiles, signiertes OCI-Release sind getrennte Zustände. Aktuell ist CUO eine **Entwicklungsvorschau**, die stabile Artefaktfreigabe bleibt offen.
+Stand: **2026-11-04 / 0.3.1**. Vereinbart ist zunächst eine lokal installierbare CUO-Instanz auf einem Linux-Docker-Host, keine verteilte Plattform. Das Repository ist bereits öffentlich. Öffentlicher Quellcode, grüne PR-Prüfungen und ein stabiles, signiertes OCI-Release sind getrennte Zustände. Aktuell ist CUO eine **Entwicklungsvorschau**, die stabile Artefaktfreigabe bleibt offen.
 
-Die lokalen 0.3.0-Nachweise stehen in [`reports/local-0.3.0.json`](../reports/local-0.3.0.json). [`reports/local-0.2.0.json`](../reports/local-0.2.0.json) dokumentiert den historischen 0.2.0-Grundstand. Die älteren [`reports/release-readiness.json`](../reports/release-readiness.json) und [`reports/restore-test.json`](../reports/restore-test.json) gehören zum dokumentierten 0.1-Stand. Sie nennen Zeit, Quellstand und Image-IDs; ein Nachweis aus einem veränderten Arbeitsverzeichnis ist kein signierter Nachweis eines sauberen Release-Tags. Ältere Berichte sind historische Ergebnisse, insbesondere kein aktueller OIDC-, Registry- oder CVE-Status.
+Der lokale 0.3.1-Nachweis steht in [`reports/local-0.3.1.json`](../reports/local-0.3.1.json). Die vorherigen 0.3.0-Nachweise stehen in [`reports/local-0.3.0.json`](../reports/local-0.3.0.json). [`reports/local-0.2.0.json`](../reports/local-0.2.0.json) dokumentiert den historischen 0.2.0-Grundstand. Die älteren [`reports/release-readiness.json`](../reports/release-readiness.json) und [`reports/restore-test.json`](../reports/restore-test.json) gehören zum dokumentierten 0.1-Stand. Sie nennen Zeit, Quellstand und Image-IDs; ein Nachweis aus einem veränderten Arbeitsverzeichnis ist kein signierter Nachweis eines sauberen Release-Tags. Ältere Berichte sind historische Ergebnisse, insbesondere kein aktueller OIDC-, Registry- oder CVE-Status.
 
 ## Produktumfang und spätere Ausbaustufen
 
@@ -14,6 +14,10 @@ Die lokalen 0.3.0-Nachweise stehen in [`reports/local-0.3.0.json`](../reports/lo
 | Hochverfügbare Datenhaltung | Außerhalb des ersten MVP. Ein Core, ein Agent und eine Identity-Instanz mit lokalen Volumes; kein Failover. SQLite nicht von mehreren Core-Replikaten gemeinsam beschreiben. | Eigener ADR für Datenbank/Transaktionen, Leader-/Worker-Koordination, Fencing des Agents, Sessions/Secrets, Event-Zustellung und getesteten Failover. |
 
 Diese Grenzen sind keine Blocker für einen ehrlich so benannten Single-Host-MVP. Sie müssen in README, UI und Release-Text sichtbar bleiben. Sie dürfen erst nach eigener Implementierung und Abnahme als unterstützt gelten.
+
+## Einordnung von 0.3.1
+
+0.3.1 ergänzt containerbezogene Owner-Freigaben zum Erhalten bereits vorhandener SYS_ADMIN-/SYS_PTRACE-/DAC_READ_SEARCH-Capabilities sowie von Host-PID. Die Rechtevergabe wird unabhängig von der delegierbaren lesenden Monitoring-Freigabe geprüft. Native RMT-Dialoge und XTend-Drawer verwenden einen X-Schließen-Button; Dialogkopf, Scrollbereich und Fokusrückgabe folgen gemeinsamen Regeln. Eine Freigabe führt keine neuen Hostrechte ein. Es gibt keine automatische Freigabe vorhandener produktiver Container und keinen Datenbank-Schemawechsel. Externe Release-Gates bleiben offen.
 
 ## Einordnung von 0.3.0
 

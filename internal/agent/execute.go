@@ -3,6 +3,7 @@ package agent
 import (
 	"bufio"
 	"context"
+	"cuo.local/cuo/internal/core"
 	"cuo.local/cuo/internal/unioci"
 	"cuo.local/cuo/internal/watchtower"
 	"encoding/base64"
@@ -96,8 +97,8 @@ func (a *Agent) executeWithRegistry(w http.ResponseWriter, op Operation, access 
 		fail(errors.New("Container changed since scan; scan again"), false)
 		return
 	}
-	if boolean(host, "Privileged") || unsafeCapabilities(asArray(host["CapAdd"])) || len(asArray(host["Devices"])) > 0 || str(host, "PidMode") == "host" || str(host, "IpcMode") == "host" || boolean(host, "AutoRemove") || str(host, "NetworkMode") == "host" || strings.HasPrefix(str(host, "NetworkMode"), "container:") {
-		fail(errors.New("Privileged capabilities, devices, shared host namespaces or auto-remove require manual updates"), false)
+	if e := validateExecutionHost(host, op.Permissions); e != nil {
+		fail(e, false)
 		return
 	}
 	mounts, _ := current["Mounts"].([]any)
@@ -392,6 +393,9 @@ func (a *Agent) reconcileCompose(ctx context.Context, current map[string]any, pi
 		}
 	}
 	remap(desired)
+	if err := validateComposePreservation(obj(services, service), current, op.Permissions); err != nil {
+		return "", err
+	}
 	lockDir := filepath.Join(a.Dir, "compose-locks")
 	if err = os.MkdirAll(lockDir, 0700); err != nil {
 		return "", err
@@ -468,10 +472,16 @@ func controlMount(m map[string]any, allowReadOnlyMonitoring bool) bool {
 
 // Explicitly restating Docker's default capabilities adds no new privilege.
 // All other capabilities, including unknown future ones, remain blocked.
-func unsafeCapabilities(values []any) bool {
+func unsafeCapabilities(values []any, grants ...core.ExecutionPermissions) bool {
 	allowed := map[string]bool{}
-	for _, name := range strings.Fields("AUDIT_WRITE CHOWN DAC_OVERRIDE FOWNER FSETID KILL MKNOD NET_BIND_SERVICE NET_RAW SETFCAP SETGID SETPCAP SETUID SYS_CHROOT") {
+	for _, name := range strings.Fields(dockerDefaultCapabilities) {
 		allowed[name] = true
+	}
+	if len(grants) != 0 {
+		p := grants[0]
+		allowed["SYS_ADMIN"] = p.PreserveSysAdmin
+		allowed["SYS_PTRACE"] = p.PreserveSysPtrace
+		allowed["DAC_READ_SEARCH"] = p.PreserveDacReadSearch
 	}
 	for _, value := range values {
 		name, ok := value.(string)

@@ -47,13 +47,13 @@ func TestPrivateZotScanCopyAndDockerUpdate(t *testing.T) {
 	}()
 	run("volume", "create", volume)
 	run("volume", "create", secretVolume)
-	run("run", "--rm", "--network", "none", "--user", "0", "--mount", "type=volume,source="+secretVolume+",target=/setup", "cuo-core:0.3.0", "provision", "--directory", "/setup", "--registry", "--registry-host", "localhost:5055")
-	raw := run("run", "--rm", "--network", "none", "--user", "0", "--entrypoint", "cat", "--mount", "type=volume,source="+secretVolume+",target=/setup,readonly", "cuo-core:0.3.0", "/setup/zot-client.json")
+	run("run", "--rm", "--network", "none", "--user", "0", "--mount", "type=volume,source="+secretVolume+",target=/setup", "cuo-core:0.3.1", "provision", "--directory", "/setup", "--registry", "--registry-host", "localhost:5055")
+	raw := run("run", "--rm", "--network", "none", "--user", "0", "--entrypoint", "cat", "--mount", "type=volume,source="+secretVolume+",target=/setup,readonly", "cuo-core:0.3.1", "/setup/zot-client.json")
 	var credentials provision.RegistryCredentials
 	if json.Unmarshal([]byte(raw), &credentials) != nil {
 		t.Fatal("invalid fixture bootstrap")
 	}
-	run("run", "--rm", "--network", "none", "--user", "0", "--entrypoint", "chown", "--mount", "type=volume,source="+volume+",target=/registry", "cuo-core:0.3.0", "10001:10001", "/registry")
+	run("run", "--rm", "--network", "none", "--user", "0", "--entrypoint", "chown", "--mount", "type=volume,source="+volume+",target=/registry", "cuo-core:0.3.1", "10001:10001", "/registry")
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
 		t.Fatal(err)

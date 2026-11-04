@@ -96,7 +96,7 @@ export function workspaceSettings(vm) {
   else
     panel = [
       h("h3", {}, t("Lokale Installation")),
-      h("p", {}, t("CUO 0.3.0 · Go Core · XTend Maraca / RMT")),
+      h("p", {}, t("CUO 0.3.1 · Go Core · XTend Maraca / RMT")),
       h(
         "p",
         { class: "muted" },

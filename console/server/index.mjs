@@ -110,7 +110,7 @@ const server = http.createServer(async (req, res) => {
       session = auth.session(req);
     const modifying = !["GET", "HEAD"].includes(req.method);
     if (url.pathname === "/health") {
-      json(res, 200, { ok: true, version: "0.3.0" });
+      json(res, 200, { ok: true, version: "0.3.1" });
       return;
     }
     if (url.pathname === "/auth/oidc/start" && req.method === "GET") {

@@ -1,5 +1,15 @@
 // Reviewed local UI messages. User-authored data and audit logs remain unchanged.
 export const messages = {
+  "SYS_ADMIN beim Update beibehalten": "Preserve SYS_ADMIN during updates",
+  "SYS_PTRACE beim Update beibehalten": "Preserve SYS_PTRACE during updates",
+  "DAC_READ_SEARCH beim Update beibehalten": "Preserve DAC_READ_SEARCH during updates",
+  "Host-PID-Zugriff beim Update beibehalten": "Preserve host PID access during updates",
+  "SYS_ADMIN und Host-PID gewähren weitreichenden Zugriff auf den Host. Nur ein Owner darf diese Freigaben vergeben oder widerrufen. CUO erhält ausschließlich bereits vorhandene Rechte; die Auswahl fügt dem Container keine neuen Rechte hinzu.": "SYS_ADMIN and host PID provide extensive access to the host. Only an Owner may grant or revoke these permissions. CUO preserves existing rights only; selecting these options does not add new container privileges.",
+  "Nur für eine konkrete Container-Richtlinie. Nicht freigegebene Capabilities, privilegierter Modus, Geräte sowie Host-Netzwerk und Host-IPC bleiben gesperrt. Schreibende System-Mounts und direkte Docker-Sockets sind nicht enthalten.": "Available only for a specific container policy. Unapproved capabilities, privileged mode, devices, host networking and host IPC remain blocked. Writable system mounts and direct Docker sockets are not included.",
+  "Ausführungsfreigaben benötigen eine konkrete Container-Richtlinie mit gültiger Ziel-ID.": "Execution permissions require a container-specific policy with a valid target ID.",
+  "Bestehende erweiterte Hostrechte freigeben": "Allow preservation of existing extended host privileges",
+  "Erlaubt containerbezogene Freigaben zum Erhalten von SYS_ADMIN, SYS_PTRACE, DAC_READ_SEARCH und Host-PID bei Updates. Fügt keine neuen Container-Rechte hinzu.": "Allows container-specific permissions to preserve SYS_ADMIN, SYS_PTRACE, DAC_READ_SEARCH and host PID during updates. Does not add new container privileges.",
+  "Bestehende Monitoring-Mounts, ausgewählte Capabilities und Host-PID benötigen ausdrückliche containerbezogene Freigaben. Neue Hostrechte werden bei Updates nicht hinzugefügt.": "Existing monitoring mounts, selected capabilities and host PID require explicit permissions in the specific container policy. No new privileges are added.",
   " überwacht · ": " monitored · ",
   "„Jetzt prüfen“ vergleicht die laufenden Images mit der Registry. Suche, Filter und sortierbare Tabellen helfen bei der Auswahl.":
     "“Check now” compares the current images with the registry. Use search, filters and sortable tables to select containers.",
@@ -148,10 +158,10 @@ export const messages = {
   "Container, Images, Tags oder Events suchen ...":
     "Search containers, images, tags or events ...",
   Containerbestand: "Container inventory",
-  "CUO 0.3.0 · Go Core · XTend Maraca / RMT":
-    "CUO 0.3.0 · Go Core · XTend Maraca / RMT",
-  "CUO 0.3.0 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.":
-    "CUO 0.3.0 is provided under the Apache License 2.0. The application and its resources include third-party components with their own license terms. Product names and trademarks belong to their respective owners.",
+  "CUO 0.3.1 · Go Core · XTend Maraca / RMT":
+    "CUO 0.3.1 · Go Core · XTend Maraca / RMT",
+  "CUO 0.3.1 wird unter der Apache License 2.0 bereitgestellt. Die Anwendung und ihre Ressourcen enthalten Komponenten Dritter mit eigenen Lizenzbedingungen. Produktnamen und Marken gehören ihren jeweiligen Inhabern.":
+    "CUO 0.3.1 is provided under the Apache License 2.0. The application and its resources include third-party components with their own license terms. Product names and trademarks belong to their respective owners.",
   "CUO Core": "CUO Core",
   "CUO Dashboard": "CUO Dashboard",
   "CUO entdeckt Container auf dem lokalen Docker-Host automatisch. Die App erstellt keine beliebigen neuen Workloads.":

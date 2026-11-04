@@ -1,3 +1,4 @@
+import { permissionEditor, collectPermissions, permissionKeys } from "./execution-permissions.mjs";
 import { t } from "../i18n/index.mjs";
 import { workspaceSettings, bindSettingsTabs } from "./workspace-settings.mjs";
 import { appearance, bindAppearance, oidcSettings } from "./account.mjs";
@@ -5,6 +6,8 @@ import { executableCandidates } from "./update-candidates.mjs";
 import { loadNotices, tutorial } from "./help.mjs";
 import {
   Widget,
+  surfaceHeading,
+  syncModal,
   register,
   h,
   icon,
@@ -31,7 +34,7 @@ export class XCUOAuth extends Widget {
           { class: "auth-brand" },
           h("span", { class: "cube-mark" }, icon("cube", "cuo")),
           h("strong", {}, "CUO"),
-          h("span", { class: "muted" }, "v0.3.0"),
+          h("span", { class: "muted" }, "v0.3.1"),
         ),
         h("p", { class: "eyebrow" }, t("CONTAINER UPDATE ORCHESTRATOR")),
         h(
@@ -123,7 +126,7 @@ export class XApprovalDialog extends Widget {
         event,
         (e) => {
           if (
-            ["permissionReason", "permissionsConfirmed"].includes(e.target.name)
+            ["scope", "target", "permissionReason", "permissionsConfirmed"].includes(e.target.name)
           )
             e.target.setCustomValidity("");
         },
@@ -154,14 +157,7 @@ export class XApprovalDialog extends Widget {
           if (this.isConnected && this.vm.dialog === "help") this.update();
         });
     }
-    const dialog = this.content.querySelector("dialog");
-    if (!dialog) return;
-    if (this.vm.dialog && !dialog.open) {
-      dialog.showModal();
-      queueMicrotask(() =>
-        dialog.querySelector("input,select,button")?.focus(),
-      );
-    } else if (!this.vm.dialog && dialog.open) dialog.close();
+    syncModal(this, !!this.vm.dialog && this.vm.dialog !== "process");
   }
   render() {
     const vm = this.vm,
@@ -284,7 +280,7 @@ export class XApprovalDialog extends Widget {
                       "p",
                       { class: "callout small" },
                       t(
-                        "Zusätzlicher Host-Monitoring-Zugriff benötigt eine ausdrückliche containerbezogene Richtlinie. Privilegierte Host-Aktionen und schreibende System-Mounts bleiben gesperrt.",
+                        "Bestehende Monitoring-Mounts, ausgewählte Capabilities und Host-PID benötigen ausdrückliche containerbezogene Freigaben. Neue Hostrechte werden bei Updates nicht hinzugefügt.",
                       ),
                     ),
                     button(
@@ -580,58 +576,7 @@ export class XApprovalDialog extends Widget {
               "1 bis 4 Updates gleichzeitig. Grenzen der globalen, Host- und Gruppenrichtlinien gelten gemeinsam; ohne globale Einstellung bleibt die Grenze 1. Dienste desselben Compose-Projekts werden zum Schutz des gemeinsamen Sollzustands nacheinander aktualisiert. Übergeordnete Ausschlüsse bleiben wirksam.",
             ),
           ),
-          h(
-            "fieldset",
-            { class: "execution-permissions" },
-            h("legend", {}, t("Erweiterte Ausführungsfreigaben")),
-            h(
-              "p",
-              { class: "callout small", role: "note" },
-              t(
-                "Achtung: Monitoring-Mounts geben dem Container Einblick in Host-Prozesse und Systeminformationen. Die Freigabe gilt dauerhaft für Updates dieses Containers, einschließlich automatischer Läufe. Nur für vertrauenswürdige Images aktivieren. Volumes und Anwendungsdaten werden bei einem Fehler nicht automatisch zurückgesetzt.",
-              ),
-            ),
-            h(
-              "label",
-              { class: "checkbox" },
-              h("input", {
-                type: "checkbox",
-                name: "readOnlyHostMonitoring",
-                checked: selected.permissions?.readOnlyHostMonitoring,
-                disabled: !can(vm, "execution.monitoring.grant"),
-              }),
-              t("Bestehende lesende Host-Mounts für Monitoring zulassen"),
-            ),
-            h(
-              "p",
-              { class: "muted small" },
-              t(
-                "Nur für eine Container-Richtlinie. Quelle, Ziel und Readonly-Status werden erhalten. Schreibende System-Mounts und Docker-Sockets benötigen einen eigenen, derzeit nicht unterstützten Freigabetyp. Die Änderung benötigt die Fähigkeit „Lesenden Host-Monitoring-Zugriff freigeben“.",
-              ),
-            ),
-            field(
-              t("Freigabegrund"),
-              "permissionReason",
-              selected.permissionReason || "",
-              "text",
-              {
-                maxlength: 500,
-                disabled: !can(vm, "execution.monitoring.grant"),
-              },
-            ),
-            h(
-              "label",
-              { class: "checkbox" },
-              h("input", {
-                type: "checkbox",
-                name: "permissionsConfirmed",
-                disabled: !can(vm, "execution.monitoring.grant"),
-              }),
-              t(
-                "Ich habe die Auswirkungen geprüft und bestätige den Host-Zugriff.",
-              ),
-            ),
-          ),
+          permissionEditor(vm, selected, can),
           h(
             "button",
             { class: "btn primary", type: "submit" },
@@ -730,7 +675,7 @@ export class XApprovalDialog extends Widget {
           h(
             "button",
             { type: "submit", class: "btn primary" },
-            kind === "approve" ? t("Freigeben") : t("Abbrechen"),
+            kind === "approve" ? t("Freigeben") : t("Job abbrechen"),
           ),
         ),
       ];
@@ -777,12 +722,7 @@ export class XApprovalDialog extends Widget {
           "aria-labelledby": "dialog-title",
           class: kind === "help" ? "help-dialog" : "",
         },
-        h(
-          "div",
-          { class: "dialog-heading" },
-          h("h2", { id: "dialog-title" }, title),
-          button("", "close", "", "", "icon-btn", "close"),
-        ),
+        surfaceHeading(title),
         h("div", { class: "dialog-content" }, body),
       ),
     ];
@@ -807,37 +747,10 @@ export class XApprovalDialog extends Widget {
       data.excluded = bool(data.excluded);
       data.concurrency = Number(data.concurrency);
       const previous = (this.vm.policies || []).find((p) => p.id === id);
-      if (can(this.vm, "execution.monitoring.grant")) {
-        const enabled = bool(data.readOnlyHostMonitoring);
-        const confirmation = form.elements.namedItem("permissionsConfirmed");
-        const reason = form.elements.namedItem("permissionReason");
-        confirmation.setCustomValidity("");
-        reason.setCustomValidity("");
-        if (enabled && !bool(data.permissionsConfirmed)) {
-          confirmation.setCustomValidity(
-            t("Bestätige zuerst den Warnhinweis zum Host-Zugriff."),
-          );
-          confirmation.reportValidity();
-          return;
-        }
-        if (enabled && String(data.permissionReason || "").trim().length < 3) {
-          reason.setCustomValidity(
-            t("Bitte gib einen Freigabegrund mit mindestens drei Zeichen an."),
-          );
-          reason.reportValidity();
-          return;
-        }
-        data.permissions = { readOnlyHostMonitoring: enabled };
-        data.permissionsConfirmed = enabled && bool(data.permissionsConfirmed);
-        data.permissionReason = enabled
-          ? String(data.permissionReason).trim()
-          : "";
-      } else {
-        data.permissions = previous?.permissions || {};
-        data.permissionReason = previous?.permissionReason || "";
-        data.permissionsConfirmed = previous?.permissionsConfirmed || false;
-      }
-      delete data.readOnlyHostMonitoring;
+      const grants = collectPermissions(form, this.vm, previous, can);
+      if (!grants) return;
+      Object.assign(data, grants);
+      for (const key of permissionKeys) delete data[key];
     }
     if (["execute", "approveJob", "cancelJob"].includes(kind)) {
       data.confirmed = bool(data.confirmed);

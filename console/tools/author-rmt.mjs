@@ -109,7 +109,7 @@ const sidebar = el(
           [
             el("div", { class: "brand-name" }, [
               text("strong", "CUO"),
-              text("small", "v0.3.0"),
+              text("small", "v0.3.1"),
             ]),
             text("p", "Container Update Orchestrator"),
           ],

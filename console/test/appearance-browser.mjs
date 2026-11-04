@@ -6,6 +6,7 @@ import path from "node:path";
 import http from "node:http";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { verifySurfaceDesign } from "./surface-browser-checks.mjs";
 const { chromium } = await import(
   process.env.CUO_PLAYWRIGHT_MODULE || "playwright"
 );
@@ -206,10 +207,10 @@ try {
     await page.locator(".global-search kbd").textContent(),
     "Alt + K",
   );
-  assert.equal(await page.locator(".brand-name small").textContent(), "v0.3.0");
+  assert.equal(await page.locator(".brand-name small").textContent(), "v0.3.1");
   assert.equal(
     (await (await context.request.get(origin + "/health")).json()).version,
-    "0.3.0",
+    "0.3.1",
   );
   // Render the real widgets through their public VM contract, without remote
   // integrations or writes. Keep them outside the visible application surface.
@@ -662,7 +663,7 @@ try {
     .getByRole("heading", { name: "Anomalies & data quality" })
     .waitFor();
   assert.match(await details.textContent(), /Gespeicherter Originaltext/);
-  await details.getByRole("button", { name: "Close", exact: true }).click();
+  await details.getByRole("button", { name: "Close dialog", exact: true }).click();
   await page
     .getByRole("button", { name: "Open your profile", exact: true })
     .click();
@@ -691,7 +692,7 @@ try {
     fullPage: true,
   });
   await drawer
-    .getByRole("button", { name: "Close", exact: true })
+    .getByRole("button", { name: "Close drawer", exact: true })
     .last()
     .click();
   await page.setViewportSize({ width: 390, height: 844 });
@@ -751,7 +752,7 @@ try {
     fullPage: true,
   });
   await drawer
-    .getByRole("button", { name: "Close", exact: true })
+    .getByRole("button", { name: "Close drawer", exact: true })
     .last()
     .click();
   // System language changes refresh automatic mode without saving profile data.
@@ -770,6 +771,7 @@ try {
   await login.getByLabel("Username", { exact: true }).waitFor();
   assert.equal(await login.locator("html").getAttribute("lang"), "en");
   await unsupported.close();
+  const surfaceDesign = await verifySurfaceDesign(page, out);
   assert.deepEqual(errors, []);
   fs.writeFileSync(
     path.join(out, "result.json"),
@@ -787,6 +789,7 @@ try {
         inactiveToggleLabelHidden: true,
         profileToggleBothStates: true,
         dataAndNamesPreserved: true,
+        surfaceDesign,
         keyboardTabs: true,
         mobile: true,
         forcedColorsSmoke: true,

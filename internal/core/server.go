@@ -110,7 +110,7 @@ func fail(w http.ResponseWriter, status int, code, msg string) {
 }
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/health" {
-		respond(w, 200, map[string]any{"ok": true, "version": "0.3.0"})
+		respond(w, 200, map[string]any{"ok": true, "version": "0.3.1"})
 		return
 	}
 	if subtle.ConstantTimeCompare([]byte(r.Header.Get("Authorization")), []byte("Bearer "+s.Token)) != 1 {
@@ -429,16 +429,20 @@ func (s *Server) mutate(path, method string, body []byte, p Principal) (int, any
 		var previous Policy
 		_ = store.Get("policy", policy.ID, &previous)
 		permissionChanged := policy.Permissions != previous.Permissions || policy.PermissionReason != previous.PermissionReason
-		if previous.Permissions.ReadOnlyHostMonitoring || policy.Permissions.ReadOnlyHostMonitoring {
+		if previous.Permissions.Any() || policy.Permissions.Any() {
 			permissionChanged = permissionChanged || previous.Scope != policy.Scope || previous.Target != policy.Target
 		}
-		if permissionChanged && !store.Allows(p, "execution.monitoring.grant") {
+		grantCapability := "execution.monitoring.grant"
+		if previous.Permissions.Elevated() || policy.Permissions.Elevated() {
+			grantCapability = "execution.host-preservation.grant"
+		}
+		if permissionChanged && !store.Allows(p, grantCapability) {
 			return 403, map[string]string{"code": "CAPABILITY_REQUIRED", "message": "Ausführungsfreigaben benötigen eine gesonderte Rollenberechtigung"}
 		}
 		if e := ValidatePolicy(policy); e != nil {
 			return bad("INVALID_POLICY", e.Error())
 		}
-		if policy.Permissions.ReadOnlyHostMonitoring {
+		if policy.Permissions.Any() {
 			var container Container
 			if store.Get("container", policy.Target, &container) != nil || !p.Host(container.HostID) {
 				return bad("INVALID_CONTAINER", "Die Ausführungsfreigabe benötigt einen vorhandenen, zugänglichen Container")
