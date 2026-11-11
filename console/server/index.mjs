@@ -8,6 +8,7 @@ import { createNodeAppServiceHost } from "../.framework/xtend-maraca/node-app-se
 import services from "../dist/server/xtend.maraca.services.mjs";
 import { Auth, ranks } from "./auth.mjs";
 import { OIDC } from "./oidc.mjs";
+import { isPublicAsset, assetContentType } from "./public-assets.mjs";
 const root = fileURLToPath(new URL("../dist", import.meta.url)),
   auth = new Auth(process.env.CUO_AUTH_DATA || "/data"),
   origin = process.env.CUO_ORIGIN || "http://127.0.0.1:8095",
@@ -95,7 +96,7 @@ const authPending = { enrollment: false };
 const server = http.createServer(async (req, res) => {
   res.setHeader(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://github.com; require-trusted-types-for 'script'",
+    "default-src 'self'; script-src 'self'; worker-src 'self'; manifest-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self' https://github.com; require-trusted-types-for 'script'",
   );
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "no-referrer");
@@ -517,11 +518,7 @@ const server = http.createServer(async (req, res) => {
     const requested = decodeURIComponent(
       url.pathname === "/" ? "/index.html" : url.pathname,
     );
-    if (
-      !/^\/(?:index\.html|xtend\.maraca\.(?:mjs|css)|boot\.mjs|favicon\.svg|assets\/[a-zA-Z0-9_.-]+|chunks\/[a-zA-Z0-9_.-]+\.mjs|runtime\/[a-zA-Z0-9_.-]+\.(?:mjs|js))$/.test(
-        requested,
-      )
-    ) {
+    if (!isPublicAsset(requested)) {
       json(res, 404, { message: "Nicht gefunden" });
       return;
     }
@@ -530,18 +527,15 @@ const server = http.createServer(async (req, res) => {
       json(res, 404, { message: "Nicht gefunden" });
       return;
     }
-    const type =
-      {
-        ".html": "text/html; charset=utf-8",
-        ".mjs": "text/javascript; charset=utf-8",
-        ".js": "text/javascript; charset=utf-8",
-        ".ttf": "font/ttf",
-        ".css": "text/css; charset=utf-8",
-        ".woff2": "font/woff2",
-        ".svg": "image/svg+xml",
-        ".json": "application/json; charset=utf-8",
-      }[path.extname(filename)] || "application/octet-stream";
+    const type = assetContentType(filename);
     const headers = { "Content-Type": type, "Cache-Control": "no-cache" };
+    if (requested === "/xtend.service-worker.js") {
+      headers["Service-Worker-Allowed"] = "/";
+      // A worker has no DOM sinks. Its separate policy permits only same-origin
+      // imports and fetches; the document keeps its strict Trusted Types policy.
+      headers["Content-Security-Policy"] =
+        "default-src 'none'; script-src 'self'; connect-src 'self'";
+    }
     if (req.method === "HEAD") {
       res.writeHead(200, headers);
       res.end();

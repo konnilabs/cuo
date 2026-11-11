@@ -29,6 +29,12 @@ docker compose up -d
 
 Bei abweichendem Port `CUO_PORT` **und** `CUO_ORIGIN` in `.env` anpassen. Für Zugriff von anderen Rechnern einen TLS-Reverse-Proxy verwenden und `CUO_ORIGIN=https://cuo.example.org` setzen. Der BFF verweigert einen unverschlüsselten Origin außerhalb von Loopback. Der Proxy muss den Origin erhalten und SSE ohne Pufferung weiterleiten. Eine optionale Caddy-Vorlage liegt in `deploy/Caddyfile.example`.
 
+## Als Web-App installieren (PWA)
+
+Die Console erzeugt Manifest und Service Worker nativ beim **XTend-Maraca-Build**. Auf `localhost`/`127.0.0.1` sowie über einen HTTPS-Origin lässt sich CUO in unterstützten Browsern als eigenständige App installieren: über das Installationssymbol bzw. Browsermenü, auf iOS über **Teilen → Zum Home-Bildschirm**. CUO liefert eigene 192-/512-Pixel-App-Icons und ein Apple-Touch-Icon. Die Browser entscheiden, wann sie eine Installation anbieten.
+
+Ohne Serververbindung erscheint eine helle/dunkle Offline-Seite mit einer Möglichkeit zum erneuten Verbinden. Anmeldung, Containerdaten, Logs und Änderungen benötigen weiterhin den Server. Der Cache enthält ausschließlich öffentliche Shell-Dateien; Zugangsdaten, API-Antworten, Exporte und schreibende Aktionen werden nicht offline gespeichert oder nachträglich abgesendet. Ein neuer Build erhält einen neuen Cache-Schlüssel; Maraca aktiviert den Worker und bereinigt alte Shell-Caches. Die neue App-Oberfläche wird beim nächsten Öffnen oder Neuladen verwendet. Die PWA ersetzt keine Sicherung der Serverdaten.
+
 ## Anmeldung und persönliche Einstellungen
 
 Unter **Integrationen → OpenID Connect** kann der Owner einen OIDC-Provider konfigurieren. Im Provider einen Web-Client für **Authorization Code Flow mit PKCE (S256)** anlegen und die in CUO angezeigte **Redirect-URI** exakt übernehmen, lokal normalerweise `http://127.0.0.1:8095/auth/oidc/callback`. Bei einem Reverse-Proxy zählt der öffentliche `CUO_ORIGIN`.

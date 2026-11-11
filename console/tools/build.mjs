@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { spawnSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
+import { preparePwaBuild, finishPwaBuild } from "./pwa.mjs";
 process.chdir(fileURLToPath(new URL("..", import.meta.url)));
 fs.mkdirSync("reports", { recursive: true });
 function run(args, report) {
@@ -23,12 +24,13 @@ run(["tools/audit-source.mjs"]);
 run([".framework/node_modules/typescript/bin/tsc", "--noEmit"]);
 const cli = ".framework/xtend-builder/bin/xt";
 run([cli, "rmt", "lint", "src/app.rmt", "--json"], "rmt-lint.json");
+const pwa = preparePwaBuild(process.cwd());
 run(
-  [cli, "maraca", "plan", "--config", "maraca.config.json", "--json"],
+  [cli, "maraca", "plan", "--config", pwa.configFile, "--json"],
   "maraca-plan.json",
 );
 run(
-  [cli, "maraca", "build", "--config", "maraca.config.json", "--json"],
+  [cli, "maraca", "build", "--config", pwa.configFile, "--json"],
   "maraca-build.json",
 );
 run(["tools/harden-runtime.mjs"]);
@@ -68,7 +70,7 @@ function publicModes(directory) {
 publicModes("dist/assets");
 fs.writeFileSync(
   "dist/boot.mjs",
-  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),lazyStrategy:'eager',actionHistoryLimit:10,commandHistoryLimit:10,stateProjectionWriteHistoryLimit:0,stateProjectionReadHistoryLimit:20,diagnosticLimit:100});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
+  `import {bootXtendMaraca} from './xtend.maraca.mjs';\nimport {serviceWorkerUrl} from './assets/cuo-pwa-registration.mjs';\nawait bootXtendMaraca({root:document.getElementById('xtend-maraca-root'),serviceWorkerUrl:serviceWorkerUrl(),lazyStrategy:'eager',actionHistoryLimit:10,commandHistoryLimit:10,stateProjectionWriteHistoryLimit:0,stateProjectionReadHistoryLimit:20,diagnosticLimit:100});\nawait window.XTendMaraca.dispatchCommand('cuo.intent',{kind:'boot'});\n`,
 );
 let html = fs
   .readFileSync("dist/index.html", "utf8")
@@ -82,7 +84,13 @@ let html = fs
     "<title>CUO · Container Update Orchestrator</title>",
   )
   .replace('src="./xtend.maraca.mjs"', 'src="./boot.mjs"');
+html = html.replace(
+  "</head>",
+  '<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png"><meta name="theme-color" content="#10192a"><meta name="apple-mobile-web-app-title" content="CUO"></head>',
+);
 fs.writeFileSync("dist/index.html", html);
+finishPwaBuild(process.cwd(), pwa.fingerprint);
+publicModes("dist/icons");
 console.log(
   "CUO: TypeScript, source gate, RMT lint and strict Maraca build passed.",
 );
