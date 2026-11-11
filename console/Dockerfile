@@ -10,6 +10,7 @@ COPY console/shared ./shared
 COPY console/i18n ./i18n
 COPY console/components ./components
 COPY console/assets ./assets
+COPY console/pwa ./pwa
 COPY console/brands ./brands
 COPY console/tools ./tools
 COPY console/server ./server

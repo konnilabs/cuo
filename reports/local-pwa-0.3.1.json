@@ -1,0 +1,77 @@
+{
+  "version": "0.3.1",
+  "verifiedAt": "2026-11-11T22:33:25.853Z",
+  "status": "Local development preview; not a stable release",
+  "source": {
+    "branch": "codex/cuo-maraca-pwa",
+    "baseCommit": "b2d298a6487cfeb7e3e40298300689e83a2bf9e9",
+    "applicationBuildInputsSha256": "4b2f5ace006010912ba752f702d063c5e36268775884c074dc1474b6ede0b385"
+  },
+  "xtend": {
+    "mcpKnowledgeRevision": "8dcc2503740d884ab8901d28f0456ebbe786fa7e",
+    "mcpResource": "xtend://docs/en/xtend-maraca",
+    "dependencyRevision": "0e2e7c9e7ee3cf7316ff8b9073ec033e7c7d0836",
+    "dependencyChanged": false,
+    "nativeGenerators": [
+      "Web App Manifest Assistant",
+      "PWA Service Worker Assistant"
+    ]
+  },
+  "pwa": {
+    "cacheVersion": "xtend-maraca-pwa-686e3e36a5ea",
+    "cacheMode": "cuo-public-shell-4b2f5ace006010912ba752f7",
+    "generated": true,
+    "businessLogicImport": "./assets/cuo-pwa-policy.js",
+    "manifest": {
+      "name": "CUO · Container Update Orchestrator",
+      "short_name": "CUO",
+      "start_url": "./",
+      "scope": "./",
+      "display": "standalone",
+      "background_color": "#10192a",
+      "theme_color": "#10192a",
+      "description": "Container, Updates und Wartungsfenster auf deinem Docker-Host verwalten.",
+      "icons": [
+        {
+          "src": "icons/android-chrome-192x192.png",
+          "sizes": "192x192",
+          "type": "image/png",
+          "purpose": "any"
+        },
+        {
+          "src": "icons/android-chrome-512x512.png",
+          "sizes": "512x512",
+          "type": "image/png",
+          "purpose": "any"
+        }
+      ]
+    },
+    "publicCachedFiles": 38,
+    "privateResponseCaching": false,
+    "offlineMutations": false
+  },
+  "validation": {
+    "strictRmtMaracaBuild": "passed",
+    "consoleUnitTests": 44,
+    "authAppearanceCases": 20,
+    "sourceBrowserCases": 2,
+    "installedBrowserCases": 2,
+    "installabilityErrors": [],
+    "cacheRotationWithChangedPublicAsset": "passed",
+    "privateNetworkBoundaries": "passed",
+    "mobileOfflineDarkAppearance": "passed",
+    "reconnection": "passed"
+  },
+  "localDeployment": {
+    "consoleImageId": "sha256:36a32546e7b34940635b62321100683c31ba80a6a0bcb94bea8afb72ad39036a",
+    "allFourServicesHealthy": true,
+    "identityBackupIntegrity": "passed",
+    "accountsProfilesAndOidcPreserved": true,
+    "coreAgentZotIdsUnchanged": true
+  },
+  "limitations": [
+    "Installability and offline behavior tested in Chromium; Safari/iOS installation on a physical device is not verified.",
+    "API data and all management actions require a reachable CUO server.",
+    "The existing release gates remain in force."
+  ]
+}

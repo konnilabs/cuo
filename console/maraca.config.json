@@ -20,6 +20,25 @@
       "src/app.rmt",
       "src/app.css"
     ],
+    "webAppManifest": {
+      "enabled": true,
+      "name": "CUO · Container Update Orchestrator",
+      "shortName": "CUO",
+      "startUrl": "./",
+      "scope": "./",
+      "display": "standalone",
+      "backgroundColor": "#10192a",
+      "themeColor": "#10192a",
+      "description": "Container, Updates und Wartungsfenster auf deinem Docker-Host verwalten."
+    },
+    "pwa": {
+      "enabled": true,
+      "updateMode": "auto",
+      "offlineFallback": true,
+      "serviceWorker": {
+        "businessLogicImport": "./assets/cuo-pwa-policy.js"
+      }
+    },
     "services": {
       "clientEntry": "src/services.ts",
       "serverEntry": "src/server-services.ts",
